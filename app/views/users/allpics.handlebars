@@ -1,0 +1,83 @@
+<!--  all pics for a defined user   -->
+
+<!--  scripts for Google Maps -->
+<!--
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAE03QBe5yDXRr1fzDvkWs9i_E_BIyCDhk&libraries=places" async
+ defer></script>
+<script src="https://apis.google.com/js/api.js" type="text/javascript"></script>
+-->
+<div id="varb-in" data-user-id="{{user_id}}"></div>
+
+<h2> All Pictures On Server for a user </h2>
+<button class='btn btn-primary btn-back' id="btn-back">Back</button>
+<button class='btn btn-primary' id="btn-delete-pics">Delete All Pics</button>
+<hr>
+
+<table style="width:100%" class="table table-bordered table-condensed table-hover">
+	<tr>
+		<strong>
+			<th>#</th>
+			<th>Picture</th>
+			<th>FileName</th>
+		</strong>
+	</tr>
+	{{#each outputLines}}
+	<tr>
+		<td>
+			<h5>{{this.recNum}}</h5>
+		</td>
+		<td>
+			<img class="img-item" width="320" height="240" src="{{this.imgSrc}}">
+		</td>
+		<td>
+			<h5>{{this.descripString}}</h5>
+		</td>
+	</tr>
+	{{/each}}
+</table>
+
+
+
+<br/>
+<br/>
+<br/>
+<br/>
+
+<script type="text/javascript" src="../../javascript/numeral.js"></script>
+
+
+
+<script>
+	var global_user_id;
+
+	$(document).ready(function () {
+		//document is ready, so move the incoming data over
+		//		global_user_id = $("#varb-in").attr("data-user-id");
+		//		$(document.body).on("click", "#btn-users", function () {
+		//			window.location = "/admin/admin_users";
+		//		});
+		//		$(document.body).on("click", "#btn-log", function () {
+		//			window.location = "/admin/log-disp";
+		//		});
+		global_user_id = $("#varb-in").attr("data-user-id");
+		$(document.body).on("click", "#btn-delete-pics", function () {
+			$.post("/users/deleteAllPics",   //delete all pics, not users !!!
+				{
+					//object that gets sent out is here 
+					user_id: global_user_id,
+				},
+				function (data, status) {
+					if (data.errCode === 0) {
+						//there is no error
+						window.location.reload(true);
+					} else {
+						console.log("err code " + data.errCode);
+						/*
+						there is some kind of error 
+						*/
+					};
+				});
+		});
+	});
+
+</script>

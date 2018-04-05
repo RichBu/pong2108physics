@@ -1,0 +1,302 @@
+<div id="varb-storage" data-user-id="{{user_id}}" data-device-id="{{device_id}}" data-tim-int="{{commTimeInt}}" data-pic-int="{{commPromptInt}}">
+
+</div>
+<div class="row">
+	<video id="video" width="320" height="240" autoplay></video>
+	<canvas id="canvas" width="320" height="240"></canvas>
+	<img class="img-item" id="snap">
+</div>
+<br/>
+<br/>
+
+<div id="varb-in" data-tim-int={{commTimeInt}}></div>
+<div class="row">
+	<div class="col-md-4">
+		<div class="row">
+			<div class="panel panel-default">
+				<div class="panel-heading">Self Timer</div>
+				<div class="panel-body">
+					<h4 id="timeLeft" data-comm-stop="{{commStopAuto}}">{{timerInterval}}</h4>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="row">
+	<div class="col-md-4">
+		<div class="row">
+			<div class="panel panel-default">
+				<div class="panel-heading">From Camera</div>
+				<div class="panel-body">
+					<div class="col-md-6">
+						<button class="btn btn-primary" style="width: 90%;" id="snapButton">Snap Photo</button>
+					</div>
+					<div class="col-md-6">
+						<button id="sendButton" style="width: 90%;" class="btn btn-primary sendButton">Send Pic</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-4">
+		<div class="row">
+			<div class="panel panel-default">
+				<div class="panel-heading">Existing Picture</div>
+				<div class="panel-body">
+					<form action="/picture/create" enctype="multipart/form-data" method="post" id="form">
+						<input style="display: none;" type="text" name="title">
+						<br/>
+						<input class="btn btn-primary" type="file" name="upl" id="filename">
+						<br/>
+						<input type="submit" class="btn btn-primary" id="submitButton">
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<br/>
+
+
+<p class="clear">
+	{{logged_in}} | {{{ body }}}
+
+	<script>
+		var snap;
+		var snapAfter;
+		var myBlob;
+		var formData;
+
+		var take_photo_btn;
+		var image;
+		var video;
+		var submitButton;
+		var submitClick;
+		var hidden_canvas;
+
+		var cameraStillTaken = false;
+		var autoPictSendInProg = false;
+		var timeInterval;     	//time interval for pics
+		var myIntervalTimer;  	//handle to interval timer
+		//var myCommStatTimer; 	//timer for the comm status
+		var commStatTimerInt = 3; 	//interval 
+		var commStopAuto; //stop the auto pics
+
+		var global_User_Id;
+		var global_Device_Id;
+		var global_Email_Id;
+
+
+		var sendImageClick = function (isAutoPic) {
+			//if it is auto pic then reload next time
+			//if it is not, reload the page
+			console.log("sending image");
+			var full_url = "/picture/create-img/" + parseInt(global_User_Id) + "/" + parseInt(global_Device_Id);
+
+			try {
+				snapAfter = hidden_canvas.toDataURL('image/png');
+				myBlob = new Blob([image.src], { type: "image/png" });
+
+				$.ajax({
+					type: "POST",
+					url: full_url,
+					data: myBlob,
+					processData: false,
+					ContentType: false,
+					method: "POST",
+					success: function (r) {
+						//console.log("result", r);
+						//a send was successful 
+						autoPictSendInProg = false;
+						hidden_canvas.style.display = "none";
+						if (!isAutoPic) {
+							//not auto pic so reload the page
+							window.location.reload(false); //reload from cache
+						};
+					},
+					error: function (e) {
+						console.log(e);
+					}
+				});
+			}
+			catch (e) {
+				console.log("storage failed #2 : " + e);
+			};
+		};
+
+
+		var takeSnapshot = function () {
+			// Here we're using a trick that involves a hidden canvas element.  
+
+			hidden_canvas = document.querySelector('canvas');
+			var context = hidden_canvas.getContext('2d');
+
+			var width = video.videoWidth,
+				height = video.videoHeight;
+
+			if (width && height) {
+
+				// Setup a canvas with the same dimensions as the video.
+				hidden_canvas.width = width;
+				hidden_canvas.height = height;
+
+				context.drawImage(video, 0, 0, width, height);
+
+				// Turn the canvas image into a dataURL that can be used as a src for our photo.
+				// the returned value can be used to upload the image
+				return hidden_canvas.toDataURL('image/png');
+			};
+		};
+
+
+		var initSnapShot = function () {
+			snap = takeSnapshot();
+
+			// Show image. 
+			image.setAttribute('src', snap);
+			image.classList.add("visible");
+			image.setAttribute('width', 320)
+			image.setAttribute('height', 240)
+			video.style.display = "none";
+			hidden_canvas.style.display = "none";
+
+			video.pause();
+		};
+
+
+		var autoPictSend = function () {
+			autoPictSendInProg = true;
+			initSnapShot();
+			takeSnapshot();
+			sendImageClick();  //send and save the image
+		};
+
+
+		$(document.body).on("click", ".sendButton", function () {
+			sendImageClick(false);
+		});
+		//$(document.body).on("load", ".img-item", sendClick);
+
+
+		$(document).ready(function () {
+			global_Device_Id = $("#varb-storage").attr("data-device-id");
+			global_User_Id = $("#varb-storage").attr("data-user-id");
+			timeInterval = $("#timeLeft").text();
+			console.log("time interval=" + timeInterval);
+			var tempStr = $("#timeLeft").attr("data-comm-stop").toLowerCase();
+			console.log(tempStr);
+			if ($("#timeLeft").attr("data-comm-stop").toLowerCase() === "true") {
+				commStopAuto = true;
+			} else {
+				commStopAuto = false;
+			};
+
+			hidden_canvas = document.querySelector('canvas')
+			hidden_canvas.style.display = "none";
+			take_photo_btn = document.querySelector('#snapButton');
+			$('#snapButton').text("Snap Photo");
+			image = document.querySelector('#snap');
+			video = document.getElementById('video');
+			submitButton = document.querySelector('#sendButton');
+
+			myIntervalTimer = setInterval(function () {
+				//update timer for every second
+				//stop this timer using  clearInterval( myIntervalTimer )
+				if (commStopAuto) {
+					//not taking pics, but still communicating
+					commStatTimerInt--; //status timer
+					if (commStatTimerInt <= 0) {
+						//time to prompt for update
+						$.post("/picture/statcheck",
+							{
+								//object that gets sent out is here 
+								user_id: global_User_Id,
+								device_id: global_Device_Id,
+								//user_email: global_User_Email
+							},
+							function (data, status) {
+								if (data.errCode === 0) {
+									commStatTimerInt = data.commPromptInt;
+									timerInterval = data.timerInterval;
+									commStopAuto = data.commStopAuto;
+									//window.location.reload(true);
+								} else {
+									console.log("err code " + data.errCode);
+									/*
+									there is some kind of error 
+									*/
+								};
+							});
+					};
+				} else {
+					timeInterval--;
+					if (timeInterval <= 0) {
+						//time out, but don't send if one is in progress
+						if (!autoPictSendInProg) {
+							autoPictSend();
+						};
+					} else {
+						//keep timing
+						$("#timeLeft").text(timeInterval);
+					};
+				}
+			}, 1000);
+
+			//if (commStopAuto) clearInterval(myIntervalTimer);
+
+			navigator.mediaDevices.getUserMedia(
+				// Options
+				{
+					video: true
+				}).then(
+					// Success Callback
+					function (mediaStream) {
+						// Create an object URL for the video stream and
+						// set it as src of our HTLM video element.
+						if (window.webkitURL) {
+							video.src = window.webkitURL.createObjectURL(mediaStream);
+							localMediaStream = mediaStream;
+						} else if (video.mozSrcObject != undefined) {
+							video.mozSrcObject = mediaStream;
+						} else if (video.srcObject !== undefined) {
+							video.srcObject = mediaStream;
+						} else {
+							video.src = mediaStream;
+						};
+
+						// Play the video element to show the stream to the user.
+						//to hide it, change its 
+						video.onloadedmetadata = function (e) {
+							video.play();
+						};
+					}).catch(
+						// Error Callback
+						function (err) {
+							// Most common errors are PermissionDenied and DevicesNotFound.
+							console.error(err);
+
+						}
+					);
+
+			take_photo_btn.addEventListener("click", function (e) {
+				e.preventDefault();
+				if (cameraStillTaken) {
+					//picture was already taken
+					//so reload the page
+					window.location.reload(true);
+				} else {
+					initSnapShot();
+					cameraStillTaken = true;
+					$('#snapButton').text("Retake Picture");
+				};
+			});
+		});
+
+	</script>

@@ -1,0 +1,180 @@
+<!--   
+
+-->
+<div id="varb-storage" data-time-started="{{time_started}}" data-samp-time="{{samp_time_ball}}" data-is-running="{{isRunning}}"
+ data-time-stopped="{{time_stopped}}">
+
+</div>
+<br/>
+
+<div id="varb-in" data-tim-int={{commTimeInt}}></div>
+<div class="row">
+	<div class="col-md-3">
+		<div class="row">
+			<div class="panel panel-primary">
+				<div class="panel-heading">Time Started</div>
+				<div class="panel-body">
+					<!--
+					<input style="width: 90%; margin: 5px 0px 5px 0px;" type="password" name="user_password" id="user_password" placeholder="time started">
+					-->
+					<h4 id="time_started">{{time_started}}</h4>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-1">
+	</div>
+	<div class="col-md-3">
+		<div class="row">
+			<div class="panel panel-primary">
+				<div class="panel-heading">Time Stopped</div>
+				<div class="panel-body">
+					<!--
+					<input style="width: 90%; margin: 5px 0px 5px 0px;" type="password" name="user_password" id="user_password" placeholder="time started">
+					-->
+					<h4 id="time_started">{{time_stopped}}</h4>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-1">
+	</div>
+	<div class="col-md-3">
+		<div class="row">
+			<div class="panel panel-primary">
+				<div class="panel-heading">Time Elapsed</div>
+				<div class="panel-body">
+					<!--
+					<input style="width: 90%; margin: 5px 0px 5px 0px;" type="password" name="user_password" id="user_password" placeholder="time started">
+					-->
+					<h4 id="time_elapsed">{{time_elapsed}}</h4>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-3">
+		<div class="row">
+			<button class='btn btn-success' id="btn-start">Start Engine</button>
+		</div>
+		<div class="row">
+			<br/>
+		</div>
+		<div class="row">
+			<button class='btn btn-danger' id="btn-stop">Stop Engine</button>
+		</div>
+	</div>
+	<div class="col-md-1">
+	</div>
+	<div class="col-md-3">
+		<div class="row">
+			<div class="panel panel-primary">
+				<div class="panel-heading">Status</div>
+				<div class="panel-body">
+					<h4 id="is_started">{{isRunning}} </h4>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-1">
+	</div>
+	<div class="col-md-3">
+		<div class="row">
+			<div class="panel panel-primary">
+				<div class="panel-heading">Ball Samp Time</div>
+				<div class="panel-body">
+					<input style="width: 90%; margin: 5px 0px 5px 0px;" type="text" name="ball_samp_time" id="ball_samp_time" placeholder="ball samp time">
+					<!--
+					<h4 id="ball_samp_time"></h4>
+					-->
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="row">
+</div>
+
+<br/>
+
+
+<p class="clear">
+	{{logged_in}} | {{{ body }}}
+
+	<script>
+		var snap;
+		var snapAfter;
+		var myBlob;
+		var formData;
+
+		var take_photo_btn;
+		var image;
+		var video;
+		var submitButton;
+		var submitClick;
+		var hidden_canvas;
+
+		var cameraStillTaken = false;
+		var autoPictSendInProg = false;
+		var timeInterval;     	//time interval for pics
+		var myIntervalTimer;  	//handle to interval timer
+		//var myCommStatTimer; 	//timer for the comm status
+		var commStatTimerInt = 3; 	//interval 
+		var commStopAuto; //stop the auto pics
+
+		var global_User_Id;
+		var global_Device_Id;
+		var global_Email_Id;
+		var sendObj = {
+			ball_samp_time: 0.00,
+			start_button: 0,
+			stop_button: 0
+		};
+
+
+
+		//$(document.body).on("load", ".img-item", sendClick);
+		var sendPost = function () {
+			$.post("/physics/button",
+				sendObj,
+				function (data, status) {
+					if (data.errCode === 0) {
+						//there is no error
+						window.location.href = "/physics"
+					} else {
+						//what to do with error ?
+					};
+				});
+
+		};
+
+
+		$(document).ready(function () {
+			var timeVal = $('#varb-storage').attr("data-samp-time")
+			$('#ball_samp_time').val(timeVal);
+			$(document.body).on("click", ".sendButton", function () {
+				sendImageClick(false);
+			});
+			$(document.body).on("click", "#btn-start", function () {
+				sendObj.ball_samp_time = $('#ball_samp_time').val();
+				sendObj.start_button = true;
+				sendObj.stop_button = false;
+				sendPost();
+			});
+			$(document.body).on("click", "#btn-stop", function () {
+				sendObj.ball_samp_time = $('#ball_samp_time').val();
+				sendObj.start_button = false;
+				sendObj.stop_button = true;
+				sendPost();
+			});
+//			window.setTimeout( function() {
+//				window.location.reload(true);
+//			}, 10000 )
+
+		});
+
+	</script>

@@ -1,0 +1,165 @@
+<!-- Trigger the modal with the ? button -->
+<div id="modal-help" class="modal" style="padding:5px !important; width:500px !important; ">
+    <!-- Modal content-->
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close close-help" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title" id="help-errMsg">Error Explanation</h4>
+        </div>
+        <div class="modal-body">
+            <!-- <h4 id="help-errCode">Error Code </h4> -->
+            <!-- <h4 id="help-errMsg">message2 </h4>  -->
+            <h4 id="help-errExp">explanation </h4>
+        </div>
+    </div>
+</div>
+
+
+
+<!--Pick what type of user Form-->
+<div>
+    <h2>Pick your login type on this device</h2>
+    <hr>
+</div>
+
+<div id="param-in" data-user-id="{{user_id}}"></div>
+<!-- need an input group to select device or monitor   -->
+<div class="container-fluid">
+    <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+        <form>
+            <!-- containing object for the entire row -->
+            <div class="rowPick" id="pick-monitor">
+                <div class="row">
+                    <div class="col-lg-4 col-xs-4">
+                        <div style="float:left">
+                            <img src="/images/Phone_upload_02.png" alt='My Mobi Link Logo' id='pageLogo' class='img img-thumbnail' style="width: 140px;">
+                        </div>
+                    </div>
+                    <div class="col-lg-8 col-xs-8">
+                        <h4>Monitor</h4>
+                        <br/>
+                        <h6>use this device to monitor events, like camera mode to get pictures</h6>
+                    </div>
+                </div>
+            </div>
+            <hr/>
+            <div class="rowPick" id="pick-display">
+                <div class="row">
+                    <div class="col-lg-4 col-xs-4">
+                        <div style="float:left">
+                            <img src="/images/Phone_down_02.png" alt='My Mobi Link Logo' id='pageLogo' class='img img-thumbnail' style="width: 140px;">
+                        </div>
+                    </div>
+                    <div class="col-lg-8 col-xs-8">
+                        <h4>Display</h4>
+                        <br/>
+                        <h6>use this device to display what the rest of your devices are doing</h6>
+                    </div>
+                </div>
+                <div class="row">
+                </div>
+                <div class="row">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="row">
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+</div>
+
+
+<!--{{#if logged_in}}
+	<p>Logged in as {{req.session.username}}.</p>
+	<br/>
+	<a href='/users/log-out'><p>Log out</p></a>
+{{else}}
+	<a href='/users/log-in'><h3>Log In</h3></a>
+{{/if}}-->
+
+
+
+<!--
+	<script type="text/javascript" src="../../javascript/login.js"></script>
+-->
+
+
+<script>
+    //global variable for the current err
+    var currErrorObj = {
+        errCode: 0,   //0 if no error
+        errLine: 0,   //which line of the input form
+        errMsg: "", //error message
+        errExp: ""   //error explanation
+    };
+
+    var global_user_id;
+
+    var dispHelpUser = function (_showBttn) {
+        //0 = hide the help button until an error comes in
+        //1=  show the help button
+        if (_showBttn) {
+            $("#bttn-help-user").css("display", "block");
+        } else {
+            $("#bttn-help-user").css("display", "none");
+        };
+    };
+
+
+    var dispModalHelp = function () {
+        //$("#help-errCode").text("Error code: " + currErrorObj.errCode);
+        $("#help-errMsg").text(currErrorObj.errMsg);
+        $("#help-errExp").text(currErrorObj.errExp);
+        //var modTag = $("#modal-help");
+        var modTag = $("#modal-help");
+        console.log("tag = ");
+        console.log(modTag);
+        $(modTag).css("display", "block");
+        //$(modTag).css("")
+        //$(modTag).style.display="block";
+    };
+
+
+    var closeModalHelp = function () {
+        var modTag = $("#modal-help");
+        $(modTag).css("display", "none");
+    };
+
+
+    var evalContinue = function () {
+        //the continue button was pressed
+        var outVal = $("input[Type='radio'][name='PickType']:checked").val();
+        //var outVal = $("#toggle-one").val();
+        console.log(outVal);
+    };
+
+
+    var evalPickDisplay = function () {
+        //the pick display row was pressed
+        //RPB todo add correct device id and user_email
+        window.location.href = "/users/display_table/" + global_user_id + "/test";
+    };
+
+
+    var evalPickMonitor = function () {
+        //the pick monitor was pressed
+        //RPB todo add correct device id and user_email
+        window.location.href = "/users/device/" + global_user_id + "/test";
+    };
+
+
+    $(document).ready(function () {
+        global_user_id = $("#param-in").attr("data-user-id");
+    });
+
+    $(document.body).on("click", "#btn-continue", evalContinue);
+    $(document.body).on("click", "#pick-monitor", evalPickMonitor);
+    $(document.body).on("click", "#pick-display", evalPickDisplay);
+//	$(document.body).on("click", ".bttn-help-user", dispModalHelp);
+//	$(document.body).on("click", ".bttn-help-new", dispModalHelp);
+//	$(document.body).on("click", ".close-help", closeModalHelp);
+
+</script>

@@ -1,0 +1,256 @@
+<!-- Trigger the modal with the ? button -->
+<div id="modal-help" class="modal" style="padding:5px !important; width:500px !important; ">
+	<!-- Modal content-->
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close close-help" data-dismiss="modal">&times;</button>
+			<h4 class="modal-title" id="help-errMsg">Error Explanation</h4>
+		</div>
+		<div class="modal-body">
+			<!-- <h4 id="help-errCode">Error Code </h4> -->
+			<!-- <h4 id="help-errMsg">message2 </h4>  -->
+			<h4 id="help-errExp">explanation </h4>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-default close-help" data-dismiss="modal">Close</button>
+		</div>
+	</div>
+</div>
+
+
+<!-- No new users modal  button -->
+<div id="modal-register" class="modal" style="padding:5px !important; width:500px !important; ">
+	<!-- Modal content-->
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close close-help" data-dismiss="modal">&times;</button>
+			<h4 class="modal-title" id="help-errMsg">No New Users - restriction</h4>
+		</div>
+		<div class="modal-body">
+			<!-- <h4 id="help-errCode">Error Code </h4> -->
+			<!-- <h4 id="help-errMsg">message2 </h4>  -->
+			<h4>Thank-you for trying out this website.  At the moment 
+				it is in Beta testing (and future styling upgrades). 
+				As such, the bandwidth and storage are limited. Please
+				contact the creator of this site to get a user name and
+				password.  Thank-you
+			</h4>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-default close-help" data-dismiss="modal">Close</button>
+		</div>
+	</div>
+</div>
+
+
+<!--Log In Form-->
+<div id="loginForm">
+	<h2>User Login</h2>
+	<hr>
+	<div class='warning'>
+		<div id='loginWarning'></div>
+		<!--Help Button-->
+		<button class='btn btn-info bttn-help-user' data-toggle="modal" data-target="#modal-help" id='bttn-help-user' type='button'>?</button>
+	</div>
+	<br/>
+	<!-- split the screen into two halves -->
+	<div class="container-fluid">
+		<div class="col-6 col-xl-6 col-lg-6 col-sm-12 col-xs-12">
+			<form action="/users/login" method="post" id="form-login">
+				<div class="row">
+					<!-- split remaining column into 2 -->
+					<div class="col-sm-4 col-xs-12">
+						<label style="margin: 5px 0px 5px 0px;" for="user_email">User Email Address:</label>
+					</div>
+					<div class="col-sm-6 col-xs-12">
+						<input style="width:90%; margin: 5px 0px 5px 0px;" type="text" name="user_email" id="user_email" placeholder="example@email.com">
+					</div>
+				</div>
+				<div class="row">
+					<!-- split remaining column into 2 -->
+					<div class="col-sm-4 col-xs-12">
+						<label style="margin: 5px 0px 5px 0px;" for="user_password">User Password:</label>
+					</div>
+					<div class="col-sm-6 col-xs-12">
+						<input style="width: 90%; margin: 5px 0px 5px 0px;" type="password" name="user_password" id="user_password" placeholder="Password">
+					</div>
+				</div>
+
+				<div class="row">
+					<br/>
+				</div>
+				<!--  buttons  -->
+				<div class="row">
+					<!-- split remaining column into 2 -->
+					<div class="col-xs-12 col-md-3 col-xl-3 col-lg-3">
+						<button style="width: 90%; margin: 5px 0px 5px 0px;" class='btn btn-primary bttn-login' type='button'>Login</button>
+					</div>
+					<div class="col-xs-12 col-md-3 col-xl-3 col-lg-3">
+						<button style="width: 90%; margin: 5px 0px 5px 0px;" class='btn btn-primary bttn-register' type='button'>Register</button>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="row">
+			<br/>
+			<br/>
+		</div>
+	</div>
+
+	<!-- <input type="submit" class='btn btn-primary' id="submitButton" value="Login"> -->
+	<hr>
+</div>
+
+<!--{{#if logged_in}}
+	<p>Logged in as {{req.session.username}}.</p>
+	<br/>
+	<a href='/users/log-out'><p>Log out</p></a>
+{{else}}
+	<a href='/users/log-in'><h3>Log In</h3></a>
+{{/if}}-->
+
+
+<hr>
+<hr>
+
+<!--
+	<script type="text/javascript" src="../../javascript/login.js"></script>
+-->
+
+
+<script>
+	var global_user_id;
+	//global variable for the current err
+	var currErrorObj = {
+		errCode: 0,   //0 if no error
+		errLine: 0,   //which line of the input form
+		errMsg: "", //error message
+		errExp: ""   //error explanation
+	};
+
+
+	var dispHelpUser = function (_showBttn) {
+		//0 = hide the help button until an error comes in
+		//1=  show the help button
+		if (_showBttn) {
+			$("#bttn-help-user").css("display", "block");
+		} else {
+			$("#bttn-help-user").css("display", "none");
+		};
+	};
+
+
+	var dispHelpNew = function (_showBttn) {
+		//0 = hide the help button until an error comes in
+		//1=  show the help button
+		if (_showBttn) {
+			$("#bttn-help-new").css("display", "block");
+		} else {
+			$("#bttn-help-new").css("display", "none");
+		};
+	};
+
+
+	var dispModalHelp = function () {
+		//$("#help-errCode").text("Error code: " + currErrorObj.errCode);
+		$("#help-errMsg").text(currErrorObj.errMsg);
+		$("#help-errExp").text(currErrorObj.errExp);
+		//var modTag = $("#modal-help");
+		var modTag = $("#modal-help");
+		console.log("tag = ");
+		console.log(modTag);
+		$(modTag).css("display", "block");
+		//$(modTag).css("")
+		//$(modTag).style.display="block";
+	};
+
+	var closeModalHelp = function () {
+		var modTag = $("#modal-help");
+		$(modTag).css("display", "none");
+		modTag = $("#modal-register");
+		$(modTag).css("display", "none");
+	}
+
+	var dispNewUserForm = function () {
+		//right now display modal for admin only
+		var modTag = $("#modal-register");
+		$(modTag).css("display", "block");
+	};
+
+	var dispCurrentUserForm = function () {
+		$("#newUserForm").css("display", "none");
+		$("#loginForm").css("display", "block");
+		$("#loginWarning").text(" ");
+		dispHelpUser(false);
+	};
+
+	var createNewUser = function () {
+		//clear out the warning first
+		$("#newUserWarning").text(" ");
+		$.post("/users/create",
+			{
+				user_name: $("#user_name").val(),
+				user_email: $("#register_user_email").val(),
+				user_password: $("#register_user_password").val(),
+				user_password2: $("#user_password_2").val()
+			},
+			function (data, status) {
+				if (data.errCode === 0) {
+					//there is no error
+					$("#newUserWarning").text(" ");
+					dispHelpNew(false);
+					window.location.href = "/group"
+				} else {
+					currErrorObj.errCode = data.errCode;
+					currErrorObj.errLine = data.errLine;
+					currErrorObj.errMsg = data.errMsg;
+					currErrorObj.errExp = data.errExp;
+					$("#newUserWarning").text(data.errMsg);
+					dispHelpNew(true);
+				};
+			});
+	};
+
+
+	var checkLogin = function () {
+		//check the login
+		//clear out the warning first
+		console.log("at login button clicked");
+		$("#loginWarning").text(" ");
+		$.post("/users/login",
+			{
+				user_email: $("#user_email").val(),
+				user_password: $("#user_password").val()
+			},
+			function (data, status) {
+				console.log("post is valid");
+				if (data.errCode === 0) {
+					//there is no error
+					global_user_id = data.errExp;  //in the 4th spot
+					$("#loginWarning").text(" ");
+					dispHelpUser(false);
+					window.location.href = "/users/pick-type/" + global_user_id;
+				} else {
+					currErrorObj.errCode = data.errCode;
+					currErrorObj.errLine = data.errLine;
+					currErrorObj.errMsg = data.errMsg;
+					currErrorObj.errExp = data.errExp;
+					$("#loginWarning").text(data.errMsg);
+					dispHelpUser(true);
+				};
+			});
+	};
+
+
+	$(document).ready(function () {
+		dispCurrentUserForm();
+	});
+	$(document.body).on("click", ".bttn-register", dispNewUserForm);
+	$(document.body).on("click", ".bttn-existing", dispCurrentUserForm);
+	$(document.body).on("click", ".bttn-create-new", createNewUser);
+	$(document.body).on("click", ".bttn-login", checkLogin);
+	$(document.body).on("click", ".bttn-help-user", dispModalHelp);
+	$(document.body).on("click", ".bttn-help-new", dispModalHelp);
+	$(document.body).on("click", ".close-help", closeModalHelp);
+
+</script>

@@ -1,0 +1,297 @@
+<!--  display all of the devices page   -->
+
+<!--  scripts for Google Maps -->
+<!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAE03QBe5yDXRr1fzDvkWs9i_E_BIyCDhk&libraries=places" async
+ defer></script>  -->
+
+
+
+<div id="modal-device-view" class="modal" style="padding:5px !important; width:500px !important; ">
+	<!-- Modal content-->
+	<div class="modal-content" style="overflow-y: auto;">
+		<div class="modal-header">
+			<button type="button" class="close close-modal" data-dismiss="modal">&times;</button>
+			<h4 class="modal-title" id="mod-dv-dev">Device</h4>
+		</div>
+		<div class="modal-body" style="height: 60%; overflow-y: auto !important;">
+			<h6 id="mod-dv-loc">Location: </h6>
+			<h6 id="mod-dv-pur">Purpose:</h6>
+			<img class="img-item" width="320" height="240" id="mod-dv-img" src="">
+		</div>
+		<div class="modal-footer">
+			<input type="text" style="width:20%;" placeholder="# pics" id="mod-div-numpic">
+			<input type="text" style="width:20%;" placeholder="secs " id="mod-div-picint">
+			<button type="button" class="btn btn-default" id="mod-div-force">Force Pic</button>
+			<button type="button" class="btn btn-default" id="mod-div-kickoff">Kickoff</button>
+			<button type="button" class="btn btn-default close-modal" data-dismiss="modal">Close</button>
+		</div>
+	</div>
+</div>
+
+<div id="modal-info-1" class="modal" style="padding:5px !important; width:300px !important; ">
+	<!-- Modal content-->
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close close-modal" data-dismiss="modal">&times;</button>
+			<h4 class="modal-title">Refresh the Screen</h4>
+		</div>
+		<div class="modal-body">
+			<h6>Command sent to remote unit.</h6>
+			<h6>At the moment, the screen will not refresh.</h6>
+			<h6>To see your new picture, after closing this</h6>
+			<h6>window, hit the refresh on your browers then</h6>
+			<h6>repick the same device again</h6>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-default close-modal" data-dismiss="modal">Close</button>
+		</div>
+	</div>
+</div>
+
+<div class="modal" tabindex="-1" role="dialog" id="modal-delete">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Warning!!</h4>
+				<button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<P id="del-event"></P>
+				<p>Clicking "Delete" will delete this entry</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger">Delete</button>
+				<button type="button" class="btn btn-secondary close-modal" data-dismiss="modal">Exit</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<h2> Display Current Devices </h2>
+<div "float: right;">
+	<button type="button" class="btn btn-default" id="bttn-show-allPics">Show All Pics</button>
+</div>
+<hr>
+
+<!-- <form action="/users/device/register" method="post" id="form-register">  -->
+<!-- split the screen into two halves -->
+<div class="container" id="main-container" data-id="{{user_id}}" data-email="{{user_email}}">
+	<table style="width:100%" class="table table-bordered table-condensed table-hover">
+		<tr>
+			<strong>
+				<th>Device Name</th>
+				<th>Location</th>
+				<th>Purpose</th>
+				<th>Time logon</th>
+				<th>Last Comm</th>
+				<th>Pic Upload</th>
+			</strong>
+		</tr>
+		{{#each outputLines}}
+		<tr class="row-click" data-deviceId="{{ this.device_id }}">
+			<td>
+				<h5 id="{{this.device_id}}-1">{{this.device_name}}</h5>
+			</td>
+			<td>
+				<h5 id="{{this.device_id}}-2">{{this.location_name}}</h5>
+			</td>
+			<td>
+				<h5 id="{{this.device_id}}-3">{{this.purpose}}</h5>
+			</td>
+			<td>
+				<h5 id="{{this.device_id}}-4">{{this.timeLogOn}}</h5>
+			</td>
+			<td>
+				<h5 id="{{this.device_id}}-5">{{this.lastTimUpd}}</h5>
+			</td>
+			<td>
+				<h5 id="{{this.device_id}}-6">{{this.lastTimePic}}</h5>
+			</td>
+		</tr>
+		{{/each}}
+	</table>
+</div>
+
+<br/>
+
+<hr>
+<!-- <input type="submit" class='btn btn-primary' id="submitButton" value="Login"> -->
+<!-- </form>  -->
+
+
+</form>
+
+
+
+
+<br/>
+<br/>
+<br/>
+<br/>
+
+<script type="text/javascript" src="../../../javascript/numeral.js"></script>
+
+
+
+<script>
+	var global_User_Id;
+	var global_Device_Id;
+	var global_User_Email;
+
+
+	var evalShowAllPics = function() {
+		window.location.href = "/users/getAllPics/" + global_User_Id;
+	};
+
+	var evalForceButton = function () {
+		//hit the kickoff button, so force it off by deleting from active users
+		var _numPics = $("#mod-div-numpic").val();
+		if (_numPics === undefined || _numPics === null || _numPics === "") {
+			_numPics = "1";
+		};
+		_numPics = _numPics.trim();
+
+		var _timPicInterval = $("#mod-div-picint").val();
+		if (_timPicInterval === undefined || _timPicInterval === null || _timPicInterval === "") {
+			_timPicInterval = "2";
+		};
+		_timPicInterval = _timPicInterval.trim();
+		console.log(_numPics + " | " + _timPicInterval)
+		$.post("/users/forcepic",
+			{
+				//object that gets sent out is here 
+				user_id: global_User_Id,
+				device_id: global_Device_Id,
+				numPicsToTake: _numPics,
+				timPicInterval: _timPicInterval
+			},
+			function (data, status) {
+				console.log("call back from post");
+				if (data.errCode === 0) {
+					console.log("successful force pic post");
+					$("#modal-info-1").css("display", "block");
+					//there is no error
+					//window.location.reload(true);
+				} else {
+					console.log("err code " + data.errCode);
+					/*
+					there is some kind of error 
+					*/
+				};
+			});
+	};
+
+
+	var evalKickOffButton = function () {
+		//hit the kickoff button, so force it off by deleting from active users
+		$.post("/users/device/kickoff",
+			{
+				//object that gets sent out is here 
+				user_id: global_User_Id,
+				device_id: global_Device_Id,
+				user_email: global_User_Email
+			},
+			function (data, status) {
+				console.log("call back from post");
+				if (data.errCode === 0) {
+					console.log("error 0 returned");
+					//there is no error
+					window.location.reload(true);
+				} else {
+					console.log("err code " + data.errCode);
+					/*
+					there is some kind of error 
+					*/
+				};
+			});
+	};
+
+	var closeModals = function () {
+		$("#modal-device-view").css("display", "none");
+		$("#modal-info-1").css("display", "none");
+	};
+
+	var evalRowClicked = function (data) {
+		var rowClickedTag = $(this);  //save for later
+		var device_id = $(rowClickedTag).attr("data-deviceid");
+		global_Device_Id = device_id;
+
+		var locDev = "#" + device_id.trim() + "-1";  //col1 is device
+		var deviceStr = $(locDev).text();
+		var locCol = "#" + device_id.trim() + "-2";  //col2 is location
+		var locatStr = $(locCol).text();
+		var purCol = "#" + device_id.trim() + "-3";  //col3 is purpose
+		var purStr = $(purCol).text();
+
+		var full_url = "/users/device/latestpic";
+		$.post(full_url,
+			{
+				user_id: global_User_Id,
+				device_id: global_Device_Id
+			}, function (data, status) {
+				if (data.errCode === 0) {
+					//there is no error
+					console.log(data.imgSource);
+					$("#mod-dv-img").attr("src", data.imgSource);
+					$("#mod-dv-dev").text(deviceStr);
+					$("#mod-dv-loc").text("Location: " + locatStr);
+					$("#mod-dv-pur").text("Purpose: " + purStr);
+					$("#modal-device-view").css("display", "block");
+				} else {
+					//what to do if there is an error ?
+					console.log("there is an error");
+				};
+			});
+	};
+
+	var evalStartButton = function () {
+		$.post("/users/device/register",
+			{
+				user_id: $("#btn-startup").attr("data-id"),
+				user_email: $("#btn-startup").attr("data-email"),
+				device_name: $("#device_name").val(),
+				purpose: $("#purpose").val(),
+				location_name: $("#location_name").val(),
+				location_lat: 0,
+				location_lon: 0
+			},
+			function (data, status) {
+				console.log("call back from post");
+				if (data.errCode === 0) {
+					console.log("error 0 returned");
+					//there is no error
+					//$("#newUserWarning").text(" ");
+					//dispHelpNew(false);
+					window.location.href = "/picture";
+				} else {
+					console.log("err code " + data.errCode);
+					/*
+					currErrorObj.errCode = data.errCode;
+					currErrorObj.errLine = data.errLine;
+					currErrorObj.errMsg = data.errMsg;
+					currErrorObj.errExp = data.errExp;
+					$("#newUserWarning").text(data.errMsg);
+					dispHelpNew(true);
+					*/
+				};
+			});
+	};
+
+	$(document).ready(function () {
+		//document is ready, so move the incoming data over
+		global_User_Id = $("#main-container").attr("data-id");  //user id
+		global_User_Email = $("#main-container").attr("data-email");
+	});
+
+	$(document.body).on("click", ".bttn-startup", evalStartButton);
+	$(document.body).on("click", ".row-click", evalRowClicked);
+	$(document.body).on("click", ".close-modal", closeModals);
+	$(document.body).on("click", "#mod-div-kickoff", evalKickOffButton);
+	$(document.body).on("click", "#mod-div-force", evalForceButton);
+	$(document.body).on("click", "#bttn-show-allPics", evalShowAllPics  );
+</script>
+

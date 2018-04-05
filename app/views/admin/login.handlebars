@@ -1,0 +1,78 @@
+<!--  schedule page   -->
+
+<!--  scripts for Google Maps -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAE03QBe5yDXRr1fzDvkWs9i_E_BIyCDhk&libraries=places" async
+ defer></script>
+<script src="https://apis.google.com/js/api.js" type="text/javascript"></script>
+
+
+
+<h2> Admin login for Pong 2108 </h2>
+<hr>
+<hr>
+
+<!-- split the screen into two halves -->
+<div class="container-fluid">
+	<div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12">
+		<form action="/admin/check" method="post" id="form-login">
+			<div class="row">
+				<!-- split remaining column into 2 -->
+				<div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-xs-12">
+					<label style="margin: 5px 0px 5px 0px;" for="user_email">Admin Email Address:</label>
+				</div>
+				<div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+					<input style="width:90%; margin: 5px 0px 5px 0px;" type="text" name="user_email" id="user_email" placeholder="admin@email.com">
+				</div>
+			</div>
+			<div class="row">
+				<!-- split remaining column into 2 -->
+				<div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-xs-12">
+					<label style="margin: 5px 0px 5px 0px;" for="user_password">Admin Password:</label>
+				</div>
+				<div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+					<input style="width: 90%; margin: 5px 0px 5px 0px;" type="password" name="user_password" id="user_password" placeholder="Password">
+				</div>
+			</div>
+
+			<div class="row">
+				<br/>
+			</div>
+			<!--  buttons  -->
+			<div class="row">
+				<!-- split remaining column into 2 -->
+				<div class="col-12 col-md-6">
+					<button style="width: 90%;" class='btn btn-primary bttn-login' type='submit'>Login</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<br/>
+
+<hr>
+<!-- <input type="submit" class='btn btn-primary' id="submitButton" value="Login"> -->
+
+</form>
+
+
+
+
+<br/>
+<br/>
+<br/>
+<br/>
+
+<script type="text/javascript" src="../../javascript/numeral.js"></script>
+
+
+
+<script>
+
+	$(document).ready(function () {
+		//document is ready, so move the incoming data over
+	});
+
+	//$(document.body).on("click", ".bttn-store", saveAppoint);
+
+</script>

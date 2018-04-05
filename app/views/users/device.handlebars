@@ -1,0 +1,120 @@
+<!--  registered page   -->
+
+<!--  scripts for Google Maps -->
+<!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAE03QBe5yDXRr1fzDvkWs9i_E_BIyCDhk&libraries=places" async
+ defer></script>  -->
+<script src="https://apis.google.com/js/api.js" type="text/javascript"></script>
+
+
+<h2> Register Device </h2>
+<hr>
+<hr>
+
+<!-- <form action="/users/device/register" method="post" id="form-register">  -->
+<!-- split the screen into two halves -->
+<div class="container">
+	<div class="col-lg-6 col-xs-12">
+		<div class="row">
+			<!-- split remaining column into 2 -->
+			<div class="col-lg-3 col-md-3 col-xs-12">
+				<label for="device_name">Device Name:</label>
+			</div>
+			<div class="col-lg-6 col-md-4 col-xs-12">
+				<input style="width:90%;" type="text" name="device_name" id="device_name" placeholder="your name for this device">
+			</div>
+		</div>
+		<div class="row">
+			<!-- split remaining column into 2 -->
+			<div class="col-lg-3 col-md-3 col-xs-12">
+				<label for="purpose">Purpose:</label>
+			</div>
+			<div class="col-lg-6 col-md-4 col-xs-12">
+				<input style="width:90%;" type="text" name="purpose" id="purpose" placeholder="why monitoring">
+			</div>
+		</div>
+		<div class="row">
+			<!-- split remaining column into 2 -->
+			<div class="col-lg-3 col-md-3 col-xs-12">
+				<label for="location_name">What is the location:</label>
+			</div>
+			<div class="col-lg-6 col-md-4 col-xs-12">
+				<input style="width:90%;" type="text" name="location_name" id="location_name" placeholder="in your own words">
+			</div>
+		</div>
+		<div class="row">
+			<br/>
+		</div>
+		<!--  buttons  -->
+		<div class="row">
+			<!-- split remaining column into 2 -->
+			<div class="col-lg-4 col-md-4 col-xs-12">
+				<button style="width: 90%;" class='btn btn-primary bttn-startup' type='' data-id="{{user_id}}" data-email="{{user_email}}"
+				 id="btn-startup">Startup</button>
+			</div>
+		</div>
+	</div>
+	<div class="col-6 col-lg-6 col-md-6">
+	</div>
+</div>
+
+<br/>
+
+<hr>
+<!-- <input type="submit" class='btn btn-primary' id="submitButton" value="Login"> -->
+<!-- </form>  -->
+
+
+
+<br/>
+<br/>
+<br/>
+<br/>
+
+<script type="text/javascript" src="../../javascript/numeral.js"></script>
+
+
+
+<script>
+
+	var evalStartButton = function () {
+		$.post("/users/device/register",
+			{
+				user_id: $("#btn-startup").attr("data-id"),
+				user_email: $("#btn-startup").attr("data-email"),
+				device_name: $("#device_name").val(),
+				purpose: $("#purpose").val(),
+				location_name: $("#location_name").val(),
+				location_lat: 0,
+				location_lon: 0
+			},
+			function (data, status) {
+				console.log("call back from post");
+				if (data.errCode === 0) {
+					console.log("error 0 returned");
+					//there is no error
+					//$("#newUserWarning").text(" ");
+					//dispHelpNew(false);
+					var locStr = "/picture/" + $("#btn-startup").attr("data-id");
+					locStr += "/" + data.device_id;
+					window.location.href = locStr;
+				} else {
+					console.log("err code " + data.errCode);
+					/*
+					currErrorObj.errCode = data.errCode;
+					currErrorObj.errLine = data.errLine;
+					currErrorObj.errMsg = data.errMsg;
+					currErrorObj.errExp = data.errExp;
+					$("#newUserWarning").text(data.errMsg);
+					dispHelpNew(true);
+					*/
+				};
+			});
+	};
+
+	$(document).ready(function () {
+		//document is ready, so move the incoming data over
+	});
+
+	$(document.body).on("click", ".bttn-startup", evalStartButton);
+
+</script>
