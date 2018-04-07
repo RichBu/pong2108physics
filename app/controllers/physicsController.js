@@ -10,13 +10,13 @@ var momentDurationFormatSetup = require("moment-duration-format");
 var numeral = require("numeral");
 
 
-//for firebase
-var adminFirebase = require("firebase-admin");
-var serviceAccount = require("../../pong2108-200301.json");
-adminFirebase.initializeApp({
-  credential: adminFirebase.credential.cert(serviceAccount),
-  databaseURL: "https://pong2108-200301.firebaseio.com"
-});
+// //for firebase
+// var adminFirebase = require("firebase-admin");
+// var serviceAccount = require("../../pong2108-200301.json");
+// adminFirebase.initializeApp({
+//   credential: adminFirebase.credential.cert(serviceAccount),
+//   databaseURL: "https://pong2108-200301.firebaseio.com"
+// });
 
 
 
@@ -122,7 +122,37 @@ router.post('/button', function (req, res) {
 
 router.post('/start', function (req, res) {
   console.log('started a game');
-  var startTime_str = moment();
+  var startTime_str = moment().format( "YYYY-MM-DD HH:mm:ss a" );
+
+  var fbase_ballpos_outputObj = {
+    game_id: 1,
+    time_start_str: "",       //full string for calculating
+    ball_phyics: {
+      curr_vel : 0.0,
+      accel_val : 0.0,
+      accel_time : 0.0,
+      angle : 0.0
+    },
+    ball_curr_pos: {
+      pos_X: 0.0,
+      pos_Y: 0.0,
+      pos_Z: 0.0,
+      loc_GPS_lat: 0.0,
+      loc_GPS_lon: 0.0
+    },
+    dist : {
+      between : 0.0,
+      play_1 : 0.0,
+      play_2 : 0.0
+    },
+    time : {
+      start_unix : 0,
+      stop_unix : 0,
+      play_1 : 0.0,
+      play_2 : 0.0
+    },
+    speed_up_fact : 0.0,
+  };
 
   //set to global variables right now.
   //should poll the existing file first and
@@ -133,17 +163,17 @@ router.post('/start', function (req, res) {
 
   var _time_start_unix = 0;
   var _time_stop_unix = 0;
-  var _start_pos_loc_GPS_lat = 40.10;
-  var _start_pos_loc_GPS_lon = 20.10;
-  var _stop_pos_loc_GPS_lat = 40.00;
-  var _stop_pos_loc_GPS_lon = 19.00;
-  var _dist_between = 100.45;
+  var _start_pos_loc_GPS_lat = 42.050377;
+  var _start_pos_loc_GPS_lon = -87.684347;
+  var _stop_pos_loc_GPS_lat = 41.896041;
+  var _stop_pos_loc_GPS_lon = -87.618772;
+  var _dist_between = 100.45;   //feet between
   var _type_hit = "SERVE";
   var _result_hit = "GOOD";
-  var _player_num = 0;
+  var _player_num = 1;
   var _ball_accel_val = 0.00;
   var _ball_accel_tim = 0.00;
-  var _ball_vel = 5.00;
+  var _ball_vel = 5.00;         //in per second
   var _ball_angle = 0.00;
   var _speed_up_fact = 1.00;
 
@@ -173,10 +203,10 @@ router.post('/start', function (req, res) {
     _ball_angle,
     _speed_up_fact
   ];
-  console.log(queryAray);
+  console.log(queryArray);
 
   connection.query(query, queryArray, function (err, response) {
-    console.log("error at audit = \n" + err);
+    console.log("error at start game = \n" + err);
     //write to audit file
     //if (err) throw err;
   });

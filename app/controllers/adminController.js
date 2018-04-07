@@ -11,7 +11,7 @@ var crypto = require('crypto');
 var glob = require("glob");
 var fs = require('fs');
 
-momentDurationFormatSetup(moment);
+momentDurationFormatSetup(moment);  //setup formatting for durations
 
 //setup with password
 var transporter = nodemailer.createTransport({
@@ -52,7 +52,7 @@ var hackCheck = function (str1, str2, str3, str4) {
         this.html = _html                 // plain text body
       };
   
-      var subjectStr = "HACKING attempt at Table Top Genie @ " + moment().format("YYYY-MM-DD  hh:mm a");
+      var subjectStr = "HACKING attempt at Table Top Genie @ " + moment().format("YYYY-MM-DD  HH:mm a");
       var messageStr = "<h3>User is attempting to use unauthorized characters</h3><br/>";
       messageStr += "<h3>Characters were detected and input was sanitized.<h3>";
       messageStr += "<h3>You can check on the status by using  /Admin/1  page.<h3><br/>";
@@ -407,7 +407,7 @@ var dispAuditPage = function (res) {
         this.browser_id = _browser_id;
         this.ip_addr = _ip_addr;
 
-        this.timeStampStr = moment.unix(_time_stamp).format("YYYY-MM-DD  hh:mm a");
+        this.timeStampStr = moment.unix(_time_stamp).format("YYYY-MM-DD  HH:mm a");
     };
 
 

@@ -50,7 +50,7 @@ var hackCheck = function (str1, str2, str3, str4) {
       this.html = _html                 // plain text body
     };
 
-    var subjectStr = "HACKING attempt at Table Top Genie @ " + moment().format("YYYY-MM-DD  hh:mm a");
+    var subjectStr = "HACKING attempt at Table Top Genie @ " + moment().format("YYYY-MM-DD  HH:mm a");
     var messageStr = "<h3>User is attempting to use unauthorized characters</h3><br/>";
     messageStr += "<h3>Characters were detected and input was sanitized.<h3>";
     messageStr += "<h3>You can check on the status by using  /Admin/1  page.<h3><br/>";
@@ -181,9 +181,9 @@ router.get('/display_table/:user_id/:user_email', function (req, res) {
   var _user_email = req.params.user_email;
 
   function outputObj(_device_id, _device_name, _location_name, _purpose, _timeLogOn, _lastTimUpd, _lastTimePic) {
-    var timeLogOn_str = moment.unix(parseInt(_timeLogOn)).format("YYYY-MM-DD  hh:mm a");
-    var lastTimUpd_str = moment.unix(parseInt(_lastTimUpd)).format("YYYY-MM-DD  hh:mm a");
-    var lastTimePic_str = moment.unix(parseInt(_lastTimePic)).format("YYYY-MM-DD  hh:mm a");
+    var timeLogOn_str = moment.unix(parseInt(_timeLogOn)).format("YYYY-MM-DD  HH:mm a");
+    var lastTimUpd_str = moment.unix(parseInt(_lastTimUpd)).format("YYYY-MM-DD  HH:mm a");
+    var lastTimePic_str = moment.unix(parseInt(_lastTimePic)).format("YYYY-MM-DD  HH:mm a");
 
     this.device_id = _device_id;
     this.device_name = _device_name;
@@ -361,10 +361,8 @@ router.post('/device/kickoff', function (req, res) {
       req.body.user_id,
       req.body.device_id
     );
-
     //if (err) throw err;
   });
-
 });
 
 
@@ -441,7 +439,7 @@ router.get('/getAllPics/:user_id', function (req, res) {
     } else {
       var endVal = response.length;
       for (var i = 0; i < endVal; i++) {
-        var timeStamp = moment.unix(response[i].date_start_unix).format("YYYY-MM-DD  hh:mm:ss a");
+        var timeStamp = moment.unix(response[i].date_start_unix).format("YYYY-MM-DD  HH:mm:ss a");
         var descripString = "Uploaded on " + timeStamp;
         var imgSource = response[i].imgSource;
         var filename = response[i].filename;

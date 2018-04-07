@@ -64,6 +64,7 @@
 		</div>
 		<div class="row">
 			<button class='btn btn-danger' id="btn-stop">Stop Engine</button>
+			<button class='btn btn-info' style="float: right;" id="btn-start-game">Start Game</button>
 		</div>
 	</div>
 	<div class="col-md-1">
@@ -110,6 +111,7 @@
 
 
 <div class="row">
+	<h4>Real Time Ball Position</h4>
 </div>
 
 <br/>
@@ -165,12 +167,33 @@
 
 		};
 
+		var sendPostGame = function () {
+			$.post("/physics/start",
+				sendObj,
+				function (data, status) {
+					if (data.errCode === 0) {
+						//there is no error
+						window.location.href = "/physics"
+					} else {
+						//what to do with error ?
+					};
+				});
+
+		};
+
+
 
 		$(document).ready(function () {
 			var timeVal = $('#varb-storage').attr("data-samp-time")
 			$('#ball_samp_time').val(timeVal);
 			$(document.body).on("click", ".sendButton", function () {
 				sendImageClick(false);
+			});
+			$(document.body).on("click", "#btn-start-game", function () {
+				sendObj.ball_samp_time = $('#ball_samp_time').val();
+				sendObj.start_button = true;
+				sendObj.stop_button = false;
+				sendPostGame();
 			});
 			$(document.body).on("click", "#btn-start", function () {
 				sendObj.ball_samp_time = $('#ball_samp_time').val();
