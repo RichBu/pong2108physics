@@ -4,12 +4,14 @@ var router = express.Router();
 var mmysql = require('mysql');
 var connection = require('../config/connection.js');
 var moment = require("moment");
+var momentDurationFormatSetup = require("moment-duration-format");
 var numeral = require("numeral");
 var nodemailer = require('nodemailer');
 var crypto = require('crypto');
 var glob = require("glob");
 var fs = require('fs');
 
+momentDurationFormatSetup(moment);
 
 //setup with password
 var transporter = nodemailer.createTransport({

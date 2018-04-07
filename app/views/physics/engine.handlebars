@@ -82,13 +82,26 @@
 	</div>
 	<div class="col-md-3">
 		<div class="row">
-			<div class="panel panel-primary">
-				<div class="panel-heading">Ball Samp Time</div>
-				<div class="panel-body">
-					<input style="width: 90%; margin: 5px 0px 5px 0px;" type="text" name="ball_samp_time" id="ball_samp_time" placeholder="ball samp time">
-					<!--
+			<div class="col-md-6">
+				<div class="panel panel-primary">
+					<div class="panel-heading">Ball upd tim</div>
+					<div class="panel-body">
+						<input style="width: 90%; margin: 5px 0px 5px 0px;" type="text" name="ball_samp_time" id="ball_samp_time" placeholder="ball samp time">
+						<!--
 					<h4 id="ball_samp_time"></h4>
 					-->
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="panel panel-primary">
+					<div class="panel-heading">sql upd tim</div>
+					<div class="panel-body">
+						<input style="width: 90%; margin: 5px 0px 5px 0px;" type="text" name="sql_upd_time" id="sql_upd_time" placeholder="sql upd time">
+						<!--
+					<h4 id="ball_samp_time"></h4>
+					-->
+					</div>
 				</div>
 			</div>
 		</div>
@@ -171,9 +184,9 @@
 				sendObj.stop_button = true;
 				sendPost();
 			});
-//			window.setTimeout( function() {
-//				window.location.reload(true);
-//			}, 10000 )
+			//			window.setTimeout( function() {
+			//				window.location.reload(true);
+			//			}, 10000 )
 
 		});
 

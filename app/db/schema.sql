@@ -64,8 +64,13 @@ CREATE TABLE games (
     ball_type INT,
     ball_curr_vel INT,
     ball_curr_pos_X FLOAT(15,10),
-    start_time_unix INT(13),
-    stop_time_unix INT(13),
+    ball_curr_pos_Y FLOAT(15,10),
+    ball_curr_pos_Z FLOAT(15,10),
+    ball_curr_pos_loc_GPS_lat FLOAT(15,10),
+    ball_curr_pos_loc_GPS_lon FLOAT(15,10),
+    game_soeed_up_fact FLOAT(10,5),
+    start_time_unix BIGINT(20),
+    stop_time_unix BIGINT(20),
     isGameRunning BOOLEAN,
     PRIMARY KEY (game_id)
 );
@@ -74,24 +79,60 @@ CREATE TABLE games (
 CREATE TABLE ball_hits (
     ball_hit_id  INT NOT NULL AUTO_INCREMENT,
     game_id INT,
-    time_start_unix INT(13),
-    time_stop_unix INT(13),
+    time_start_unix BIGINT(20),
+    time_stop_unix BIGINT(20),
+    start_pos_loc_GPS_lat REAL(15,10),
+    start_pos_loc_GPS_lon REAL(15,10),
+    stop_pos_loc_GPS_lat REAL(15,10),
+    stop_pos_loc_GPS_lon REAL(15,10),
+    dist_between REAL(20,5),
     type_hit VARCHAR(10),
     result_hit VARCHAR(10),
     player_num INT,
-    ball_accel FLOAT(20,5),
+    ball_accel_val FLOAT(10,5),
+    ball_accel_tim FLOAT(20,5),
     ball_vel FLOAT(20,5),
     ball_angle FLOAT(10,5),
+    speed_up_fact FLOAT(10,5),
     PRIMARY KEY (ball_hit_id)
 );
 
 
+
+CREATE TABLE ball_pos (
+    cur_pos_id  INT NOT NULL AUTO_INCREMENT,
+    game_id INT,
+    ball_hit_id  INT,
+    time_start_str VARCHAR(30),
+    time_stop_str VARCHAR(30),
+    ball_curr_vel INT,
+    ball_curr_pos_X REAL(15,10),
+    ball_curr_pos_Y REAL(15,10),
+    ball_curr_pos_Z REAL(15,10),
+    ball_curr_pos_loc_GPS_lat REAL(15,10),
+    ball_curr_pos_loc_GPS_lon REAL(15,10),
+    dist_between REAL(20,5),
+    dist_play_1  REAL(20,5),
+    time_play_1  REAL(10,5),
+    dist_play_2  REAL(20,5),
+    time_play_2  REAL(10,5),
+    ball_accel_val FLOAT(10,5),
+    ball_accel_tim FLOAT(20,5),
+    ball_vel FLOAT(20,5),
+    ball_angle FLOAT(10,5),
+    speed_up_fact FLOAT(10,5),
+    PRIMARY KEY (cur_pos_id)
+);
+
+
+
 CREATE TABLE engine_stats (
     engine_stats_id INT NOT NULL AUTO_INCREMENT,
-    time_started_unix INT(13),
-    time_stopped_unix INT(13),
+    time_started_unix BIGINT(20),
+    time_stopped_unix BIGINT(20),
     samp_time_ball FLOAT(5,2),
-    isRunning BOOLEAN,
+    samp_time_sql FLOAT(5,2),
+    isRunning INT,
     PRIMARY KEY (engine_stats_id)
 );
 
@@ -110,7 +151,7 @@ CREATE TABLE administrators (
 CREATE TABLE audit_log (
     id INT AUTO_INCREMENT,
     typeRec VARCHAR (15),
-    time_stamp INT(13),
+    time_stamp BIGINT(20),
     user_name VARCHAR(20),
     user_email VARCHAR(20),
     fault VARCHAR(30),

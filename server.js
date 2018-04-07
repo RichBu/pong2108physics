@@ -18,13 +18,13 @@ app.use(express.static(path.join(__dirname, './app/public')));
 var cookieParser = require('cookie-parser');
 var session = require('express-session');  //allows user to stay logged in
 //allow sessions
-app.use(session({ secret: 'app', cookie: { maxAge: 6*1000*1000*1000*1000*1000*1000 }, resave: true, saveUninitialized: false}));
+app.use(session({ secret: 'app', cookie: { maxAge: 6 * 1000 * 1000 * 1000 * 1000 * 1000 * 1000 }, resave: true, saveUninitialized: false }));
 app.use(cookieParser());
 
 
 //need for parsing JSON files
-app.use(bodyParser.json( { limit: '50mb'} ));
-app.use(bodyParser.urlencoded({ extended: true, limit:'50mb' }));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 app.use(bodyParser.text());
 app.use(morgan('dev'));
 
@@ -42,7 +42,7 @@ var exphbs = require("express-handlebars");
 var hbs = exphbs.create({
     // Specify helpers which are only registered on this instance.
     helpers: {
-        if_eq: function(a, b, opts) {
+        if_eq: function (a, b, opts) {
             if (a == b) {
                 return opts.fn(this);
             } else {
@@ -51,7 +51,7 @@ var hbs = exphbs.create({
         },
         foo: function (a) { return 'FOO!' + a; },
         bar: function (b) { return 'BAR!' + b; },
-        breaklines: function(text) {
+        breaklines: function (text) {
             text = Handlebars.Utils.escapeExpression(text);
             text = text.replace(/(\r\n|\n|\r)/gm, '<br>');
             return new Handlebars.SafeString(text);
@@ -88,7 +88,50 @@ app.use("/admin", adminController);
 
 
 // Start listening on PORT
-app.listen(PORT, function() {
-  console.log('app is up, running, and listening on port: ' + PORT);
+app.listen(PORT, function () {
+    console.log('app is up, running, and listening on port: ' + PORT);
 });
+
+var timerBallUpd;   //const variable for the update of the ball speed
+
+//put in the logic to run the physics engine now
+var update_ball_pos = function () {
+    //console.log('update position');
+};
+
+
+var timer_check_if_update = function () {
+    //check if there should be an update
+
+    var query = "SELECT * FROM engine_stats";
+
+    connection.query(query, function (err, response) {
+        running_stat = response[0].isRunning;
+        if (response[0].isRunning || response[0].isRunning != 0) {
+            samp_time_ball = response[0].samp_time_ball;
+
+            if (timerBallUpd === undefined || timerBallUpd === null) {
+                //timer is not currently setup to run.  only then 
+                //start it up, otherwise will have duplicates
+                console.log('turning on timer');
+                timerBallUpd = setInterval(update_ball_pos, samp_time_ball);
+            };
+        } else {
+            if (timerBallUpd !== undefined && timerBallUpd !== null) {
+                //if (timerBallUpd['0'] !== null) {
+                //timer is defined and running, but want to shut off
+                console.log('turning off the timer');
+                clearInterval(timerBallUpd);
+                timerBallUpd = null;
+                //console.log(timerBallUpd['0']);
+                //};
+            };
+        };
+    });
+
+};
+
+setInterval(timer_check_if_update, 5000);
+
+
 

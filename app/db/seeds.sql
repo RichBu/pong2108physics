@@ -58,13 +58,75 @@ VALUES (
     "successful",
     " ",
     " "
-)
+);
 
 
-INSERT INTO engine_stats ( time_started_unix, time_stopped_unix, samp_time_ball, isRunning )
+INSERT INTO engine_stats ( time_started_unix, time_stopped_unix, samp_time_ball, samp_time_sql, isRunning )
 VALUES (
     0,
     0,
     1.0,
-    false
-)
+    5.0,
+    0
+);
+
+
+INSERT INTO ball_hits ( 
+    game_id,
+    time_start_unix,
+    time_stop_unix,
+    start_pos_loc_GPS_lat,
+    start_pos_loc_GPS_lon,
+    stop_pos_loc_GPS_lat,
+    stop_pos_loc_GPS_lon,
+    dist_between,
+    type_hit,
+    result_hit,
+    player_num,
+    ball_accel_val,
+    ball_accel_tim,
+    ball_vel,
+    ball_angle,
+    speed_up_fac )
+VALUES (
+    1,
+    0,
+    0,
+    0.000,
+    0.00,
+    0.000,
+    0.000,
+    20,
+    "SERVE",
+    "GOOD",
+    1,
+    0.00,
+    0.00,
+    0.50,
+    0.00,
+    1.0
+)    
+
+
+
+
+CREATE TABLE ball_hits (
+    ball_hit_id  INT NOT NULL AUTO_INCREMENT,
+    game_id INT,
+    time_start_unix INT(13),
+    time_stop_unix INT(13),
+    start_pos_loc_GPS_lat FLOAT(15,10),
+    start_pos_loc_GPS_lon FLOAT(15,10),
+    stop_pos_loc_GPS_lat FLOAT(15,10),
+    stop_pos_loc_GPS_lon FLOAT(15,10),
+    dist_between FLOAT(20,5),
+    type_hit VARCHAR(10),
+    result_hit VARCHAR(10),
+    player_num INT,
+    ball_accel_val FLOAT(10,5),
+    ball_accel_tim FLOAT(20,5),
+    ball_vel FLOAT(20,5),
+    ball_angle FLOAT(10,5),
+    speed_up_fact FLOAT(10,5),
+    PRIMARY KEY (ball_hit_id)
+);
