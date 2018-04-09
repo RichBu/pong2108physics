@@ -173,7 +173,7 @@ var update_ball_pos = function () {
 
 
 
-function game_rec (
+function game_rec_type (
     _game_id,
     _player_1_id,
     _player_1_coord_X,
@@ -328,19 +328,69 @@ var write_ball_hit_rec = function(_game_id) {
 
 
 
+function ball_hit_rec_type(
+    _game_id,
+    _ball_hit_id,
+    _time_start_str,
+    _time_start_unix,
+    _time_stop_unix,
+    _start_pos_loc_GPS_lat,
+    _start_pos_loc_GPS_lon,
+    _stop_pos_loc_GPS_lat,
+    _stop_pos_loc_GPS_lon,
+    _dist_between,
+    _type_hit,
+    _result_hit,
+    _player_num,
+    _ball_accel_val,
+    _ball_accel_tim,
+    _ball_vel,
+    _ball_angle,
+    _speed_up_fact
+) {
+    this.game_id = _game_id;
+    this.ball_hit_id = _ball_hit_id;
+    this.time_start_st = _time_start_str;
+    this.time_start_unix = _time_start_unix;
+    this.time_stop_unix = _time_stop_unix;
+    this.start_pos_loc_GPS_lon = _start_pos_loc_GPS_lon;
+    this.stop_pos_loc_GPS_lat = _stop_pos_loc_GPS_lat;
+    this.stop_pos_loc_GPS_lon = _stop_pos_loc_GPS_lon;
+    this.dist_between = _dist_between;
+    this.type_hit = _type_hit;
+    this.result_hit = _result_hit;
+    this.player_num = _player_num;
+    this.ball_accel_val = _ball_accel_val;
+    this.ball_accel_tim = _ball_accel_tim;
+    this.ball_vel = _ball_vel;
+    this._ball_angle = _ball_angle;
+    this.speed_up_fact = _speed_up_fact;
+};
+
+
+
 var hit_ball = function ( _game_id, _player_num, _type_hit) {
     //incoming player_num is player who hit the ball
     //a player has hit the ball, so need to pull record from
     //game settings and push it onto a single player
-    switch (type_hit) {
-        case 0:        //serve
-            //write_ball_hit_rec( _game_id)
-            break;
-        case 1:        //good hit
-            break;
-        case 2:        //miss
-            break;
-    };
+    read_game_rec( _game_id).then( function(result) {
+        //a valid game rec has been read
+
+        switch (type_hit) {
+            case 0:        //serve
+                //write_ball_hit_rec( _game_id)
+                break;
+            case 1:        //good hit
+                break;
+            case 2:        //miss
+                break;
+        };
+    
+
+    }, function(err) {
+        //invalid read
+        console.log("can not hit ball no game stored");
+    });
 };
 
 

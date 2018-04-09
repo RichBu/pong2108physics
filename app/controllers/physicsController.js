@@ -125,13 +125,74 @@ router.post('/start', function (req, res) {
   console.log('started a game');
   var startTime_str = moment().format("YYYY-MM-DD HH:mm:ss a");
 
+  //create a record for the start of the game
+  var gr = new game_rec_type(
+    1,  //_game_id  later on make it increment
+    1, //_player_1_id,
+    0.00, //_player_1_coord_X,
+    0.00, //_player_1_coord_Y,
+    42.050377, //_player_1_locat_GPS_lat,
+    -87.684347, //_player_1_locat_GPS_lon,
+    "1801 N. Maple  Evanston, IL", // _player_1_locat_addr,
+    5.00, //_player_1_hit_time_win,
+    2, //_player_2_id,
+    3000.00, //_player_2_coord_X,
+    0.00, //_player_2_coord_Y,
+    41.896041,  //_player_2_locat_GPS_lat,
+    -87.618772, //_player_2_locat_GPS_lon,
+    "340 E. Superior St., Chicago, IL 60611", //_player_2_locat_addr,
+    5.00, //_player_2_hit_time_win,
+    4000.00, //_field_size_X,
+    40000.00, //_field_size_Y,
+    1.00, //_field_scale_X,
+    1.00, //_field_scale_Y,
+    3000.00, //_dist_players,
+    1, //_ball_type,
+    5.00, //_ball_curr_vel  ft/sec
+    0.00, //_ball_curr_pos_X,
+    0.00, //_ball_curr_pos_Y,
+    20.00, //_ball_curr_pos_Z,
+    42.050377, //_ball_curr_pos_loc_GPS_lat,
+    -87.684347, //_ball_curr_pos_loc_GPS_lon,
+    1.000, //_game_soeed_up_fact,
+    moment().valueOf(), //_start_time_unix,  start time in  unix ms
+    0, //_stop_time_unix,
+    true //_isGameRunning
+  );
 
-  //write to Firebase first, then mySQl
-  //this will allow the remotes to begin to catch up
-  fbase_ballpos_outputObj.time_start_str = moment().format("YYYY-MM-DD  HH:mm:ss a");
-  fbase_ballpos_outputObj.time.start_unix = moment().valueOf();
-  fbase_ballpos_outputObj._speed_up_fact = 1.0;
-
+  var gameRecArray = [
+    //gr.game_id,
+    gr.player_1_id,
+    gr.player_1_coord_X,
+    gr.player_1_coord_Y,
+    gr.player_1_locat_GPS_lat,
+    gr.player_1_locat_GPS_lon,
+    gr.player_1_locat_addr,
+    gr.player_1_hit_time_win,
+    gr.player_2_id,
+    gr.player_2_coord_X,
+    gr.player_2_coord_Y,
+    gr.player_2_locat_GPS_lat,
+    gr.player_2_locat_GPS_lon,
+    gr.player_2_locat_addr,
+    gr.player_2_hit_time_win,
+    gr.field_size_X,
+    gr.field_size_Y,
+    gr.field_scale_X,
+    gr.field_scale_Y,
+    gr.dist_players,
+    gr.ball_type,
+    gr.ball_curr_vel,
+    gr.ball_curr_pos_X,
+    gr.ball_curr_pos_Y,
+    gr.ball_curr_pos_Z,
+    gr.ball_curr_pos_loc_GPS_lat,
+    gr.ball_curr_pos_loc_GPS_lon,
+    gr.game_soeed_up_fact,
+    gr.start_time_unix,
+    gr.stop_time_unix,
+    gr.isGameRunning
+  ];
 
   console.log("after change\n");
   console.log(fbase_ballpos_outputObj);

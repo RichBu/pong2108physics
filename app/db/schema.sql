@@ -71,7 +71,7 @@ CREATE TABLE games (
     game_soeed_up_fact FLOAT(10,5),
     start_time_unix BIGINT(20),
     stop_time_unix BIGINT(20),
-    isGameRunning BOOLEAN,
+    isGameRunning INT,
     PRIMARY KEY (game_id)
 );
 
