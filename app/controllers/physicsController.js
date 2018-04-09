@@ -121,19 +121,91 @@ router.post('/button', function (req, res) {
 
 
 
+
+function game_rec_type(
+  _game_id,
+  _player_1_id,
+  _player_1_coord_X,
+  _player_1_coord_Y,
+  _player_1_locat_GPS_lat,
+  _player_1_locat_GPS_lon,
+  _player_1_locat_addr,
+  _player_1_hit_time_win,
+  _player_2_id,
+  _player_2_coord_X,
+  _player_2_coord_Y,
+  _player_2_locat_GPS_lat,
+  _player_2_locat_GPS_lon,
+  _player_2_locat_addr,
+  _player_2_hit_time_win,
+  _field_size_X,
+  _field_size_Y,
+  _field_scale_X,
+  _field_scale_Y,
+  _dist_players,
+  _ball_type,
+  _ball_curr_vel,
+  _ball_curr_pos_X,
+  _ball_curr_pos_Y,
+  _ball_curr_pos_Z,
+  _ball_curr_pos_loc_GPS_lat,
+  _ball_curr_pos_loc_GPS_lon,
+  _game_soeed_up_fact,
+  _start_time_unix,
+  _stop_time_unix,
+  _isGameRunning
+) {
+  this.game_id = _game_id;
+  this.player_1_id = _player_1_id;
+  this.player_1_coord_X = _player_1_coord_X;
+  this.player_1_coord_Y = _player_1_coord_Y;
+  this.player_1_locat_GPS_lat = _player_1_locat_GPS_lat;
+  this.player_1_locat_GPS_lon = _player_1_locat_GPS_lon;
+  this.player_1_locat_addr =   _player_1_locat_addr;
+  this.player_1_hit_time_win = _player_1_hit_time_win;
+  this.player_2_id = _player_2_id;
+  this.player_2_coord_X = _player_2_coord_X;
+  this.player_2_coord_Y = _player_2_coord_Y;
+  this.player_2_locat_GPS_lat = _player_2_locat_GPS_lat;
+  this.player_2_locat_GPS_lon = _player_2_locat_GPS_lon;
+  this.player_2_locat_addr = _player_2_locat_addr;
+  this.player_2_hit_time_win = _player_2_hit_time_win;
+  this.field_size_X = _field_size_X;
+  this.field_size_Y = _field_size_Y;
+  this.field_scale_X = _field_scale_X;
+  this.field_scale_Y = _field_scale_Y;
+  this.dist_players = _dist_players;
+  this.ball_type = _ball_type;
+  this.ball_curr_vel = _ball_curr_vel;
+  this.ball_curr_pos_X = _ball_curr_pos_X;
+  this.ball_curr_pos_Y = _ball_curr_pos_Y;
+  this.ball_curr_pos_Z = _ball_curr_pos_Z;
+  this.ball_curr_pos_loc_GPS_lat = _ball_curr_pos_loc_GPS_lat;
+  this.ball_curr_pos_loc_GPS_lon = _ball_curr_pos_loc_GPS_lon;
+  this.game_soeed_up_fact = _game_soeed_up_fact;
+  this.start_time_unix = _start_time_unix;
+  this.stop_time_unix = _stop_time_unix;
+  this.isGameRunning = _isGameRunning;
+};
+
+
+
+
 router.post('/start', function (req, res) {
   console.log('started a game');
+  var _game_id = 1;
   var startTime_str = moment().format("YYYY-MM-DD HH:mm:ss a");
 
   //create a record for the start of the game
+  //initialize with values
   var gr = new game_rec_type(
-    1,  //_game_id  later on make it increment
+    _game_id,  //_game_id  later on make it increment
     1, //_player_1_id,
     0.00, //_player_1_coord_X,
     0.00, //_player_1_coord_Y,
     42.050377, //_player_1_locat_GPS_lat,
     -87.684347, //_player_1_locat_GPS_lon,
-    "1801 N. Maple  Evanston, IL", // _player_1_locat_addr,
+    "1801 N. Maple,  Evanston, IL", // _player_1_locat_addr,
     5.00, //_player_1_hit_time_win,
     2, //_player_2_id,
     3000.00, //_player_2_coord_X,
@@ -143,7 +215,7 @@ router.post('/start', function (req, res) {
     "340 E. Superior St., Chicago, IL 60611", //_player_2_locat_addr,
     5.00, //_player_2_hit_time_win,
     4000.00, //_field_size_X,
-    40000.00, //_field_size_Y,
+    4000.00, //_field_size_Y,
     1.00, //_field_scale_X,
     1.00, //_field_scale_Y,
     3000.00, //_dist_players,
@@ -194,69 +266,79 @@ router.post('/start', function (req, res) {
     gr.isGameRunning
   ];
 
-  console.log("after change\n");
+  console.log("len=" + gameRecArray.length);
+
+  var query2_bottom = "";
+  var query2_top = "INSERT INTO games ";
+  query2_bottom += "( ";
+  query2_bottom += "player_1_id, player_1_coord_X, player_1_coord_Y, player_1_locat_GPS_lat, ";
+  query2_bottom += "player_1_locat_GPS_lon, player_1_locat_addr, player_1_hit_time_win, ";
+  query2_bottom += "player_2_id, player_2_coord_X, player_2_coord_Y, player_2_locat_GPS_lat, ";
+  query2_bottom += "player_2_locat_GPS_lon, player_2_locat_addr, player_2_hit_time_win, ";
+  query2_bottom += "field_size_X, field_size_Y, field_scale_X, field_scale_Y, dist_players, ";
+  query2_bottom += "ball_type, ball_curr_vel, ball_curr_pos_X, ball_curr_pos_Y, ";
+  query2_bottom += "ball_curr_pos_Z, ball_curr_pos_loc_GPS_lat, ball_curr_pos_loc_GPS_lon, ";
+  query2_bottom += "game_soeed_up_fact, start_time_unix, stop_time_unix, isGameRunning ";
+  query2_bottom += ") ";
+  query2_bottom += "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
+  var query2 = query2_top + query2_bottom;
+
+  var query3_bottom = "";
+  var query3_top = "UPDATE games SET "
+  query3_bottom += "player_1_id=?, player_1_coord_X=?, player_1_coord_Y=?, player_1_locat_GPS_lat=?, ";
+  query3_bottom += "player_1_locat_GPS_lon=?, player_1_locat_addr=?, player_1_hit_time_win=?, ";
+  query3_bottom += "player_2_id=?, player_2_coord_X=?, player_2_coord_Y=?, player_2_locat_GPS_lat=?, ";
+  query3_bottom += "player_2_locat_GPS_lon=?, player_2_locat_addr=?, player_2_hit_time_win=?, ";
+  query3_bottom += "field_size_X=?, field_size_Y=?, field_scale_X=?, field_scale_Y=?, dist_players=?, ";
+  query3_bottom += "ball_type=?, ball_curr_vel=?, ball_curr_pos_X=?, ball_curr_pos_Y=?, ";
+  query3_bottom += "ball_curr_pos_Z=?, ball_curr_pos_loc_GPS_lat=?, ball_curr_pos_loc_GPS_lon=?, ";
+  query3_bottom += "game_soeed_up_fact=?, start_time_unix=?, stop_time_unix=?, isGameRunning=? ";
+  query3_bottom + "WHERE game_id=?";
+  var query3 = query3_top + query3_bottom;
+
+
+  //console.log("after change\n");
   console.log(fbase_ballpos_outputObj);
   //need logic to find out which player hit the ball,
   //then get his position and stats to impart on the ball
 
 
-  //set to global variables right now.
-  //should poll the existing file first and
-  //get ball hit id from there and increment
-  var _game_id = 1;
-  var _ball_hit_id = 1;
-  var _time_start_str = startTime_str;
-
-  var _time_start_unix = 0;
-  var _time_stop_unix = 0;
-  var _start_pos_loc_GPS_lat = 42.050377;
-  var _start_pos_loc_GPS_lon = -87.684347;
-  var _stop_pos_loc_GPS_lat = 41.896041;
-  var _stop_pos_loc_GPS_lon = -87.618772;
-  var _dist_between = 100.45;   //feet between
-  var _type_hit = "SERVE";
-  var _result_hit = "GOOD";
-  var _player_num = 1;
-  var _ball_accel_val = 0.00;
-  var _ball_accel_tim = 0.00;
-  var _ball_vel = 5.00;         //in per second
-  var _ball_angle = 0.00;
-  var _speed_up_fact = 1.00;
-
-  var query = "INSERT INTO ball_hits ( ";
-  query += "game_id,  time_start_unix, time_stop_unix, start_pos_loc_GPS_lat, ";
-  query += "start_pos_loc_GPS_lon, stop_pos_loc_GPS_lat, stop_pos_loc_GPS_lon, ";
-  query += "dist_between, type_hit, result_hit, player_num, ball_accel_val, ";
-  query += "ball_accel_tim, ball_vel, ball_angle, speed_up_fact ) ";
-  query += "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
-
-  //console.log(query);
-  var queryArray = [
-    _game_id,
-    _time_start_unix,
-    _time_stop_unix,
-    _start_pos_loc_GPS_lat,
-    _start_pos_loc_GPS_lon,
-    _stop_pos_loc_GPS_lat,
-    _stop_pos_loc_GPS_lon,
-    _dist_between,
-    _type_hit,
-    _result_hit,
-    _player_num,
-    _ball_accel_val,
-    _ball_accel_tim,
-    _ball_vel,
-    _ball_angle,
-    _speed_up_fact
-  ];
-  //console.log(queryArray);
-
-  connection.query(query, queryArray, function (err, response) {
+  //first find out if game exists
+  var query1 = "SELECT * FROM games WHERE game_id=?";
+  connection.query(query1, [_game_id], function (err, response) {
     if (err) {
-      console.log("error at start game = \n" + err);
+      console.log("error start game -- find prev game = \n" + err);
+    } else {
+      //no error check if game_id exists
+      //write to audit file
+      console.log("resp=" + response);
+      if (response[0] == undefined || response[0] == null || response.length < 0) {
+        //it was empty so write new value, append (insert) into it
+        connection.query(query2, gameRecArray, function (err, response2) {
+          if (err) {
+            console.log("error at start game, insert = \n" + err);
+          } else {
+            console.log("wrote new game record");
+            //write to audit file
+            //if (err) throw err;  
+          };
+        });
+      } else {
+        //value exists so need to update it
+        //output array needs value of game_id
+        gameRecArray.push(_game_id);
+        connection.query(query3, gameRecArray, function (err, response2) {
+          if (err) {
+            console.log("error at start game, update = \n" + err);
+          } else {
+            console.log("updated existing record");
+            //write to audit file
+            //if (err) throw err;
+          };
+        });
+      };
+
     };
-    //write to audit file
-    //if (err) throw err;
   });
 
 
