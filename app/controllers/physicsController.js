@@ -120,39 +120,24 @@ router.post('/button', function (req, res) {
 });
 
 
+
 router.post('/start', function (req, res) {
   console.log('started a game');
-  var startTime_str = moment().format( "YYYY-MM-DD HH:mm:ss a" );
+  var startTime_str = moment().format("YYYY-MM-DD HH:mm:ss a");
 
-  var fbase_ballpos_outputObj = {
-    game_id: 1,
-    time_start_str: "",       //full string for calculating
-    ball_phyics: {
-      curr_vel : 0.0,
-      accel_val : 0.0,
-      accel_time : 0.0,
-      angle : 0.0
-    },
-    ball_curr_pos: {
-      pos_X: 0.0,
-      pos_Y: 0.0,
-      pos_Z: 0.0,
-      loc_GPS_lat: 0.0,
-      loc_GPS_lon: 0.0
-    },
-    dist : {
-      between : 0.0,
-      play_1 : 0.0,
-      play_2 : 0.0
-    },
-    time : {
-      start_unix : 0,
-      stop_unix : 0,
-      play_1 : 0.0,
-      play_2 : 0.0
-    },
-    speed_up_fact : 0.0,
-  };
+
+  //write to Firebase first, then mySQl
+  //this will allow the remotes to begin to catch up
+  fbase_ballpos_outputObj.time_start_str = moment().format("YYYY-MM-DD  HH:mm:ss a");
+  fbase_ballpos_outputObj.time.start_unix = moment().valueOf();
+  fbase_ballpos_outputObj._speed_up_fact = 1.0;
+
+
+  console.log("after change\n");
+  console.log(fbase_ballpos_outputObj);
+  //need logic to find out which player hit the ball,
+  //then get his position and stats to impart on the ball
+
 
   //set to global variables right now.
   //should poll the existing file first and
@@ -184,7 +169,7 @@ router.post('/start', function (req, res) {
   query += "ball_accel_tim, ball_vel, ball_angle, speed_up_fact ) ";
   query += "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
 
-  console.log(query);
+  //console.log(query);
   var queryArray = [
     _game_id,
     _time_start_unix,
@@ -203,10 +188,12 @@ router.post('/start', function (req, res) {
     _ball_angle,
     _speed_up_fact
   ];
-  console.log(queryArray);
+  //console.log(queryArray);
 
   connection.query(query, queryArray, function (err, response) {
-    console.log("error at start game = \n" + err);
+    if (err) {
+      console.log("error at start game = \n" + err);
+    };
     //write to audit file
     //if (err) throw err;
   });
