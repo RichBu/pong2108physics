@@ -87,7 +87,7 @@ INSERT INTO ball_hits (
     ball_accel_tim,
     ball_vel,
     ball_angle,
-    speed_up_fac )
+    speed_up_fact )
 VALUES (
     1,
     0,
@@ -110,23 +110,3 @@ VALUES (
 
 
 
-CREATE TABLE ball_hits (
-    ball_hit_id  INT NOT NULL AUTO_INCREMENT,
-    game_id INT,
-    time_start_unix INT(13),
-    time_stop_unix INT(13),
-    start_pos_loc_GPS_lat FLOAT(15,10),
-    start_pos_loc_GPS_lon FLOAT(15,10),
-    stop_pos_loc_GPS_lat FLOAT(15,10),
-    stop_pos_loc_GPS_lon FLOAT(15,10),
-    dist_between FLOAT(20,5),
-    type_hit VARCHAR(10),
-    result_hit VARCHAR(10),
-    player_num INT,
-    ball_accel_val FLOAT(10,5),
-    ball_accel_tim FLOAT(20,5),
-    ball_vel FLOAT(20,5),
-    ball_angle FLOAT(10,5),
-    speed_up_fact FLOAT(10,5),
-    PRIMARY KEY (ball_hit_id)
-);

@@ -2,6 +2,7 @@
 //global variable .... must leave off the "var", "const", or "let"
 fbase_ballpos_outputObj = {  //variable written to in Firebase
     game_id: 1,
+    ball_active: 0,         //ball is active if 1
     time_start_str: "",       //full string for calculating
     ball_physics: {
         curr_vel: 0.0,
@@ -32,6 +33,7 @@ fbase_ballpos_outputObj = {  //variable written to in Firebase
     hit_play_2: 0
 };
 
+var fbase_ball_pos_inputObj;
 
 
 var express = require('express');
@@ -39,6 +41,12 @@ var bodyParser = require('body-parser');
 var path = require('path');
 var methodOverride = require("method-override");
 var morgan = require('morgan');
+var util = require('util');   //for inspecting objects
+var extend = require('extend');
+
+var moment = require("moment");
+var momentDurationFormatSetup = require("moment-duration-format");
+var numeral = require("numeral");
 
 
 // Configure the Express application
@@ -59,7 +67,7 @@ var configData = {
     firebaseMainGame: "/games",
     firebaseStatusFolder: "/status",
     firebaseRefreshBit: "/status/refreshUsers",
-    firebaseActive: false
+    firebaseActive: true
 };
 
 var connConfig;
@@ -165,7 +173,13 @@ var update_ball_pos = function () {
     //console.log('update position');
     if (configData.firebaseActive == true) {
         //only run these routines if firebase is active
-        dbUserGameStorageMain.set(fbase_ballpos_outputObj);
+        dbIncomingRec  = database.ref(configData.firebaseMainGame);
+        dbIncomingRec.on( "value", function( snap ) {
+            //incoming value came in
+            console.log("snap=\n" + util.inspect(snap, false, null ) );
+            //only update after having read on in
+            dbUserGameStorageMain.set(fbase_ballpos_outputObj);
+        });
     } else {
         //console.log(fbase_ballpos_outputObj);
     }
@@ -173,7 +187,7 @@ var update_ball_pos = function () {
 
 
 
-function game_rec_type (
+function game_rec_type(
     _game_id,
     _player_1_id,
     _player_1_coord_X,
@@ -204,14 +218,13 @@ function game_rec_type (
     _game_soeed_up_fact,
     _start_time_unix,
     _stop_time_unix,
-    _isGameRunning            
+    _isGameRunning
 ) {
     this.game_id = _game_id;
     this.player_1_id = _player_1_id;
     this.player_1_coord_X = _player_1_coord_X;
     this.player_1_coord_Y = _player_1_coord_Y;
     this.player_1_locat_GPS_lat = _player_1_locat_GPS_lat;
-    this.player_1_locat_GPS_lon = _player_1_locat_GPS_lon;
     this.player_1_locat_GPS_lon = _player_1_locat_GPS_lon;
     this.player_1_hit_time_win = _player_1_hit_time_win;
     this.player_2_id = _player_2_id;
@@ -241,17 +254,17 @@ function game_rec_type (
 
 
 
-var read_game_rec = function ( _game_id) {
+var read_game_rec = function (_game_id) {
     //constructor for record coming from the database
     var query = "SELECT * FROM games WHERE game_id=?";
 
-    return new Promise( function(resolve, reject) {
-        connection.query(query, [ _game_id], function (err, response) {
-            if(err) {
+    return new Promise(function (resolve, reject) {
+        connection.query(query, [_game_id], function (err, response) {
+            if (err) {
                 console.log("err at read game rec = ");
                 console.log(err);
             } else {
-                resolve( response );
+                resolve(response);
             };
         });
     })
@@ -260,7 +273,7 @@ var read_game_rec = function ( _game_id) {
 
 
 
-var write_ball_hit_rec = function(_game_id) {
+write_ball_hit_rec = function (_game_id, _player_num, _type_hit, _result_hit, _ball_active) {
     //will have to be some kind of ball hit.  need to know:
     //player number and type of hit ?
     var startTime_str = moment().format("YYYY-MM-DD HH:mm:ss a");
@@ -276,9 +289,9 @@ var write_ball_hit_rec = function(_game_id) {
     var _stop_pos_loc_GPS_lat = 41.896041;
     var _stop_pos_loc_GPS_lon = -87.618772;
     var _dist_between = 100.45;   //feet between
-    var _type_hit = "SERVE";
-    var _result_hit = "GOOD";
-    var _player_num = 1;
+    //var _type_hit = "SERVE";
+    //var _result_hit = "GOOD";
+    //var _player_num = 1;          comes in from the params
     var _ball_accel_val = 0.00;
     var _ball_accel_tim = 0.00;
     var _ball_vel = 5.00;         //in per second
@@ -286,15 +299,16 @@ var write_ball_hit_rec = function(_game_id) {
     var _speed_up_fact = 1.00;
 
     var query = "INSERT INTO ball_hits ( ";
-    query += "game_id,  time_start_unix, time_stop_unix, start_pos_loc_GPS_lat, ";
+    query += "game_id,  ball_active, time_start_unix, time_stop_unix, start_pos_loc_GPS_lat, ";
     query += "start_pos_loc_GPS_lon, stop_pos_loc_GPS_lat, stop_pos_loc_GPS_lon, ";
     query += "dist_between, type_hit, result_hit, player_num, ball_accel_val, ";
     query += "ball_accel_tim, ball_vel, ball_angle, speed_up_fact ) ";
-    query += "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
+    query += "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
 
     //console.log(query);
     var queryArray = [
         _game_id,
+        _ball_active,
         _time_start_unix,
         _time_stop_unix,
         _start_pos_loc_GPS_lat,
@@ -331,6 +345,7 @@ var write_ball_hit_rec = function(_game_id) {
 function ball_hit_rec_type(
     _game_id,
     _ball_hit_id,
+    _ball_active,
     _time_start_str,
     _time_start_unix,
     _time_stop_unix,
@@ -350,9 +365,11 @@ function ball_hit_rec_type(
 ) {
     this.game_id = _game_id;
     this.ball_hit_id = _ball_hit_id;
+    this.ball_active = _ball_active;
     this.time_start_st = _time_start_str;
     this.time_start_unix = _time_start_unix;
     this.time_stop_unix = _time_stop_unix;
+    this.start_pos_loc_GPS_lat = _start_pos_loc_GPS_lat;
     this.start_pos_loc_GPS_lon = _start_pos_loc_GPS_lon;
     this.stop_pos_loc_GPS_lat = _stop_pos_loc_GPS_lat;
     this.stop_pos_loc_GPS_lon = _stop_pos_loc_GPS_lon;
@@ -363,31 +380,136 @@ function ball_hit_rec_type(
     this.ball_accel_val = _ball_accel_val;
     this.ball_accel_tim = _ball_accel_tim;
     this.ball_vel = _ball_vel;
-    this._ball_angle = _ball_angle;
+    this.ball_angle = _ball_angle;
     this.speed_up_fact = _speed_up_fact;
 };
 
 
 
-var hit_ball = function ( _game_id, _player_num, _type_hit) {
+hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
     //incoming player_num is player who hit the ball
+    console.log("sub = hit_ball");
+    console.log("player = ", _player_num);
+
+    //write to Firebase first, then mySQl
+    //this will allow the remotes to begin to catch up
+    fbase_ballpos_outputObj.time_start_str = moment().format("YYYY-MM-DD  HH:mm:ss a");
+    fbase_ballpos_outputObj.time.start_unix = moment().valueOf();
+    fbase_ballpos_outputObj.speed_up_fact = 1.0;
+
+    var init_ball_accel_val = 10.0;
+    var init_ball_accel_tim = 3.00;
+    var init_ball_vel = 10.00;
+    var init_ball_angle = 0.00;
+    var init_speed_up_fact = 1.00;
+
+    var init_ball_pos_Z = 10.00;
+
+    var init_ball_active = 1;  //right now all hits make it active
+
+    var out_ball_hit_rec;
     //a player has hit the ball, so need to pull record from
     //game settings and push it onto a single player
-    read_game_rec( _game_id).then( function(result) {
+    read_game_rec(_game_id).then(function (result) {
+        var rc = result[0]; //short hand
         //a valid game rec has been read
 
-        switch (type_hit) {
+        switch (_type_hit_int) {
             case 0:        //serve
-                //write_ball_hit_rec( _game_id)
+                _type_hit = "serve";
+                _type_result = "good";
+                write_ball_hit_rec(_game_id, _player_num, _type_hit, _type_result, 1);
                 break;
             case 1:        //good hit
                 break;
             case 2:        //miss
                 break;
         };
-    
 
-    }, function(err) {
+        if (_player_num === 1) {
+            //first player   
+            out_ball_hit_rec = new ball_hit_rec_type(
+                _game_id,
+                0, //ball hit id
+                init_ball_active,
+                moment().format("YYYY-MM-DD HH:mm:ss a"),
+                moment().valueOf(),
+                0,
+                rc.player_1_locat_GPS_lat,
+                rc.player_1_locat_GPS_lon,
+                0.00,
+                0.00,
+                rc.dist_players,
+                _type_hit,
+                _result_hit,
+                1, //play num
+                init_ball_accel_val,
+                init_ball_accel_tim,
+                init_ball_vel,
+                init_ball_angle,
+                init_speed_up_fact
+            );
+            fbase_ballpos_outputObj.hit_play_1 = 1;
+            fbase_ballpos_outputObj.hit_play_2 = 0;
+        } else {
+            //second player
+            out_ball_hit_rec = new ball_hit_rec_type(
+                _game_id,
+                0, //ball hit id
+                moment().format("YYYY-MM-DD HH:mm:ss a"),
+                moment().valueOf(),
+                0,
+                rc.player_2_locat_GPS_lat,
+                rc.player_2_locat_GPS_lon,
+                0.00,
+                0.00,
+                rc.dist_players,
+                _type_hit,
+                _result_hit,
+                2, //play num
+                init_ball_accel_val,
+                init_ball_accel_tim,
+                init_ball_vel,
+                init_ball_angle,
+                init_speed_up_fact
+            );
+            fbase_ballpos_outputObj.hit_play_1 = 0;
+            fbase_ballpos_outputObj.hit_play_2 = 1;
+        };
+
+        //setup the firebase variables
+        var fbo = fbase_ballpos_outputObj; //shorthand
+        fbo.game_id = _game_id;
+        fbo.ball_physics.curr_vel = init_ball_vel;
+        fbo.ball_physics.accel_val = init_ball_accel_val;
+        fbo.ball_physics.accel_time = init_ball_accel_tim;
+        fbo.ball_physics.angle = init_ball_angle;
+        fbo.ball_curr_pos.loc_GPS_lat = out_ball_hit_rec.start_pos_loc_GPS_lat;
+        fbo.ball_curr_pos.loc_GPS_lon = out_ball_hit_rec.start_pos_loc_GPS_lon;
+        if (fbo.hit_play_1 === 1) {
+            //player #1 hit the ball, so move his recs from game rec
+            //to firebase
+            fbo.ball_curr_pos.loc_GPS_lat = rc.player_1_locat_GPS_lat;
+            fbo.ball_curr_pos.loc_GPS_lon = rc.player_1_locat_GPS_lon;
+            fbo.ball_curr_pos.pos_X = rc.player_1_coord_X;
+            fbo.ball_curr_pos.pos_Y = rc.player_1_coord_Y;
+            fbo.ball_curr_pos.pos_Z = init_ball_pos_Z;
+            fbo.dist.between = rc.dist_players;
+            fbo.dist.play_1 = 0.0;
+            fbo.dist.play_2 = rc.dist_players;
+        } else {
+            //must be player #1
+            fbo.ball_curr_pos.loc_GPS_lat = rc.player_2_locat_GPS_lat;
+            fbo.ball_curr_pos.loc_GPS_lon = rc.player_2_locat_GPS_lon;
+            fbo.ball_curr_pos.pos_X = rc.player_2_coord_X;
+            fbo.ball_curr_pos.pos_Y = rc.player_2_coord_Y;
+            fbo.ball_curr_pos.pos_Z = init_ball_pos_Z;
+            fbo.dist.between = rc.dist_players;
+            fbo.dist.play_1 = rc.dist_players;
+            fbo.dist.play_2 = 0.0;
+        };
+
+    }, function (err) {
         //invalid read
         console.log("can not hit ball no game stored");
     });

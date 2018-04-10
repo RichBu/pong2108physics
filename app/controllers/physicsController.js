@@ -121,6 +121,37 @@ router.post('/button', function (req, res) {
 
 
 
+router.post('/button/hit', function (req, res) {
+  console.log('post hit button routes');
+  var ball_samp_time = req.body.ball_samp_time;
+  var start_button_stat = req.body.start_button;
+  var stop_button_stat = req.body.stop_button;
+  var button_hit_01 = req.body.hit_01;
+  var button_hit_02 = req.body.hit_02;
+  var running_stat = true;
+
+  //fixed strings right now
+  var fixed_game_id = 1;
+  var fixed_type_hit_int = 0;  //for serve
+  var fixed_type_hit = "serve";
+  var fixed_result_hit = "good";
+
+  var player_hit;
+  if (button_hit_01 == 1) {
+    player_hit = 1;
+  }
+  else if (button_hit_02 == 1) {
+    player_hit = 2;
+  };
+
+  console.log("player hit = " + player_hit );
+  console.log(button_hit_01);
+  console.log(button_hit_02);
+  console.log("before the hit_ball");
+  hit_ball( fixed_game_id, player_hit, fixed_type_hit_int, fixed_result_hit );
+  //write_ball_hit_rec(1, "serve", "good");
+});
+
 
 function game_rec_type(
   _game_id,
@@ -161,7 +192,7 @@ function game_rec_type(
   this.player_1_coord_Y = _player_1_coord_Y;
   this.player_1_locat_GPS_lat = _player_1_locat_GPS_lat;
   this.player_1_locat_GPS_lon = _player_1_locat_GPS_lon;
-  this.player_1_locat_addr =   _player_1_locat_addr;
+  this.player_1_locat_addr = _player_1_locat_addr;
   this.player_1_hit_time_win = _player_1_hit_time_win;
   this.player_2_id = _player_2_id;
   this.player_2_coord_X = _player_2_coord_X;
