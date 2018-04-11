@@ -44,19 +44,7 @@ router.get('/', function (req, res) {
     } else {
       timeStop_str = moment.unix(timeStop_unix / 1000).format("YYYY-MM-DD  hh:mm:ss a");
     };
-    //var timeStop_str = response[0].isRunning!==0 ? "- - - - -" : moment.unix(timeStop_unix/1000).format("YYYY-MM-DD  hh:mm:ss a");
     var timeElapsed_unix = moment.duration(timeStop_unix - timeStart_unix);
-    //var timeElapsed_unix = moment().unix() - timeStart_unix;
-    //var newTimeElap = moment.unix(timeElapsed_unix)- moment("06:00").format("hh:mm");
-    //var t1 = moment.unix(timeStart_unix);
-    //var t2 = moment();
-    //console.log( moment.unix(newTimeElap).format("hh:mm:ss")   );
-    //var timeElapsed_unix = moment().from( moment.unix(timeStart_unix));
-    //var timeElapsed_unix = moment( moment().unix(timeStart_unix)).fromNow();
-    //console.log("unix time = \n" + timeElapsed_unix);
-    //console.log( moment.unix(timeElapsed_unix).format("hh:mm:ss") );
-    //console.log( moment( moment.duration(timeElapsed_unix)).format("hh:mm:ss") );
-    //var timeElapsed_str = response[0].isRunning!==0 ? moment.unix(timeElapsed_unix).format("hh:mm:ss") : "- - - - -";
     var timeElapsed_str = response[0].isRunning !== 0 ? timeElapsed_unix.format("HH:mm:ss", { trim: false }) : "- - - - -";
     var isRunning_str = response[0].isRunning !== 0 ? "RUNNING" : "STOPPED";
     res.render('../app/views/physics/engine', {
@@ -64,6 +52,7 @@ router.get('/', function (req, res) {
       time_stopped: timeStop_str,
       time_elapsed: timeElapsed_str,
       samp_time_ball: response[0].samp_time_ball,
+      speed_up_fact: response[0].speed_up_fact,
       isRunning: isRunning_str
     });
 
@@ -72,6 +61,8 @@ router.get('/', function (req, res) {
 
 router.post('/button', function (req, res) {
   console.log('did a post inside of button routes');
+  var speed_up_fact = parseFloat(req.body.speed_up_fact);
+  fbase_ballpos_outputObj.speed_up_fact = speed_up_fact;
   var ball_samp_time = req.body.ball_samp_time;
   var start_button_stat = req.body.start_button;
   var stop_button_stat = req.body.stop_button;
@@ -103,9 +94,9 @@ router.post('/button', function (req, res) {
     };
 
     var query2 = "UPDATE engine_stats SET time_started_unix=?, ";
-    query2 += "time_stopped_unix=?, samp_time_ball=?, isRunning=? ";
+    query2 += "time_stopped_unix=?, samp_time_ball=?, speed_up_fact=?, isRunning=? ";
     query2 += "WHERE engine_stats_id=1";
-    var arrayOut = [timeStart_unix, timeStop_unix, parseFloat(ball_samp_time), running_stat];
+    var arrayOut = [timeStart_unix, timeStop_unix, parseFloat(ball_samp_time), speed_up_fact, running_stat];
     connection.query(query2, arrayOut, function (err, response) {
       //updated the engine stat
       if (err) console.log("error at button press query 2\n" + err);
@@ -123,6 +114,8 @@ router.post('/button', function (req, res) {
 
 router.post('/button/hit', function (req, res) {
   console.log('post hit button routes');
+  fbase_ballpos_outputObj.speed_up_fact = parseFloat(req.body.speed_up_fact);
+  console.log("speed up fact = " + fbase_ballpos_outputObj.speed_up_fact);
   var ball_samp_time = req.body.ball_samp_time;
   var start_button_stat = req.body.start_button;
   var stop_button_stat = req.body.stop_button;
@@ -144,11 +137,11 @@ router.post('/button/hit', function (req, res) {
     player_hit = 2;
   };
 
-  console.log("player hit = " + player_hit );
+  console.log("player hit = " + player_hit);
   console.log(button_hit_01);
   console.log(button_hit_02);
   console.log("before the hit_ball");
-  hit_ball( fixed_game_id, player_hit, fixed_type_hit_int, fixed_result_hit );
+  hit_ball(fixed_game_id, player_hit, fixed_type_hit_int, fixed_result_hit);
   //write_ball_hit_rec(1, "serve", "good");
 });
 
@@ -181,7 +174,7 @@ function game_rec_type(
   _ball_curr_pos_Z,
   _ball_curr_pos_loc_GPS_lat,
   _ball_curr_pos_loc_GPS_lon,
-  _game_soeed_up_fact,
+  _game_speed_up_fact,
   _start_time_unix,
   _stop_time_unix,
   _isGameRunning
@@ -213,7 +206,7 @@ function game_rec_type(
   this.ball_curr_pos_Z = _ball_curr_pos_Z;
   this.ball_curr_pos_loc_GPS_lat = _ball_curr_pos_loc_GPS_lat;
   this.ball_curr_pos_loc_GPS_lon = _ball_curr_pos_loc_GPS_lon;
-  this.game_soeed_up_fact = _game_soeed_up_fact;
+  this.game_speed_up_fact = _game_speed_up_fact;
   this.start_time_unix = _start_time_unix;
   this.stop_time_unix = _stop_time_unix;
   this.isGameRunning = _isGameRunning;
@@ -226,7 +219,8 @@ router.post('/start', function (req, res) {
   console.log('started a game');
   var _game_id = 1;
   var startTime_str = moment().format("YYYY-MM-DD HH:mm:ss a");
-
+  fbase_ballpos_outputObj.speed_up_fact = parseFloat(req.body.speed_up_fact);
+  console.log("after req.body");
   //create a record for the start of the game
   //initialize with values
   var gr = new game_rec_type(
@@ -236,10 +230,10 @@ router.post('/start', function (req, res) {
     0.00, //_player_1_coord_Y,
     42.050377, //_player_1_locat_GPS_lat,
     -87.684347, //_player_1_locat_GPS_lon,
-    "1801 N. Maple,  Evanston, IL", // _player_1_locat_addr,
+    "1801 Maple Ave.,  Evanston, IL 60208", // _player_1_locat_addr,
     5.00, //_player_1_hit_time_win,
     2, //_player_2_id,
-    3000.00, //_player_2_coord_X,
+    67056.00, //_player_2_coord_X,
     0.00, //_player_2_coord_Y,
     41.896041,  //_player_2_locat_GPS_lat,
     -87.618772, //_player_2_locat_GPS_lon,
@@ -249,7 +243,7 @@ router.post('/start', function (req, res) {
     4000.00, //_field_size_Y,
     1.00, //_field_scale_X,
     1.00, //_field_scale_Y,
-    3000.00, //_dist_players,
+    67056.00, //_dist_players,
     1, //_ball_type,
     5.00, //_ball_curr_vel  ft/sec
     0.00, //_ball_curr_pos_X,
@@ -257,7 +251,7 @@ router.post('/start', function (req, res) {
     20.00, //_ball_curr_pos_Z,
     42.050377, //_ball_curr_pos_loc_GPS_lat,
     -87.684347, //_ball_curr_pos_loc_GPS_lon,
-    1.000, //_game_soeed_up_fact,
+    parseFloat(req.body.speed_up_fact), //_game_speed_up_fact,
     moment().valueOf(), //_start_time_unix,  start time in  unix ms
     0, //_stop_time_unix,
     true //_isGameRunning
@@ -291,7 +285,7 @@ router.post('/start', function (req, res) {
     gr.ball_curr_pos_Z,
     gr.ball_curr_pos_loc_GPS_lat,
     gr.ball_curr_pos_loc_GPS_lon,
-    gr.game_soeed_up_fact,
+    gr.game_speed_up_fact,
     gr.start_time_unix,
     gr.stop_time_unix,
     gr.isGameRunning
@@ -309,7 +303,7 @@ router.post('/start', function (req, res) {
   query2_bottom += "field_size_X, field_size_Y, field_scale_X, field_scale_Y, dist_players, ";
   query2_bottom += "ball_type, ball_curr_vel, ball_curr_pos_X, ball_curr_pos_Y, ";
   query2_bottom += "ball_curr_pos_Z, ball_curr_pos_loc_GPS_lat, ball_curr_pos_loc_GPS_lon, ";
-  query2_bottom += "game_soeed_up_fact, start_time_unix, stop_time_unix, isGameRunning ";
+  query2_bottom += "game_speed_up_fact, start_time_unix, stop_time_unix, isGameRunning ";
   query2_bottom += ") ";
   query2_bottom += "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
   var query2 = query2_top + query2_bottom;
@@ -323,15 +317,34 @@ router.post('/start', function (req, res) {
   query3_bottom += "field_size_X=?, field_size_Y=?, field_scale_X=?, field_scale_Y=?, dist_players=?, ";
   query3_bottom += "ball_type=?, ball_curr_vel=?, ball_curr_pos_X=?, ball_curr_pos_Y=?, ";
   query3_bottom += "ball_curr_pos_Z=?, ball_curr_pos_loc_GPS_lat=?, ball_curr_pos_loc_GPS_lon=?, ";
-  query3_bottom += "game_soeed_up_fact=?, start_time_unix=?, stop_time_unix=?, isGameRunning=? ";
+  query3_bottom += "game_speed_up_fact=?, start_time_unix=?, stop_time_unix=?, isGameRunning=? ";
   query3_bottom + "WHERE game_id=?";
   var query3 = query3_top + query3_bottom;
 
 
   //console.log("after change\n");
-  console.log(fbase_ballpos_outputObj);
-  //need logic to find out which player hit the ball,
+  //console.log(fbase_ballpos_outputObj);
+  // *** to add: need logic to find out which player hit the ball,
   //then get his position and stats to impart on the ball
+
+  //move data over to the firebase object so that it can be written
+  var fbo = fbase_ballpos_outputObj; //shorthand notation
+
+  fbo.play_1.id = gr.player_1_id;
+  fbo.play_1.coord_X = gr.player_1_coord_X;
+  fbo.play_1.coord_Y = gr.player_1_coord_Y;
+  fbo.play_1.locat_GPS_lat = gr.player_1_locat_GPS_lat;
+  fbo.play_1.locat_GPS_lon = gr.player_1_locat_GPS_lon;
+  fbo.play_1.locat_addr = gr.player_1_locat_addr;
+  fbo.play_1.hit_time_win = gr.player_1_hit_time_win;
+
+  fbo.play_2.id = gr.player_2_id;
+  fbo.play_2.coord_X = gr.player_2_coord_X;
+  fbo.play_2.coord_Y = gr.player_2_coord_Y;
+  fbo.play_2.locat_GPS_lat = gr.player_2_locat_GPS_lat;
+  fbo.play_2.locat_GPS_lon = gr.player_2_locat_GPS_lon;
+  fbo.play_2.locat_addr = gr.player_2_locat_addr;
+  fbo.play_2.hit_time_win = gr.player_2_hit_time_win;
 
 
   //first find out if game exists

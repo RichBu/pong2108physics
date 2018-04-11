@@ -68,7 +68,7 @@ CREATE TABLE games (
     ball_curr_pos_Z FLOAT(15,10),
     ball_curr_pos_loc_GPS_lat FLOAT(15,10),
     ball_curr_pos_loc_GPS_lon FLOAT(15,10),
-    game_soeed_up_fact FLOAT(10,5),
+    game_speed_up_fact FLOAT(10,5),
     start_time_unix BIGINT(20),
     stop_time_unix BIGINT(20),
     isGameRunning INT,
@@ -79,6 +79,7 @@ CREATE TABLE games (
 CREATE TABLE ball_hits (
     ball_hit_id  INT NOT NULL AUTO_INCREMENT,
     game_id INT,
+    ball_active INT,
     time_start_unix BIGINT(20),
     time_stop_unix BIGINT(20),
     start_pos_loc_GPS_lat REAL(15,10),
@@ -132,6 +133,7 @@ CREATE TABLE engine_stats (
     time_stopped_unix BIGINT(20),
     samp_time_ball FLOAT(5,2),
     samp_time_sql FLOAT(5,2),
+    speed_up_fact FLOAT(5,2),
     isRunning INT,
     PRIMARY KEY (engine_stats_id)
 );

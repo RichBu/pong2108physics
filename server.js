@@ -18,16 +18,34 @@ fbase_ballpos_outputObj = {  //variable written to in Firebase
         loc_GPS_lon: 0.0
     },
     dist: {
-        between: 0.0,
-        play_1: 0.0,
-        play_2: 0.0
+        between: 0.0,   //in ft
+        play_1: 0.0,    //in ft
+        play_2: 0.0     
     },
     time: {
         start_unix: 0,
         stop_unix: 0,
         elapsed_unix: 0,
-        play_1: 0.0,
-        play_2: 0.0
+        play_1: 0.0,        //in secs
+        play_2: 0.0         //in secs
+    },
+    play_1: {
+        id: 1,
+        coord_X: 0.0,
+        coord_Y: 0.0,
+        locat_GPS_lat: 0.0,
+        locat_GPS_lon: 0.0,
+        locat_addr: "",
+        hit_time_win: 0.0
+    },
+    play_2: {
+        id: 1,
+        coord_X: 0.0,
+        coord_Y: 0.0,
+        locat_GPS_lat: 0.0,
+        locat_GPS_lon: 0.0,
+        locat_addr: "",
+        hit_time_win: 0.0
     },
     speed_up_fact: 0.0,
     hit_play_1: 0,
@@ -169,70 +187,97 @@ app.listen(PORT, function () {
 var timerBallUpd;   //const variable for the update of the ball speed
 
 
+var ball_calcs = function (snap, useLocal) {
+    //normally only called on a callback from the firebase read
+    //but, if firebase is down, call this function also
+
+    fbase_ball_pos_inputObj = {};
+    if (useLocal == false) {
+        //equivalent to jquery.extend.  will pick off only
+        //keys with .val()
+        extend(true, fbase_ball_pos_inputObj, snap.val());
+    } else {
+        //make a copy of the outgoting to the incoming
+        extend(true, fbase_ball_pos_inputObj, fbase_ballpos_outputObj);
+        //console.log("inputObj after copy=" + util.inspect(fbase_ball_pos_inputObj, false, null ) );
+    };
+    var fbio = fbase_ball_pos_inputObj;  //shorthand notation
+    //   console.log("snap=" + util.inspect(fbase_ball_pos_inputObj, false, null ) );
+    //only update after having read on in
+    var timeNow_unix = moment().valueOf();
+    var timeElapsed_ms = moment.duration(timeNow_unix - fbio.time.start_unix).valueOf();
+    timeElapsed_ms = timeElapsed_ms * fbio.speed_up_fact;
+    //solve dist = 1/2 * accel * t^2
+    //in order to solve physics problem, need to find out how long accelerating
+    //time accelerating can not be more than accel time limit
+    let timeAccel = 0.0;
+    let timeVel = 0.0;
+    if (timeElapsed_ms > (fbio.ball_physics.accel_time * 1000)) {
+        //ball is beyond the accel zone
+        timeAccel = fbio.ball_physics.accel_time;
+        timeVel = (timeElapsed_ms / 1000.0) - fbio.ball_physics.accel_time;
+    } else {
+        //ball is still in the accel zone
+        timeAccel = timeElapsed_ms / 1000.0;
+        timeVel = 0.0
+    };
+    //find out what the velocity is after accel is done
+    //console.log("accel = " + timeAccel);
+    //console.log("time vel = " + timeVel);
+    let velConst = (fbio.ball_physics.accel_val * timeAccel);
+    //console.log('veloc = ' + velConst);
+    let distTravel_in = (0.5 * fbio.ball_physics.accel_val * timeAccel * timeAccel) + velConst * timeVel;
+
+    fbio.time.elapsed_unix = timeElapsed_ms;
+    var fbo = fbase_ballpos_outputObj; //shorthand notation
+
+    //assume player #1 hit the ball, if not, then just revers the distances
+    fbio.dist.play_1 = distTravel_in / 12.0;
+    fbio.dist.play_2 = fbio.dist.between - fbio.dist.play_1;
+    if (fbio.hit_play_2 == 1) {
+        //player 1 hit the ball 
+        let temp1 = fbio.dist.play_2;
+        fbio.dist.play_2 = fbio.dist.play_1;
+        fbio.dist.play_1 = temp1;
+    };
+
+    fbo.ball_physics.curr_vel = velConst;
+    fbo.dist.play_1 = fbio.dist.play_1;
+    fbo.dist.play_2 = fbio.dist.play_2;
+    let distIn = (fbio.dist.play_1 / 12);
+    if(fbo.ball_physics.curr_vel ===0 ) {
+        //can't divide by zero, so make the time be really big
+        fbo.time.play_1 = 0.0;
+        fbo.time.play_2 = 0.0;
+    } else {
+        fbo.time.play_1 = (fbio.dist.play_1 / 12) / fbo.ball_physics.curr_vel;
+        fbo.time.play_2 = (fbio.dist.play_2 / 12) / fbo.ball_physics.curr_vel;
+    };
+    fbo.time.elapsed_unix = timeElapsed_ms;
+
+    //dbUserGameStorageMain.set(fbase_ballpos_outputObj);
+    if (configData.firebaseActive == true) {
+        dbUserGameStorageMain.set(fbo);
+    };
+};
+
+
 //put in the logic to run the physics engine now
 var update_ball_pos = function () {
-    console.log("entered update loop");
     //console.log('update position');
     if (configData.firebaseActive == true) {
         //only run these routines if firebase is active
         dbIncomingRec = database.ref(configData.firebaseMainGame);
         //dbIncomingRec.on("value", function (snap) {
         dbIncomingRec.once("value", function (snap) {
-            //incoming value came in
-
-            fbase_ball_pos_inputObj = {};
-            //equivalent to jquery.extend.  will pick off only
-            //keys with .val()
-            extend(true, fbase_ball_pos_inputObj, snap.val());
-            var fbio = fbase_ball_pos_inputObj;  //shorthand notation
-            //   console.log("snap=" + util.inspect(fbase_ball_pos_inputObj, false, null ) );
-            //only update after having read on in
-            var timeNow_unix = moment().valueOf();
-            var timeElapsed_ms = moment.duration(timeNow_unix - fbio.time.start_unix).valueOf();
-            //solve dist = 1/2 * accel * t^2
-            //in order to solve physics problem, need to find out how long accelerating
-            //time accelerating can not be more than accel time limit
-            let timeAccel = 0.0;
-            let timeVel = 0.0;
-            if (timeElapsed_ms > (fbio.ball_physics.accel_time * 1000)) {
-                //ball is beyond the accel zone
-                timeAccel = fbio.ball_physics.accel_time;
-                timeVel = (timeElapsed_ms / 1000.0) - fbio.ball_physics.accel_time;
-            } else {
-                //ball is still in the accel zone
-                timeAccel = timeElapsed_ms / 1000.0;
-                timeVel = 0.0
-            };
-            //find out what the velocity is after accel is done
-            console.log("accel = " + timeAccel);
-            console.log("time vel = " + timeVel);
-            let velConst = (fbio.ball_physics.accel_val * timeAccel);
-            console.log('veloc = ' + velConst);
-            let distTravel_in = (0.5 * fbio.ball_physics.accel_val * timeAccel * timeAccel) + velConst * timeVel;
-
-            fbio.time.elapsed_unix = timeElapsed_ms;
-            var fbo = fbase_ballpos_outputObj; //shorthand notation
-
-            //assume player #1 hit the ball, if not, then just revers the distances
-            fbio.dist.play_1 = distTravel_in / 12.0;
-            fbio.dist.play_2 = fbio.dist.between - fbio.dist.play_1;
-            if (fbio.hit_play_2 == 1) {
-                //player 1 hit the ball 
-                let temp1 = fbio.dist.play_2;
-                fbio.dist.play_2 = fbio.dist.play_1;
-                fbio.dist.play_1 = temp1;
-            };
-
-            fbo.ball_physics.curr_vel = velConst;
-            fbo.dist.play_1 = fbio.dist.play_1;
-            fbo.dist.play_2 = fbio.dist.play_2;
-            fbo.time.elapsed_unix = timeElapsed_ms;
-            //dbUserGameStorageMain.set(fbase_ballpos_outputObj);
-            dbUserGameStorageMain.set(fbo);
+            //a valud read was done
+            ball_calcs(snap, false);
         });
     } else {
         //console.log(fbase_ballpos_outputObj);
-    }
+        var snap = {};
+        ball_calcs(snap, true)
+    };
 };
 
 
@@ -346,7 +391,7 @@ write_ball_hit_rec = function (_game_id, _player_num, _type_hit, _result_hit, _b
     var _ball_accel_tim = 0.00;
     var _ball_vel = 5.00;         //in per second
     var _ball_angle = 0.00;
-    var _speed_up_fact = 1.00;
+    var _speed_up_fact = fbase_ballpos_outputObj.speed_up_fact;
 
     var query = "INSERT INTO ball_hits ( ";
     query += "game_id,  ball_active, time_start_unix, time_stop_unix, start_pos_loc_GPS_lat, ";
@@ -445,13 +490,13 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
     //this will allow the remotes to begin to catch up
     fbase_ballpos_outputObj.time_start_str = moment().format("YYYY-MM-DD  HH:mm:ss a");
     fbase_ballpos_outputObj.time.start_unix = moment().valueOf();
-    fbase_ballpos_outputObj.speed_up_fact = 1.0;
+    //fbase_ballpos_outputObj.speed_up_fact = 1.0;
 
-    var init_ball_accel_val = 10.0;
+    var init_ball_accel_val = 410.0;
     var init_ball_accel_tim = 3.00;
-    var init_ball_vel = 10.00;
+    var init_ball_vel = 1232.00;    //in/sec  or 70mph
     var init_ball_angle = 0.00;
-    var init_speed_up_fact = 1.00;
+    var init_speed_up_fact = fbase_ballpos_outputObj.speed_up_fact;
 
     var init_ball_pos_Z = 10.00;
 
@@ -581,7 +626,7 @@ var timer_check_if_update = function () {
                 //timer is not currently setup to run.  only then 
                 //start it up, otherwise will have duplicates
                 console.log('turning on timer');
-                timerBallUpd = setInterval(update_ball_pos, (samp_time_ball * 1000.0) );
+                timerBallUpd = setInterval(update_ball_pos, (samp_time_ball * 1000.0));
                 //timerBallUpd = setInterval(update_ball_pos, 3000);
             };
         } else {

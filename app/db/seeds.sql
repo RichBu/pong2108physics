@@ -61,13 +61,14 @@ VALUES (
 );
 
 
-INSERT INTO engine_stats ( time_started_unix, time_stopped_unix, samp_time_ball, samp_time_sql, isRunning )
+INSERT INTO engine_stats ( time_started_unix, time_stopped_unix, samp_time_ball, samp_time_sql, speed_up_fact, isRunning )
 VALUES (
     0,
     0,
     1.0,
     5.0,
-    0
+    1.0,
+    0,
 );
 
 
