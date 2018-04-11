@@ -170,13 +170,24 @@ var timerBallUpd;   //const variable for the update of the ball speed
 
 //put in the logic to run the physics engine now
 var update_ball_pos = function () {
+    console.log("entered update loop");
     //console.log('update position');
     if (configData.firebaseActive == true) {
         //only run these routines if firebase is active
         dbIncomingRec  = database.ref(configData.firebaseMainGame);
         dbIncomingRec.on( "value", function( snap ) {
             //incoming value came in
-            console.log("snap=\n" + util.inspect(snap, false, null ) );
+            //jQuery.extend(true, {}, dataInRec.val());
+            //equivalent to jquery.extend.  will pick off only
+            //keys with .val()
+            fbase_ball_pos_inputObj = {};
+            //extend(true, fbase_ball_pos_inputObj, fbase_ballpos_outputObj);  
+            //console.log( "by itself = " + fbase_ball_pos_inputObj ); 
+            //console.log("copy= " + util.inspect(fbase_ball_pos_inputObj, false, null ) );
+            //newObj = jQuery.extend( true, {}, obj )
+            extend(true, fbase_ball_pos_inputObj, snap.val());
+            //console.log( "by itself after=" + fbase_ball_pos_inputObj ); 
+            console.log("snap=" + util.inspect(fbase_ball_pos_inputObj, false, null ) );
             //only update after having read on in
             dbUserGameStorageMain.set(fbase_ballpos_outputObj);
         });
@@ -531,7 +542,7 @@ var timer_check_if_update = function () {
                 //timer is not currently setup to run.  only then 
                 //start it up, otherwise will have duplicates
                 console.log('turning on timer');
-                timerBallUpd = setInterval(update_ball_pos, samp_time_ball);
+                timerBallUpd = setInterval(update_ball_pos, samp_time_ball*1000);
             };
         } else {
             if (timerBallUpd !== undefined && timerBallUpd !== null) {
