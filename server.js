@@ -197,6 +197,45 @@ var ball_pos_calcs = function (play_1, play_2, dist_play1) {
     var theta;
     var PT_x;
     var PT_y;
+
+    var degToRad = function (degree) {
+        //returns the angle in radians
+        var outVal = degree * Math.PI / 180.0;
+        return outVal;
+    };
+
+    var radToDeg = function( radians) {
+        var outVal = radians * 180.0 / Math.PI;
+        return outVal;
+    };
+
+    var getPathLength = function (lat1, lon1, lat2, lon2) {
+        var lat1_rad, lat2_rad, delta_lat, delta_lon, a, c, dist_meter, R;
+
+        //make sure all the coords are there
+        if (lat1 == lat2 && lon1 == lon2) {
+            //same set of coords
+            return 0;
+        };
+
+        R = 6371000;  //rad of earth in meters
+        lat1_rad = degToRad(lat1);
+        lat2_rad = degToRad(lat2);
+        delta_lat = degToRad(lat2 - lat1);
+        delta_lon = degToRad(lon2 - lon1);
+
+        a = Math.sin(delta_lat / 2) * Math.sin(delta_lat / 2) + Math.cos(lat1_rad) * Math.cos(lat2_rad) * Math.sin(delta_lon / 2.0) * Math.sin(delta_lon / 2.0);
+        c = 2.0 * Math.atan2( Math.sqrt(a), Math.sqrt(1.0-a)  );
+
+        dist_meter = R * c;
+        if( isNaN(dist_meter)) {
+            return 0;
+        };
+        return dist_meter;
+    };  //getPathLength
+
+
+
     if (play_2.coord_X === play_1.coord_X) {
         //they are vertical, so can not calculate slopw
         PT_y = dist_play1;
@@ -205,7 +244,7 @@ var ball_pos_calcs = function (play_1, play_2, dist_play1) {
         theta = Math.atan2(play_2.coord_Y - play_1.coord_Y, play_2.coord_X - play_1.coord_X);
         PT_y = dist_play1 * Math.sin(theta);
         slope = (play_2.coord_Y - play_1.coord_Y) / (play_2.coord_X - play_1.coord_X);
-        if( slope == 0) {
+        if (slope == 0) {
             PT_x = dist_play1;
         } else {
             PT_x = PT_y / slope;
@@ -215,6 +254,8 @@ var ball_pos_calcs = function (play_1, play_2, dist_play1) {
     var outputObj = {};
     outputObj.pos_X = play_1.coord_X + PT_x;
     outputObj.pos_Y = play_1.coord_Y + PT_y;
+
+
     outputObj.loc_GPS_lat = 0.0;
     outputObj.loc_GPS_lon = 0.0;
     return outputObj;
@@ -288,7 +329,7 @@ var ball_calcs = function (snap, useLocal) {
         fbo.time.play_2 = (fbo.dist.play_2 * 12) / fbo.ball_physics.curr_vel;
     };
     fbo.time.elapsed_unix = timeElapsed_ms;
-    var outBallPosObj = ball_pos_calcs( fbo.play_1, fbo.play_2, fbio.dist.play_1 );
+    var outBallPosObj = ball_pos_calcs(fbo.play_1, fbo.play_2, fbio.dist.play_1);
 
     fbo.ball_curr_pos.pos_X = outBallPosObj.pos_X;
     fbo.ball_curr_pos.pos_Y = outBallPosObj.pos_Y;
