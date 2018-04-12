@@ -20,7 +20,7 @@ fbase_ballpos_outputObj = {  //variable written to in Firebase
     dist: {
         between: 0.0,   //in ft
         play_1: 0.0,    //in ft
-        play_2: 0.0     
+        play_2: 0.0
     },
     time: {
         start_unix: 0,
@@ -66,6 +66,7 @@ var extend = require('extend');
 var moment = require("moment");
 var momentDurationFormatSetup = require("moment-duration-format");
 var numeral = require("numeral");
+var math = require('mathjs');
 
 
 // Configure the Express application
@@ -187,6 +188,39 @@ app.listen(PORT, function () {
 var timerBallUpd;   //const variable for the update of the ball speed
 
 
+var ball_pos_calcs = function (play_1, play_2, dist_play1) {
+    //calculate the positon of the ball
+    //works for player #1 to player #2
+    //output 
+
+    var slope;
+    var theta;
+    var PT_x;
+    var PT_y;
+    if (play_2.coord_X === play_1.coord_X) {
+        //they are vertical, so can not calculate slopw
+        PT_y = dist_play1;
+        PT_x = 0.0;
+    } else {
+        theta = Math.atan2(play_2.coord_Y - play_1.coord_Y, play_2.coord_X - play_1.coord_X);
+        PT_y = dist_play1 * Math.sin(theta);
+        slope = (play_2.coord_Y - play_1.coord_Y) / (play_2.coord_X - play_1.coord_X);
+        if( slope == 0) {
+            PT_x = dist_play1;
+        } else {
+            PT_x = PT_y / slope;
+        }
+    };
+
+    var outputObj = {};
+    outputObj.pos_X = play_1.coord_X + PT_x;
+    outputObj.pos_Y = play_1.coord_Y + PT_y;
+    outputObj.loc_GPS_lat = 0.0;
+    outputObj.loc_GPS_lon = 0.0;
+    return outputObj;
+};
+
+
 var ball_calcs = function (snap, useLocal) {
     //normally only called on a callback from the firebase read
     //but, if firebase is down, call this function also
@@ -245,16 +279,21 @@ var ball_calcs = function (snap, useLocal) {
     fbo.dist.play_1 = fbio.dist.play_1;
     fbo.dist.play_2 = fbio.dist.play_2;
     let distIn = (fbio.dist.play_1 / 12);
-    if(fbo.ball_physics.curr_vel ===0 ) {
+    if (fbo.ball_physics.curr_vel === 0) {
         //can't divide by zero, so make the time be really big
         fbo.time.play_1 = 0.0;
         fbo.time.play_2 = 0.0;
     } else {
-        fbo.time.play_1 = (fbio.dist.play_1 / 12) / fbo.ball_physics.curr_vel;
-        fbo.time.play_2 = (fbio.dist.play_2 / 12) / fbo.ball_physics.curr_vel;
+        fbo.time.play_1 = (fbo.dist.play_1 * 12) / fbo.ball_physics.curr_vel;
+        fbo.time.play_2 = (fbo.dist.play_2 * 12) / fbo.ball_physics.curr_vel;
     };
     fbo.time.elapsed_unix = timeElapsed_ms;
+    var outBallPosObj = ball_pos_calcs( fbo.play_1, fbo.play_2, fbio.dist.play_1 );
 
+    fbo.ball_curr_pos.pos_X = outBallPosObj.pos_X;
+    fbo.ball_curr_pos.pos_Y = outBallPosObj.pos_Y;
+    fbo.ball_curr_pos.loc_GPS_lat = outBallPosObj.loc_GPS_lat;
+    fbo.ball_curr_pos.loc_GPS_lon = outBallPosObj.loc_GPS_lon;
     //dbUserGameStorageMain.set(fbase_ballpos_outputObj);
     if (configData.firebaseActive == true) {
         dbUserGameStorageMain.set(fbo);
