@@ -47,6 +47,12 @@ fbase_ballpos_outputObj = {  //variable written to in Firebase
         locat_addr: "",
         hit_time_win: 0.0
     },
+    field: {
+        center_coord_X: 0.0,
+        center_coord_Y: 0.0,
+        center_locat_GPS_lat: 0.0,
+        center_locat_GPS_lon: 0.0
+    },
     speed_up_fact: 0.0,
     hit_play_1: 0,
     hit_play_2: 0
@@ -214,12 +220,12 @@ var ball_pos_calcs = function (play_1, play_2, dist_play1) {
 
     var meterToFt = function (_meter) {
         var outVal = parseFloat(_meter) * 3.2808;
-        return parseFloat(_outVal.toFixed(6))
+        return parseFloat(outVal.toFixed(6))
     };
 
     var FtToMeter = function (_feet) {
         var outVal = parseFloat(_feet) / 3.2808;
-        return parseFloat(_outVal.toFixed(6))
+        return parseFloat(outVal.toFixed(6))
     };
 
 
@@ -245,12 +251,14 @@ var ball_pos_calcs = function (play_1, play_2, dist_play1) {
         if (isNaN(dist_meter)) {
             return 0;
         };
-        return dist_meter;
+        var dist_ft = meterToFt(dist_meter);
+        return dist_ft;
     };  //getPathLength
 
 
-    var getDestLatLon = function (lat, lon, azimuth, dist_meter) {
+    var getDestLatLon = function (lat, lon, azimuth, dist_ft) {
         var lat2, lon2, R, brng, d_km, lat1, lon1;
+        var dist_meter = FtToMeter(dist_ft);
         R = 6378.1;  //radius of the earh in km
 
         //brng is the degrees converted to radians of the azimuth
@@ -259,7 +267,7 @@ var ball_pos_calcs = function (play_1, play_2, dist_play1) {
         lat1 = degToRad(lat);
         lon1 = degToRad(lon);
         lat2 = Math.asin(Math.sin(lat1) * Math.cos(d_km / R) + Math.cos(lat1) * Math.sin(d_km / R) * Math.cos(brng));
-        lon2 = Math.atan2(Math.sin(brng) * Math.sin(d_km / R) * Math.cos(lat1), Math.cos(d_km / R) - Math.sin(lat1) * Math.sin(lat2));
+        lon2 = lon1 + Math.atan2(Math.sin(brng) * Math.sin(d_km / R) * Math.cos(lat1), Math.cos(d_km / R) - Math.sin(lat1) * Math.sin(lat2));
 
         //now need it back to degrees
         lat2 = radToDeg(lat2);
@@ -286,7 +294,7 @@ var ball_pos_calcs = function (play_1, play_2, dist_play1) {
             }
         }
 
-        bearing = (this.radiansToDegrees(Math.atan2(dLon, dPhi)) + 360.0) % 360.0;
+        bearing = (radToDeg(Math.atan2(dLon, dPhi)) + 360.0) % 360.0;
         return bearing;
     };
 
@@ -319,13 +327,14 @@ var ball_pos_calcs = function (play_1, play_2, dist_play1) {
     outputObj.pos_Y = play_1.coord_Y + PT_y;
 
     //calculate the lat/lon coordinates
-    azimuth = calculateBearing(play_1.locat_GPS_lat, play_1.locat_GPS_lon, play_2_locat_GPS_lat, play_2.locat_GPS_lon);
+    azimuth = calculateBearing(play_1.locat_GPS_lat, play_1.locat_GPS_lon, play_2.locat_GPS_lat, play_2.locat_GPS_lon);
     var dist_ball_meter = FtToMeter(dist_play1);
-    var dist_between_play = getPathLength(play_1.locat_GPS_lat, play_1_locat_GPS_lon, play_2.locat_GPS_lat, play_2_locat_GPS_lon);
-    var distCoordArray = getDestLatLon(play_1.locat_GPS_lat, play_1_locat_GPS_lon, azimuth, dist_ball_meter);
+    var dist_between_play = getPathLength(play_1.locat_GPS_lat, play_1.locat_GPS_lon, play_2.locat_GPS_lat, play_2.locat_GPS_lon);
+    //console.log("dist btw players = " + dist_between_play);
+    var distCoordArray = getDestLatLon(play_1.locat_GPS_lat, play_1.locat_GPS_lon, azimuth, dist_play1);
 
-    outputObj.loc_GPS_lat = 0.0;
-    outputObj.loc_GPS_lon = 0.0;
+    outputObj.loc_GPS_lat = distCoordArray[0];
+    outputObj.loc_GPS_lon = distCoordArray[1];
     return outputObj;
 };
 
@@ -403,6 +412,14 @@ var ball_calcs = function (snap, useLocal) {
     fbo.ball_curr_pos.pos_Y = outBallPosObj.pos_Y;
     fbo.ball_curr_pos.loc_GPS_lat = outBallPosObj.loc_GPS_lat;
     fbo.ball_curr_pos.loc_GPS_lon = outBallPosObj.loc_GPS_lon;
+
+    //need to find the center of the field
+    fbo.field.center_coord_X = (parseFloat(fbo.play_2.coord_X) - parseFloat(fbo.play_1.coord_X)) / 2.0 + parseFloat(fbo.play_1.coord_X);
+    fbo.field.center_coord_Y = (parseFloat(fbo.play_2.coord_Y) - parseFloat(fbo.play_1.coord_Y)) / 2.0 + parseFloat(fbo.play_1.coord_Y);
+    var centerPosObj = ball_pos_calcs(fbo.play_1, fbo.play_2, fbio.dist.between / 2.0);
+    fbo.field.center_locat_GPS_lat = centerPosObj.loc_GPS_lat; 
+    fbo.field.center_locat_GPS_lon = centerPosObj.loc_GPS_lon; 
+
     //dbUserGameStorageMain.set(fbase_ballpos_outputObj);
     if (configData.firebaseActive == true) {
         dbUserGameStorageMain.set(fbo);

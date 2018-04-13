@@ -20,8 +20,6 @@ var numeral = require("numeral");
 
 
 
-
-
 momentDurationFormatSetup(moment);  //setup formatting for durations
 
 console.log('physics controller is loaded...');
@@ -58,6 +56,7 @@ router.get('/', function (req, res) {
 
   });
 });
+
 
 router.post('/button', function (req, res) {
   console.log('did a post inside of button routes');
