@@ -1,5 +1,18 @@
 
+
 //global variable .... must leave off the "var", "const", or "let"
+
+
+configData = {
+    mySQLforceRemote : true,
+    firebaseStorage: "/games/user",         //prior to tacking on user number
+    firebaseMainGame: "/games",
+    firebaseStatusFolder: "/status",
+    firebaseRefreshBit: "/status/refreshUsers",
+    firebaseActive: true
+};
+
+
 fbase_ballpos_outputObj = {  //variable written to in Firebase
     game_id: 1,
     ball_active: 0,         //ball is active if 1
@@ -88,13 +101,6 @@ adminFirebase.initializeApp({
     databaseURL: "https://pong2108-200301.firebaseio.com"
 });
 
-var configData = {
-    firebaseStorage: "/games/user",         //prior to tacking on user number
-    firebaseMainGame: "/games",
-    firebaseStatusFolder: "/status",
-    firebaseRefreshBit: "/status/refreshUsers",
-    firebaseActive: true
-};
 
 var connConfig;
 var database;
@@ -782,7 +788,11 @@ var timer_check_if_update = function () {
 
     var query = "SELECT * FROM engine_stats";
 
+    console.log('query = ' + query);
+
     connection.query(query, function (err, response) {
+        console.log('err = ' + err );
+        console.log('response = ' + response );
         running_stat = response[0].isRunning;
         if (response[0].isRunning || response[0].isRunning != 0) {
             samp_time_ball = response[0].samp_time_ball;

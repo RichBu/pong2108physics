@@ -1,3 +1,7 @@
+//
+//where did this come from ?
+//import { ADDRCONFIG } from "dns";
+
 // Set up MySQL connection.
 var mysql = require("mysql");
 var app = require('../../server');
@@ -10,24 +14,34 @@ var app = require('../../server');
     database: "Imperial_Assault_db"
 });*/
 
-if (process.env.JAWSDB_URL) {
-    connection = mysql.createConnection(process.env.JAWSDB_URL);
-    // connection = mysql.createConnection({
-    //     port:3306,
-    //     host: 'hngomrlb3vfq3jcr.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',
-    //     user: 'ul4494ujhnebbe4z',
-    //     password: 'a9uixu2df510af1j',
-    //     database: 'bjaefq7kipprh1tf'
-    // });
-} else {
+console.log('at the connection');
+if (configData.mySQLforceRemote === true) {
+    console.log('force is on');
+    //if force remote, then use the designed database
     connection = mysql.createConnection({
         port:3306,
-        host: 'localhost',
-        user: 'root',
-        password: '',
-        database: 'Pong2108_db'
-        //database: 'z2znazc687xl2iem'
+        host: 'dyud5fa2qycz1o3v.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',
+        user: 'sncbdapp022v2hk2',
+        password: 'f1xmf09rrq06wypn',
+        database: 'h12uue9eo70qg2yq'
     });
+} else {
+    console.log('force is off');
+    if (process.env.JAWSDB_URL) {
+        console.log('env variable is on');
+        connection = mysql.createConnection(process.env.JAWSDB_URL);
+        // });
+    } else {
+        console.log('using local mySQL');
+        connection = mysql.createConnection({
+            port:3306,
+            host: 'localhost',
+            user: 'root',
+            password: '',
+            database: 'Pong2108_db'
+            //database: 'z2znazc687xl2iem'
+        });
+    };   
 };
 
 // Make connection.

@@ -7,8 +7,10 @@ USE Pong2108_db;
 
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS user_account;
-DROP TABLE IF EXISTS devices;
-DROP TABLE IF EXISTS uploads;
+DROP TABLE IF EXISTS games;
+DROP TABLE IF EXISTS ball_hits;
+DROP TABLE IF EXISTS ball_pos;
+DROP TABLE IF EXISTS engine_stats;
 DROP TABLE IF EXISTS administrators;
 DROP TABLE IF EXISTS audit_log;
 
