@@ -145,6 +145,67 @@ router.post('/button/hit', function (req, res) {
 });
 
 
+router.post('/button/serve', function (req, res) {
+  console.log('post serve button routes');
+  fbase_ballpos_outputObj.speed_up_fact = parseFloat(req.body.speed_up_fact);
+  var ball_samp_time = req.body.ball_samp_time;
+  var start_button_stat = req.body.start_button;
+  var stop_button_stat = req.body.stop_button;
+  var button_hit_01 = req.body.hit_01;
+  var button_hit_02 = req.body.hit_02;
+  var place_ball_01 = req.body.place_ball_1;
+  var place_ball_02 = req.body.place_ball_2;
+  var running_stat = true;
+
+  console.log("ball 01 = " + place_ball_01 );
+  console.log("ball 02 = " + place_ball_02 );
+
+  //fixed strings right now
+  var fixed_game_id = 1;
+  var fixed_type_hit_int = 0;  //for serve
+  var fixed_type_hit = "serve";
+  var fixed_result_hit = "good";
+
+  var player_hit;
+
+
+  if (place_ball_01 == 1) {
+    //put the ball on player #1 spot
+    fbase_ballpos_outputObj.ball_curr_pos.pos_X = parseFloat(fbase_ballpos_outputObj.play_1.coord_X);
+    fbase_ballpos_outputObj.ball_curr_pos.pos_Y = parseFloat(fbase_ballpos_outputObj.play_1.coord_Y);
+    fbase_ballpos_outputObj.ball_curr_pos.loc_GPS_lat = parseFloat(fbase_ballpos_outputObj.play_1.locat_GPS_lat);
+    fbase_ballpos_outputObj.ball_curr_pos.loc_GPS_lon = parseFloat(fbase_ballpos_outputObj.play_1.locat_GPS_lon);
+    fbase_ballpos_outputObj.ball_active = 0;
+    fbase_ballpos_outputObj.hit_play_1 = 0;
+    fbase_ballpos_outputObj.hit_play_2 = 0;
+    fbase_ballpos_outputObj.miss_play_1 = 0;
+    fbase_ballpos_outputObj.miss_play_2 = 0;
+    fbase_ballpos_outputObj.dirFrom = 0;
+  };
+
+
+  if (place_ball_02 == 1) {
+    //put the ball on player #1 spot
+    fbase_ballpos_outputObj.ball_curr_pos.pos_X = parseFloat(fbase_ballpos_outputObj.play_2.coord_X);
+    fbase_ballpos_outputObj.ball_curr_pos.pos_Y = parseFloat(fbase_ballpos_outputObj.play_2.coord_Y);
+    fbase_ballpos_outputObj.ball_curr_pos.loc_GPS_lat = parseFloat(fbase_ballpos_outputObj.play_2.locat_GPS_lat);
+    fbase_ballpos_outputObj.ball_curr_pos.loc_GPS_lon = parseFloat(fbase_ballpos_outputObj.play_2.locat_GPS_lon);
+    fbase_ballpos_outputObj.ball_active = 0;
+    fbase_ballpos_outputObj.hit_play_1 = 0;
+    fbase_ballpos_outputObj.hit_play_2 = 0;
+    fbase_ballpos_outputObj.miss_play_1 = 0;
+    fbase_ballpos_outputObj.miss_play_2 = 0;
+    fbase_ballpos_outputObj.dirFrom = 0;
+  };
+
+  writeFirebaseRec();
+
+  //hit_ball(fixed_game_id, player_hit, fixed_type_hit_int, fixed_result_hit);
+  //write_ball_hit_rec(1, "serve", "good");
+});
+
+
+
 function game_rec_type(
   _game_id,
   _player_1_id,

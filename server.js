@@ -430,9 +430,12 @@ var ball_calcs = function (snap, useLocal) {
     fbo.field.center_locat_GPS_lon = centerPosObj.loc_GPS_lon;
 
     //dbUserGameStorageMain.set(fbase_ballpos_outputObj);
+    writeFirebaseRec();
+    /*
     if (configData.firebaseActive == true) {
         dbUserGameStorageMain.set(fbo);
     };
+    */
 };
 
 
@@ -522,6 +525,11 @@ function game_rec_type(
 };
 
 
+writeFirebaseRec = function() {
+    if (configData.firebaseActive == true) {
+        dbUserGameStorageMain.set(fbase_ballpos_outputObj);
+    };
+};
 
 var read_game_rec = function (_game_id) {
     //constructor for record coming from the database
@@ -821,11 +829,11 @@ var timer_check_if_update = function () {
 
     var query = "SELECT * FROM engine_stats";
 
-    console.log('query = ' + query);
+    //console.log('query = ' + query);
 
     connection.query(query, function (err, response) {
-        console.log('err = ' + err);
-        console.log('response = ' + response);
+        // console.log('err = ' + err);
+        // console.log('response = ' + response);
         running_stat = response[0].isRunning;
         if (response[0].isRunning || response[0].isRunning != 0) {
             samp_time_ball = response[0].samp_time_ball;
