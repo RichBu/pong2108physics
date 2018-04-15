@@ -2,8 +2,9 @@
 //where did this come from ?
 //import { ADDRCONFIG } from "dns";
 
-// Set up MySQL connection.
-var mysql = require("mysql");
+// Set up MySQL connection. 
+//var mysql = require('mysql');
+var mysql = require('mysql');
 var app = require('../../server');
 
 /*var connection = mysql.createConnection({
