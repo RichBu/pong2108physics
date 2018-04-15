@@ -109,7 +109,7 @@
 				<div class="panel panel-primary">
 					<div class="panel-heading">Speed Up Fact</div>
 					<div class="panel-body">
-						<input style="width: 90%; margin: 5px 0px 5px 0px;" type="text" name="spd_up_fact" id="spd_up_fact" placeholder="sql upd time">
+						<input style="width: 90%; margin: 5px 0px 5px 0px;" type="text" name="spd_up_fact" id="spd_up_fact" placeholder="speed up fact">
 						<!--
 					<h4 id="ball_samp_time"></h4>
 					-->
@@ -126,6 +126,8 @@
 	<div class="col-md-3">
 		<button class='btn btn-warning' id="btn-hit-1">Hit #1</button>
 		<button class='btn btn-warning' style="float: right;" id="btn-hit-2">Hit #2</button>
+		<button class='btn btn-secondary' style="float: right;" id="btn-serve-1">Serve #1</button>
+		<button class='btn btn-secondary' style="float: right;" id="btn-serve-2">Serve #2</button>
 	</div>
 </div>
 
@@ -167,7 +169,9 @@
 			start_button: 0,
 			stop_button: 0,
 			hit_01: 0,
-			hit_02: 0
+			hit_02: 0,
+			place_ball_1: 0,
+			place_ball_2: 0
 		};
 
 
@@ -202,6 +206,20 @@
 
 		};
 
+		//sends a "hit" to the physics enginer
+		var sendPostServe = function () {
+			$.post("/physics/button/serve",
+				sendObj,
+				function (data, status) {
+					if (data.errCode === 0) {
+						//there is no error
+						window.location.href = "/physics"
+					} else {
+						//what to do with error ?
+					};
+				});
+
+		};
 
 		var sendPostGame = function () {
 			$.post("/physics/start",
@@ -266,6 +284,28 @@
 				sendObj.hit_01 = 0;
 				sendObj.hit_02 = 1;
 				sendPostHit();
+			});
+			$(document.body).on("click", "#btn-serve-1", function () {
+				sendObj.ball_samp_time = $('#ball_samp_time').val();
+				sendObj.speed_up_fact = $('#spd_up_fact').val();
+				sendObj.start_button = false;
+				sendObj.stop_button = false;
+				sendObj.hit_01 = 0;
+				sendObj.hit_02 = 0;
+				sendObj.place_ball_1 = 1;
+				sendObj.place_ball_2 = 0;
+				sendPostServe();
+			});
+			$(document.body).on("click", "#btn-serve-2", function () {
+				sendObj.ball_samp_time = $('#ball_samp_time').val();
+				sendObj.speed_up_fact = $('#spd_up_fact').val();
+				sendObj.start_button = false;
+				sendObj.stop_button = false;
+				sendObj.hit_01 = 0;
+				sendObj.hit_02 = 0;
+				sendObj.place_ball_1 = 0;
+				sendObj.place_ball_2 = 1;
+				sendPostServe();
 			});
 			//			window.setTimeout( function() {
 			//				window.location.reload(true);

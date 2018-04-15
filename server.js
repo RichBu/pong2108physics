@@ -4,7 +4,7 @@
 
 
 configData = {
-    mySQLforceRemote : true,
+    mySQLforceRemote: true,
     firebaseStorage: "/games/user",         //prior to tacking on user number
     firebaseMainGame: "/games",
     firebaseStatusFolder: "/status",
@@ -68,7 +68,10 @@ fbase_ballpos_outputObj = {  //variable written to in Firebase
     },
     speed_up_fact: 0.0,
     hit_play_1: 0,
-    hit_play_2: 0
+    hit_play_2: 0,
+    dirFrom: 1,      //direction 1=from 1 to 2
+    miss_play_1: 0,  //player #1 missed
+    miss_play_2: 0
 };
 
 var fbase_ball_pos_inputObj;
@@ -423,8 +426,8 @@ var ball_calcs = function (snap, useLocal) {
     fbo.field.center_coord_X = (parseFloat(fbo.play_2.coord_X) - parseFloat(fbo.play_1.coord_X)) / 2.0 + parseFloat(fbo.play_1.coord_X);
     fbo.field.center_coord_Y = (parseFloat(fbo.play_2.coord_Y) - parseFloat(fbo.play_1.coord_Y)) / 2.0 + parseFloat(fbo.play_1.coord_Y);
     var centerPosObj = ball_pos_calcs(fbo.play_1, fbo.play_2, fbio.dist.between / 2.0);
-    fbo.field.center_locat_GPS_lat = centerPosObj.loc_GPS_lat; 
-    fbo.field.center_locat_GPS_lon = centerPosObj.loc_GPS_lon; 
+    fbo.field.center_locat_GPS_lat = centerPosObj.loc_GPS_lat;
+    fbo.field.center_locat_GPS_lon = centerPosObj.loc_GPS_lon;
 
     //dbUserGameStorageMain.set(fbase_ballpos_outputObj);
     if (configData.firebaseActive == true) {
@@ -679,6 +682,36 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
     read_game_rec(_game_id).then(function (result) {
         var rc = result[0]; //short hand
         //a valid game rec has been read
+        //check if the ball was not active then it was a server
+        if (fbase_ballpos_outputObj.ball_active === 0) {
+            //the ball was not active so it is a serve
+            _type_hit_int = 0;  //serve
+            //need to find out who should serve
+        } else {
+            //check if it is valid hit
+            if (_player_num == 1) {
+                if (Math.abs(parseFloat(fbase_ballpos_outputObj.time.play_1)) <= parseFloat(fbase_ballpos_outputObj.play_1.hit_time_win)) {
+                    //valid hit for player #1
+                    fbase_ballpos_outputObj.ball_active = 1;
+                    fbase_ballpos_outputObj.dirFrom = 1;
+                } else {
+                    //missed
+                    fbase_ballpos_outputObj.ball_active = 0;
+                    fbase_ballpos_outputObj.dirFrom = 0;
+                };
+            } else {
+                //must be player num 2
+                if (Math.abs(parseFloat(fbase_ballpos_outputObj.time.play_2)) <= parseFloat(fbase_ballpos_outputObj.play_2.hit_time_win)) {
+                    //valid hit for player #1
+                    fbase_ballpos_outputObj.ball_active = 1;
+                    fbase_ballpos_outputObj.dirFrom = 2;
+                } else {
+                    //missed
+                    fbase_ballpos_outputObj.ball_active = 0;
+                    fbase_ballpos_outputObj.dirFrom = 0;
+                };
+            };
+        };
 
         switch (_type_hit_int) {
             case 0:        //serve
@@ -791,8 +824,8 @@ var timer_check_if_update = function () {
     console.log('query = ' + query);
 
     connection.query(query, function (err, response) {
-        console.log('err = ' + err );
-        console.log('response = ' + response );
+        console.log('err = ' + err);
+        console.log('response = ' + response);
         running_stat = response[0].isRunning;
         if (response[0].isRunning || response[0].isRunning != 0) {
             samp_time_ball = response[0].samp_time_ball;
