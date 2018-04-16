@@ -134,8 +134,8 @@
 
 		};
 
-		var clearTimer = function() {
-			console.log( "can hit again" );
+		var clearTimer = function () {
+			console.log("can hit again");
 			timerLockOutBit = false;
 			timerLock = null;
 		};
@@ -143,7 +143,7 @@
 		var hitBall = function () {
 			if (timerLockOutBit == false) {
 				console.log("lock out multiple hits");
-				timerLock = setTimeout( clearTimer, 3000);
+				timerLock = setTimeout(clearTimer, 3000);
 				timerLockOutBit = true;
 				if (navigator.vibrate) {
 					//vibratation is active
@@ -187,11 +187,13 @@
 					//now check if armed
 					//if ( deviceRotat.rotX >25 deviceRotat.isArmedY === false ) {
 					if (deviceRotat.rotX > 25) {
-						deviceRotat.isArmedX = true;
-						if (navigator.vibrate) {
-							//vibratation is active
-							navigator.vibrate(100);
-						};
+						if (deviceRotat.isArmedX == false) {
+							deviceRotat.isArmedX = true;
+							if (navigator.vibrate) {
+								//vibratation is active
+								navigator.vibrate(100);
+							};
+						}
 						//alert( "armed on X");
 					} else {
 						//rotat X is towards the positive side
@@ -205,12 +207,13 @@
 					};
 					//if ( deviceRotat.rotY > 25 && deviceRotat.isArmedX === false ) {
 					if (deviceRotat.rotY > 25) {
-						deviceRotat.isArmedY = true;
-						if (navigator.vibrate) {
-							//vibratation is active
-							navigator.vibrate(100);
+						if (deviceRotat.isArmedY == false) {
+							deviceRotat.isArmedY = true;
+							if (navigator.vibrate) {
+								//vibratation is active
+								navigator.vibrate(100);
+							};
 						};
-						//alert( "armed on Y");
 					} else {
 						//rotat X is towards the positive side
 						if (deviceRotat.rotY < -25 && deviceRotat.isArmedY) {
