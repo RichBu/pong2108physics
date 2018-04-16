@@ -222,7 +222,7 @@
 		};
 
 		var sendPostGame = function () {
-			$.post("/physics/start",
+			$.post("/physics/start/1",
 				sendObj,
 				function (data, status) {
 					if (data.errCode === 0) {

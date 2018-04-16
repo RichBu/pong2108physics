@@ -104,7 +104,7 @@
 		};
 
 		var sendPostGame = function () {
-			$.post("/physics/start",
+			$.post("/physics/start/2",	//to let it know that it is from mobile
 				sendObj,
 				function (data, status) {
 					if (data.errCode === 0) {

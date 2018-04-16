@@ -486,7 +486,7 @@ var update_ball_pos = function () {
     } else {
         //console.log(fbase_ballpos_outputObj);
         var snap = {};
-        ball_calcs(snap, true)
+        balln_calcs(snap, true)
     };
 };
 

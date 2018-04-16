@@ -314,10 +314,13 @@ function game_rec_type(
 
 router.post('/start/:typeStart', function (req, res) {
   console.log('started a game');
-  var typeStart = parseInt(req.params.typeStrt);  //1=admin screen
+  var typeStart = parseInt(req.params.typeStart);  //1=admin screen
+  console.log("type strt = " + typeStart);
   var _game_id = 1;
+  var _speed_up_fact;
   var startTime_str = moment().format("YYYY-MM-DD HH:mm:ss a");
   if (typeStart==1) {
+    _spped_up_fact = parseFloat(req.body.speed_up_fact);
     fbase_ballpos_outputObj.speed_up_fact = parseFloat(req.body.speed_up_fact);
   };
   console.log("after req.body");
@@ -351,7 +354,7 @@ router.post('/start/:typeStart', function (req, res) {
     20.00, //_ball_curr_pos_Z,
     42.050377, //_ball_curr_pos_loc_GPS_lat,
     -87.684347, //_ball_curr_pos_loc_GPS_lon,
-    parseFloat(req.body.speed_up_fact), //_game_speed_up_fact,
+    _speed_up_fact, //_game_speed_up_fact,
     moment().valueOf(), //_start_time_unix,  start time in  unix ms
     0, //_stop_time_unix,
     true //_isGameRunning
