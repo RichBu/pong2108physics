@@ -815,7 +815,7 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
                     fbase_ballpos_outputObj.dirFrom = 2;
                 } else {
                     //missed
-                    console.log("player #2 missed");
+                    console.log("player #2 missed ");
                     fbase_ballpos_outputObj.ball_active = 0;  //was 0
                     fbase_ballpos_outputObj.dirFrom = 0;
                     fbase_ballpos_outputObj.miss_play_2 = 1;
