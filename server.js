@@ -435,8 +435,8 @@ var ball_calcs = function (snap, useLocal) {
         fbo.time.play_1 = 0.0;
         fbo.time.play_2 = 0.0;
     } else {
-        fbo.time.play_1 = (fbo.dist.play_1 * 12) / fbo.ball_physics.curr_vel;
-        fbo.time.play_2 = (fbo.dist.play_2 * 12) / fbo.ball_physics.curr_vel;
+        fbo.time.play_1 = ((fbo.dist.play_1 * 12) / fbo.ball_physics.curr_vel) / fbo.speed_up_fact;
+        fbo.time.play_2 = ((fbo.dist.play_2 * 12) / fbo.ball_physics.curr_vel) / fbo.speed_up_fact;
     };
     fbo.time.elapsed_unix = timeElapsed_ms;
     var outBallPosObj;
