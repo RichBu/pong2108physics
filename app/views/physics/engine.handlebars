@@ -2,7 +2,7 @@
 
 -->
 <div id="varb-storage" data-time-started="{{time_started}}" data-samp-time="{{samp_time_ball}}" data-is-running="{{isRunning}}"
- data-time-stopped="{{time_stopped}}" data-speed-fact="{{speed_up_fact}}" >
+ data-time-stopped="{{time_stopped}}" data-speed-fact="{{speed_up_fact}}">
 
 </div>
 <br/>
@@ -53,32 +53,20 @@
 		</div>
 	</div>
 </div>
-
-<div class="row">
-	<div class="col-md-3">
-		<div class="row">
-			<button class='btn btn-success' id="btn-start">Start Engine</button>
-		</div>
-		<div class="row">
-			<br/>
-		</div>
-		<div class="row">
-			<button class='btn btn-danger' id="btn-stop">Stop Engine</button>
-			<button class='btn btn-info' style="float: right;" id="btn-start-game">Start Game</button>
-		</div>
-	</div>
-	<div class="col-md-1">
-	</div>
-	<div class="col-md-3">
-		<div class="row">
-			<div class="panel panel-primary">
-				<div class="panel-heading">Status</div>
-				<div class="panel-body">
-					<h4 id="is_started">{{isRunning}} </h4>
-				</div>
+ß
+<div class="col-md-3">
+	<div class="row">
+		<div class="panel panel-primary">
+			<div class="panel-heading">Status</div>
+			<div class="panel-body">
+				<h4 id="is_started">{{isRunning}} </h4>
 			</div>
 		</div>
 	</div>
+</div>
+
+
+<div class="row">
 	<div class="col-md-1">
 	</div>
 	<div class="col-md-3">
@@ -122,12 +110,29 @@
 <div class="row">
 	<h4>Real Time Ball Position</h4>
 </div>
+
+<div class="col-md-12">
+	<div class="row">
+	</div>
+	<div class="row">
+		{{!--
+		<br/> --}}
+	</div>
+	<div class="row">
+		<button class='jumbotron btn btn-success btn-lg' style="font-size: 20px" id="btn-start">Start Engine</button>
+		<button class='jumbotron btn btn-danger btn-lg' style="font-size: 20px;" id="btn-stop">Stop Engine</button>
+		<button class='jumbotron btn btn-info btn-lg' style="font-size: 20px;" id="btn-start-game">Start Game</button>
+	</div>
+</div>
+<div class="col-md-1">
+</div>
+
 <div class="row">
-	<div class="col-md-4">
-		<button class='btn btn-warning' style="float: left;" id="btn-hit-1">Hit #1</button>
-		<button class='btn btn-warning' style="float: left;" id="btn-hit-2">Hit #2</button>
-		<button class='btn btn-info' style="float: right;" id="btn-serve-2">Serve #2</button>
-		<button class='btn btn-info' style="float: right;" id="btn-serve-1">Serve #1</button>
+	<div class="col-md-12">
+		<button class='jumbotron btn btn-warning' style="font-size: 20px" style="float: left;" id="btn-hit-1">Hit #1</button>
+		<button class='jumbotron btn btn-warning' style="font-size: 20px" style="float: left;" id="btn-hit-2">Hit #2</button>
+		<button class='jumbotron btn btn-info' style="font-size: 20px" style="float: left;" id="btn-serve-2">Serve #2</button>
+		<button class='jumbotron btn btn-info' style="font-size: 20px" style="float: left;" id="btn-serve-1">Serve #1</button>
 	</div>
 </div>
 

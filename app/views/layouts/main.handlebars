@@ -46,7 +46,7 @@
 
 
     <!--Google Fonts: Berkshire Swash and Domine-->
-    <link href="https://fonts.googleapis.com/css?family=Berkshire+Swash|Domine" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Berkshire+Swash|Domine|Monoton" rel="stylesheet">
     <!--Favicon-->
     <link rel="icon" href="../../images/xx.png" sizes="16x16" type="image/png">
     <!--External CSS Link-->
@@ -58,7 +58,7 @@
             background-color: lightblue;
         }
     </style>
-    
+
 </head>
 
 <body>
@@ -66,17 +66,19 @@
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
     <!--Header-->
-    <header class="container text-center">
+
+    <header class="container-fluid text-center">
         <div class="row">
             <!--Site Logo-->
             <div class="col-xs-4">
                 <a href='/'>
-                    <img src="" alt='Pong 2108 Logo' id='pageLogo' class='img img-thumbnail' style="width: 80px;">
+                    {{!--
+                    <img src="" alt='Pong 2108 Logo' id='pageLogo' class='img img-thumbnail' style="width: 80px;"> --}}
                 </a>
             </div>
             <!--Title-->
             <div class="col-xs-4">
-                <h1 class='specialFont'>Pong2180 Physics Engine</h1>
+                <h1 class='bungeeFont'>Pong 2180 Physics Engine</h1>
             </div>
             <!--Logged In Area-->
             <div class="col-xs-4">
@@ -93,9 +95,30 @@
             </div>
         </div>
     </header>
+
+
+
+
+
     <!--Main-->
     <main class="container">
         <hr> {{{ body }}}
+
+
+    <style>
+        header {
+            color: white;
+            background-image: linear-gradient(180deg, rgba(224, 133, 14, 1), rgba(173, 52, 62, 1));
+        }
+
+        body {
+            background-image: url('./images/matrixgridfloor.png');
+        }
+
+       .monotonFont {
+        font-family: 'Monoton', cursive;
+        }
+    </style>
 
     </main>
 
@@ -107,6 +130,14 @@
             <span id='copyright'>© 2180 Pong 2180 Corp.</span>
         </div>
     </div>
+    <style>
+        .navbar-fixed-bottom {
+            background-image: linear-gradient(180deg, rgba(173, 52, 62, 1), rgba(224, 133, 14, 1));
+            color: rgba(255, 255, 255, .6);
+            padding: 20px;
+        }
+    </style>
+
     <!-- </footer> -->
 
 </body>

@@ -9,7 +9,7 @@ configData = {
     firebaseMainGame: "/games",
     firebaseStatusFolder: "/status",
     firebaseRefreshBit: "/status/refreshUsers",
-    firebaseActive: true
+    firebaseActive: false
 };
 
 
