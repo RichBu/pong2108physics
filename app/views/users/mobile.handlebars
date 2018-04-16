@@ -140,7 +140,8 @@
 					deviceRotat.rotZ = Math.round(event.alpha);
 					//alert(deviceRotat.rotX);
 					//now check if armed
-					if ( deviceRotat.rotX >25 deviceRotat.isArmedY === false ) {
+					//if ( deviceRotat.rotX >25 deviceRotat.isArmedY === false ) {
+					if ( deviceRotat.rotX >25  ) {
 						deviceRotat.isArmedX = true;
 						//alert( "armed on X");
 					} else {
@@ -152,7 +153,8 @@
 							alert("swung the phone X axis");
 						};
 					};
-					if ( deviceRotat.rotY > 25 && deviceRotat.isArmedX === false ) {
+					//if ( deviceRotat.rotY > 25 && deviceRotat.isArmedX === false ) {
+					if ( deviceRotat.rotY > 25  ) {
 						deviceRotat.isArmedY = true;
 						//alert( "armed on Y");
 					} else {
