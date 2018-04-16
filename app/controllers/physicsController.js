@@ -182,42 +182,53 @@ router.post('/button/serve', function (req, res) {
   extend(true, fbaseTempObj, fbase_ballpos_outputObj);
 
 
+  var playToTaxfr;
+  if (  place_ball_01 == 1 ) { 
+    playToTaxfr = 1;
+  };
 
-  if (place_ball_01 == 1) {
-    //put the ball on player #1 spot
-    fbaseTempObj.ball_curr_pos.pos_X = parseFloat(fbase_ballpos_outputObj.play_1.coord_X);
-    fbaseTempObj.ball_curr_pos.pos_Y = parseFloat(fbase_ballpos_outputObj.play_1.coord_Y);
-    fbaseTempObj.ball_curr_pos.loc_GPS_lat = parseFloat(fbase_ballpos_outputObj.play_1.locat_GPS_lat);
-    fbaseTempObj.ball_curr_pos.loc_GPS_lon = parseFloat(fbase_ballpos_outputObj.play_1.locat_GPS_lon);
-    fbaseTempObj.ball_active = 0;
-    fbaseTempObj.hit_play_1 = 0;
-    fbaseTempObj.hit_play_2 = 0;
-    fbaseTempObj.miss_play_1 = 0;
-    fbaseTempObj.miss_play_2 = 0;
-    fbaseTempObj.time.play_1 = 0.0;
-    fbaseTempObj.time.play_2 = fbaseTempObj.play_2.hit_time_win * 10.0;
-    fbaseTempObj.dirFrom = 0;
+  if (  place_ball_02 == 1 ) { 
+    playToTaxfr = 2;
   };
 
 
-  if (place_ball_02 == 1) {
-    //put the ball on player #1 spot
-    console.log("set ball to player #2");
-    fbaseTempObj.ball_curr_pos.pos_X = parseFloat(fbase_ballpos_outputObj.play_2.coord_X);
-    fbaseTempObj.ball_curr_pos.pos_Y = parseFloat(fbase_ballpos_outputObj.play_2.coord_Y);
-    fbaseTempObj.ball_curr_pos.loc_GPS_lat = parseFloat(fbase_ballpos_outputObj.play_2.locat_GPS_lat);
-    fbaseTempObj.ball_curr_pos.loc_GPS_lon = parseFloat(fbase_ballpos_outputObj.play_2.locat_GPS_lon);
-    fbaseTempObj.ball_active = 0;
-    fbaseTempObj.hit_play_1 = 0;
-    fbaseTempObj.hit_play_2 = 0;
-    fbaseTempObj.miss_play_1 = 0;
-    fbaseTempObj.miss_play_2 = 0;
-    fbaseTempObj.time.play_1 = fbaseTempObj.play_1.hit_time_win * 10.0;
-    fbaseTempObj.time.play_2 = 0.0;
-    fbaseTempObj.dirFrom = 0;
-    console.log("ball lat #1 = " + fbaseTempObj.ball_curr_pos.loc_GPS_lat);
-    console.log("ball lon #1 = " + fbaseTempObj.ball_curr_pos.loc_GPS_lon);
-  };
+  setBallToPlayer( fbaseTempObj, playToTaxfr  );
+
+  // if (place_ball_01 == 1) {
+  //   //put the ball on player #1 spot
+  //   fbaseTempObj.ball_curr_pos.pos_X = parseFloat(fbase_ballpos_outputObj.play_1.coord_X);
+  //   fbaseTempObj.ball_curr_pos.pos_Y = parseFloat(fbase_ballpos_outputObj.play_1.coord_Y);
+  //   fbaseTempObj.ball_curr_pos.loc_GPS_lat = parseFloat(fbase_ballpos_outputObj.play_1.locat_GPS_lat);
+  //   fbaseTempObj.ball_curr_pos.loc_GPS_lon = parseFloat(fbase_ballpos_outputObj.play_1.locat_GPS_lon);
+  //   fbaseTempObj.ball_active = 0;
+  //   fbaseTempObj.hit_play_1 = 0;
+  //   fbaseTempObj.hit_play_2 = 0;
+  //   fbaseTempObj.miss_play_1 = 0;
+  //   fbaseTempObj.miss_play_2 = 0;
+  //   fbaseTempObj.time.play_1 = 0.0;
+  //   fbaseTempObj.time.play_2 = fbaseTempObj.play_2.hit_time_win * 10.0;
+  //   fbaseTempObj.dirFrom = 0;
+  // };
+
+
+  // if (place_ball_02 == 1) {
+  //   //put the ball on player #1 spot
+  //   console.log("set ball to player #2");
+  //   fbaseTempObj.ball_curr_pos.pos_X = parseFloat(fbase_ballpos_outputObj.play_2.coord_X);
+  //   fbaseTempObj.ball_curr_pos.pos_Y = parseFloat(fbase_ballpos_outputObj.play_2.coord_Y);
+  //   fbaseTempObj.ball_curr_pos.loc_GPS_lat = parseFloat(fbase_ballpos_outputObj.play_2.locat_GPS_lat);
+  //   fbaseTempObj.ball_curr_pos.loc_GPS_lon = parseFloat(fbase_ballpos_outputObj.play_2.locat_GPS_lon);
+  //   fbaseTempObj.ball_active = 0;
+  //   fbaseTempObj.hit_play_1 = 0;
+  //   fbaseTempObj.hit_play_2 = 0;
+  //   fbaseTempObj.miss_play_1 = 0;
+  //   fbaseTempObj.miss_play_2 = 0;
+  //   fbaseTempObj.time.play_1 = fbaseTempObj.play_1.hit_time_win * 10.0;
+  //   fbaseTempObj.time.play_2 = 0.0;
+  //   fbaseTempObj.dirFrom = 0;
+  //   console.log("ball lat #1 = " + fbaseTempObj.ball_curr_pos.loc_GPS_lat);
+  //   console.log("ball lon #1 = " + fbaseTempObj.ball_curr_pos.loc_GPS_lon);
+  // };
 
 
   extend(true, fbase_ballpos_outputObj, fbaseTempObj);

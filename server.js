@@ -655,6 +655,45 @@ write_ball_hit_rec = function (_game_id, _player_num, _type_hit, _result_hit, _b
 };
 
 
+setBallToPlayer = function( fbaseTempObj, _playNum ) {
+    if (_playNum == 1) {
+        //put the ball on player #1 spot
+        fbaseTempObj.ball_curr_pos.pos_X = parseFloat(fbase_ballpos_outputObj.play_1.coord_X);
+        fbaseTempObj.ball_curr_pos.pos_Y = parseFloat(fbase_ballpos_outputObj.play_1.coord_Y);
+        fbaseTempObj.ball_curr_pos.loc_GPS_lat = parseFloat(fbase_ballpos_outputObj.play_1.locat_GPS_lat);
+        fbaseTempObj.ball_curr_pos.loc_GPS_lon = parseFloat(fbase_ballpos_outputObj.play_1.locat_GPS_lon);
+        fbaseTempObj.ball_active = 0;
+        fbaseTempObj.hit_play_1 = 0;
+        fbaseTempObj.hit_play_2 = 0;
+        fbaseTempObj.miss_play_1 = 0;
+        fbaseTempObj.miss_play_2 = 0;
+        fbaseTempObj.time.play_1 = 0.0;
+        fbaseTempObj.time.play_2 = fbaseTempObj.play_2.hit_time_win * 10.0;
+        fbaseTempObj.dirFrom = 0;
+      };
+    
+    
+      if (_playNum == 2) {
+        //put the ball on player #1 spot
+        console.log("set ball to player #2");
+        fbaseTempObj.ball_curr_pos.pos_X = parseFloat(fbase_ballpos_outputObj.play_2.coord_X);
+        fbaseTempObj.ball_curr_pos.pos_Y = parseFloat(fbase_ballpos_outputObj.play_2.coord_Y);
+        fbaseTempObj.ball_curr_pos.loc_GPS_lat = parseFloat(fbase_ballpos_outputObj.play_2.locat_GPS_lat);
+        fbaseTempObj.ball_curr_pos.loc_GPS_lon = parseFloat(fbase_ballpos_outputObj.play_2.locat_GPS_lon);
+        fbaseTempObj.ball_active = 0;
+        fbaseTempObj.hit_play_1 = 0;
+        fbaseTempObj.hit_play_2 = 0;
+        fbaseTempObj.miss_play_1 = 0;
+        fbaseTempObj.miss_play_2 = 0;
+        fbaseTempObj.time.play_1 = fbaseTempObj.play_1.hit_time_win * 10.0;
+        fbaseTempObj.time.play_2 = 0.0;
+        fbaseTempObj.dirFrom = 0;
+        console.log("ball lat #1 = " + fbaseTempObj.ball_curr_pos.loc_GPS_lat);
+        console.log("ball lon #1 = " + fbaseTempObj.ball_curr_pos.loc_GPS_lon);
+      };    
+}
+
+
 
 function ball_hit_rec_type(
     _game_id,
@@ -741,6 +780,7 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
             }
         } else {
             //check if it is valid hit
+            //if the ball was not coming to the user, then ignore it
             if (_player_num == 1) {
                 if (Math.abs(parseFloat(fbase_ballpos_outputObj.time.play_1)) <= parseFloat(fbase_ballpos_outputObj.play_1.hit_time_win)) {
                     //valid hit for player #1
@@ -748,8 +788,10 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
                     fbase_ballpos_outputObj.dirFrom = 1;
                 } else {
                     //missed
-                    fbase_ballpos_outputObj.ball_active = 1;  //was 0
+                    console.log("player #1 swung");
+                    fbase_ballpos_outputObj.ball_active = 0;  //was 0
                     fbase_ballpos_outputObj.dirFrom = 0;
+                    fbase_ballpos_outputObj.miss_play_1 = 1;
                 };
             } else {
                 //must be player num 2
@@ -759,8 +801,10 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
                     fbase_ballpos_outputObj.dirFrom = 2;
                 } else {
                     //missed
-                    fbase_ballpos_outputObj.ball_active = 1;  //was 0
+                    console.log("player #2 missed");
+                    fbase_ballpos_outputObj.ball_active = 0;  //was 0
                     fbase_ballpos_outputObj.dirFrom = 0;
+                    fbase_ballpos_outputObj.miss_play_2 = 1;
                 };
             };
         };
