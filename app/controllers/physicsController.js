@@ -317,7 +317,7 @@ router.post('/start/:typeStart', function (req, res) {
   var typeStart = parseInt(req.params.typeStart);  //1=admin screen
   console.log("type strt = " + typeStart);
   var _game_id = 1;
-  var _speed_up_fact;
+  var _speed_up_fact;  
   var startTime_str = moment().format("YYYY-MM-DD HH:mm:ss a");
   if (typeStart==1) {
     _spped_up_fact = parseFloat(req.body.speed_up_fact);
