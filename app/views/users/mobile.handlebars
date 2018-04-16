@@ -121,6 +121,49 @@
 
 
 		$(document).ready(function () {
+			//for device orientation
+			var deviceRotat = {
+				rotX : 0,
+				rotY : 0,
+				rotZ : 0,
+				isValid : false,
+				isArmedX : false,
+				isArmedY : false
+			};
+
+			if (window.DeviceOrientationEvent) {
+				deviceRotat.isValid = true;
+				window.addEventListener("deviceorientation", function(event){
+					deviceRotat.rotX = Math.round(event.gamma);
+					deviceRotat.rotY = Math.round(event.beta);
+					deviceRotat.rotZ = Math.round(event.alpha);
+					//now check if armed
+					if ( deviceRotat.rotX < -100 ) {
+						deviceRotat.isArmedX = true;
+						alert( "armed on X");
+					} else {
+						//rotat X is towards the positive side
+						if (deviceRotat.rotX > 100 && deviceRotat.isArmedX) {
+							//it is greater than 0, but is it above threshold
+							alert("swung the phone X axis");
+						};
+					};
+					if ( deviceRotat.rotY < -100 ) {
+						deviceRotat.isArmedY = true;
+						alert( "armed on Y");
+					} else {
+						//rotat X is towards the positive side
+						if (deviceRotat.rotY > 100 && deviceRotat.isArmedY) {
+							//it is greater than 0, but is it above threshold
+							alert("swung the phone Y axis");
+						};
+					};
+				}, true );
+			} else {
+				deviceRotat.isValid = false;
+				alert( "sorry your browser does not support gyro");
+			};
+
 			var timeVal = $('#varb-storage').attr("data-samp-time");
 			var speedUpFact = $('#varb-storage').attr("data-speed-fact");
 
