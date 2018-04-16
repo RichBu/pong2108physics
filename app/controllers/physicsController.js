@@ -323,7 +323,7 @@ router.post('/start/:typeStart', function (req, res) {
     _spped_up_fact = parseFloat(req.body.speed_up_fact);
     fbase_ballpos_outputObj.speed_up_fact = parseFloat(req.body.speed_up_fact);
   };
-  console.log("after req.body");
+  console.log("after req.body ");
   //create a record for the start of the game
   //initialize with values
   var gr = new game_rec_type(
