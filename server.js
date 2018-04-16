@@ -566,6 +566,8 @@ writeFirebaseRec = function () {
     };
 };
 
+
+
 var read_game_rec = function (_game_id) {
     //constructor for record coming from the database
     var query = "SELECT * FROM games WHERE game_id=?";
@@ -996,6 +998,8 @@ var startConnection = function () {
         //setTimeout(dispAllUsersOnPage_start(true), 5000);
     });
     */
+   writeFirebaseRec();   //write the firebase record once on startup
+
 };
 
 

@@ -136,12 +136,14 @@
 
 		var clearTimer = function() {
 			console.log( "can hit again" );
+			timerLockOutBit = false;
+			timerLock = null;
 		};
 
 		var hitBall = function () {
 			if (timerLockOutBit == false) {
 				console.log("lock out multiple hits");
-				timerLock =setTimeout( clearTimer, 3000);
+				timerLock = setTimeout( clearTimer, 3000);
 				timerLockOutBit = true;
 				if (navigator.vibrate) {
 					//vibratation is active
