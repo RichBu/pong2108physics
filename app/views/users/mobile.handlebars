@@ -147,6 +147,8 @@
 						//rotat X is towards the positive side
 						if (deviceRotat.rotX < -25 && deviceRotat.isArmedX) {
 							//it is greater than 0, but is it above threshold
+							deviceRotat.isArmedX = false;
+							deviceRotat.isArmedY = false;
 							alert("swung the phone X axis");
 						};
 					};
@@ -157,6 +159,8 @@
 						//rotat X is towards the positive side
 						if (deviceRotat.rotY <-25 && deviceRotat.isArmedY) {
 							//it is greater than 0, but is it above threshold
+							deviceRotat.isArmedX = false;
+							deviceRotat.isArmedY = false;
 							alert("swung the phone Y axis");
 						};
 					};
