@@ -9,6 +9,8 @@ var numeral = require("numeral");
 var nodemailer = require('nodemailer');
 var crypto = require('crypto');
 var fs = require('fs');
+var extend = require('extend');
+
 
 
 //setup with password
@@ -140,6 +142,161 @@ var writeAuditLog = function (_typeRec, _user_name, _user_email, _fault, _browse
     //if (err) throw err;
   });
 };
+
+
+
+
+
+router.get('/mobile/:user', function (req, res) {
+  console.log("at the mobile user");
+
+  //don't have the device id 
+  var query = "SELECT * FROM engine_stats";
+
+  connection.query(query, function (err, response) {
+    var timeStart_unix = response[0].time_started_unix;
+    var timeStart_str = moment.unix(timeStart_unix / 1000).format("YYYY-MM-DD  hh:mm:ss a");
+    var timeStop_unix = response[0].time_stopped_unix;
+    if (response[0].isRunning !== 0) {
+      timeStop_unix = moment().valueOf();
+      timeStop_str = "- - - - -";
+    } else {
+      timeStop_str = moment.unix(timeStop_unix / 1000).format("YYYY-MM-DD  hh:mm:ss a");
+    };
+    var timeElapsed_unix = moment.duration(timeStop_unix - timeStart_unix);
+    var timeElapsed_str = response[0].isRunning !== 0 ? timeElapsed_unix.format("HH:mm:ss", { trim: false }) : "- - - - -";
+    var isRunning_str = response[0].isRunning !== 0 ? "RUNNING" : "STOPPED";
+    res.render('../app/views/users/mobile', {
+      time_started: timeStart_str,
+      time_stopped: timeStop_str,
+      time_elapsed: timeElapsed_str,
+      samp_time_ball: response[0].samp_time_ball,
+      speed_up_fact: response[0].speed_up_fact,
+      isRunning: isRunning_str,
+      user_num : req.params.user
+    });
+
+  });
+});
+
+
+
+router.post('/mobile/hit', function (req, res) {
+  console.log('post mobile hit button routes');
+  var start_button_stat = req.body.start_button;
+  var stop_button_stat = req.body.stop_button;
+  var button_hit_01 = req.body.hit_01;
+  var button_hit_02 = req.body.hit_02;
+  var running_stat = true;
+
+  //fixed strings right now
+  var fixed_game_id = 1;
+  var fixed_type_hit_int = 0;  //for serve
+  var fixed_type_hit = "serve";
+  var fixed_result_hit = "good";
+
+  //turn off the ball placement
+  var fbo = fbase_ballpos_outputObj;
+  
+
+  var player_hit;
+  if (button_hit_01 == 1) {
+    player_hit = 1;
+  }
+  else if (button_hit_02 == 1) {
+    player_hit = 2;
+  };
+
+  console.log("player hit = " + player_hit);
+  console.log(button_hit_01);
+  console.log(button_hit_02);
+  console.log("before the hit_ball");
+  hit_ball(fixed_game_id, player_hit, fixed_type_hit_int, fixed_result_hit);
+  //write_ball_hit_rec(1, "serve", "good");
+  res.send({
+    errCode: 0,
+    Status: "OK"
+  });
+});
+
+
+
+router.post('/mobile/serve', function (req, res) {
+  console.log('post mobile server button routes');
+  var button_hit_01 = req.body.hit_01;
+  var button_hit_02 = req.body.hit_02;
+  var place_ball_01 = req.body.place_ball_1;
+  var place_ball_02 = req.body.place_ball_2;
+  var running_stat = true;
+
+  console.log("ball 01 = " + place_ball_01);
+  console.log("ball 02 = " + place_ball_02);
+
+  //fixed strings right now
+  var fixed_game_id = 1;
+  var fixed_type_hit_int = 0;  //for serve
+  var fixed_type_hit = "serve";
+  var fixed_result_hit = "good";
+
+  var player_hit;
+  var fbaseTempObj = {};
+  extend(true, fbaseTempObj, fbase_ballpos_outputObj);
+
+
+
+  if (place_ball_01 == 1) {
+    //put the ball on player #1 spot
+    fbaseTempObj.ball_curr_pos.pos_X = parseFloat(fbase_ballpos_outputObj.play_1.coord_X);
+    fbaseTempObj.ball_curr_pos.pos_Y = parseFloat(fbase_ballpos_outputObj.play_1.coord_Y);
+    fbaseTempObj.ball_curr_pos.loc_GPS_lat = parseFloat(fbase_ballpos_outputObj.play_1.locat_GPS_lat);
+    fbaseTempObj.ball_curr_pos.loc_GPS_lon = parseFloat(fbase_ballpos_outputObj.play_1.locat_GPS_lon);
+    fbaseTempObj.ball_active = 0;
+    fbaseTempObj.hit_play_1 = 0;
+    fbaseTempObj.hit_play_2 = 0;
+    fbaseTempObj.miss_play_1 = 0;
+    fbaseTempObj.miss_play_2 = 0;
+    fbaseTempObj.time.play_1 = 0.0;
+    fbaseTempObj.time.play_2 = fbaseTempObj.play_2.hit_time_win * 10.0;
+    fbaseTempObj.dirFrom = 0;
+  };
+
+
+  if (place_ball_02 == 1) {
+    //put the ball on player #1 spot
+    console.log("set ball to player #2");
+    fbaseTempObj.ball_curr_pos.pos_X = parseFloat(fbase_ballpos_outputObj.play_2.coord_X);
+    fbaseTempObj.ball_curr_pos.pos_Y = parseFloat(fbase_ballpos_outputObj.play_2.coord_Y);
+    fbaseTempObj.ball_curr_pos.loc_GPS_lat = parseFloat(fbase_ballpos_outputObj.play_2.locat_GPS_lat);
+    fbaseTempObj.ball_curr_pos.loc_GPS_lon = parseFloat(fbase_ballpos_outputObj.play_2.locat_GPS_lon);
+    fbaseTempObj.ball_active = 0;
+    fbaseTempObj.hit_play_1 = 0;
+    fbaseTempObj.hit_play_2 = 0;
+    fbaseTempObj.miss_play_1 = 0;
+    fbaseTempObj.miss_play_2 = 0;
+    fbaseTempObj.time.play_1 = fbaseTempObj.play_1.hit_time_win * 10.0;
+    fbaseTempObj.time.play_2 = 0.0;
+    fbaseTempObj.dirFrom = 0;
+    console.log("ball lat #1 = " + fbaseTempObj.ball_curr_pos.loc_GPS_lat);
+    console.log("ball lon #1 = " + fbaseTempObj.ball_curr_pos.loc_GPS_lon);
+  };
+
+
+  extend(true, fbase_ballpos_outputObj, fbaseTempObj);
+  console.log("ball lat #3 = " + fbase_ballpos_outputObj.ball_curr_pos.loc_GPS_lat);
+  console.log("ball lon #3 = " + fbase_ballpos_outputObj.ball_curr_pos.loc_GPS_lon);
+  writeFirebaseRec();
+  console.log("ball lat #4 = " + fbase_ballpos_outputObj.ball_curr_pos.loc_GPS_lat);
+  console.log("ball lon #4 = " + fbase_ballpos_outputObj.ball_curr_pos.loc_GPS_lon);
+
+
+  res.send({
+    errCode: 0,
+    Status: "OK"
+  });
+
+});
+
+
 
 
 //this is the users_controller.js file

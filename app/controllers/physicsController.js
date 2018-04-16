@@ -60,6 +60,7 @@ router.get('/', function (req, res) {
 });
 
 
+
 router.post('/button', function (req, res) {
   console.log('did a post inside of button routes');
   var speed_up_fact = parseFloat(req.body.speed_up_fact);
@@ -311,11 +312,14 @@ function game_rec_type(
 
 
 
-router.post('/start', function (req, res) {
+router.post('/start/:typeStart', function (req, res) {
   console.log('started a game');
+  var typeStart = parseInt(req.params.typeStrt);  //1=admin screen
   var _game_id = 1;
   var startTime_str = moment().format("YYYY-MM-DD HH:mm:ss a");
-  fbase_ballpos_outputObj.speed_up_fact = parseFloat(req.body.speed_up_fact);
+  if (typeStart==1) {
+    fbase_ballpos_outputObj.speed_up_fact = parseFloat(req.body.speed_up_fact);
+  };
   console.log("after req.body");
   //create a record for the start of the game
   //initialize with values

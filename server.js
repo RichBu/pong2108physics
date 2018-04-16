@@ -561,8 +561,8 @@ function game_rec_type(
 writeFirebaseRec = function () {
     if (configData.firebaseActive == true) {
         dbUserGameStorageMain.set(fbase_ballpos_outputObj);
-        console.log("ball lat #5 = " + fbase_ballpos_outputObj.ball_curr_pos.loc_GPS_lat);
-        console.log("ball lon #5 = " + fbase_ballpos_outputObj.ball_curr_pos.loc_GPS_lon);      
+        //console.log("ball lat #5 = " + fbase_ballpos_outputObj.ball_curr_pos.loc_GPS_lat);
+        //console.log("ball lon #5 = " + fbase_ballpos_outputObj.ball_curr_pos.loc_GPS_lon);      
     };
 };
 

@@ -1,0 +1,180 @@
+<!--   
+
+-->
+<div id="varb-storage" data-time-started="{{time_started}}" data-samp-time="{{samp_time_ball}}" data-is-running="{{isRunning}}"
+ data-time-stopped="{{time_stopped}}" data-speed-fact="{{speed_up_fact}}" data-user-num="{{user_num}}">
+
+</div>
+<br/>
+
+<div id="varb-in" data-tim-int={{commTimeInt}}></div>
+<div class="row">
+	<div class="col-md-3">
+		<h4>Engine Running</h4>
+		<h5 id="is_started">{{isRunning}} </h5>
+		<h5 id="time_elapsed">{{time_elapsed}}</h5>
+	</div>
+</div>
+<div class="row">
+	<button class='btn btn-success' style="float: right;" id="btn-start-game">Start Game</button>
+</div>
+
+<div class="row">
+	<div class="col-md-4">
+		<button class='btn btn-warning' style="float: left;" id="btn-hit-1">Hit Ball</button>
+		<button class='btn btn-info' style="float: right;" id="btn-serve-1">Serve</button>
+	</div>
+</div>
+
+<br/>
+<br/>
+<br/>
+
+
+<p class="clear">
+	{{logged_in}} | {{{ body }}}
+
+	<script>
+		var snap;
+		var snapAfter;
+		var myBlob;
+		var formData;
+
+		var take_photo_btn;
+		var image;
+		var video;
+		var submitButton;
+		var submitClick;
+		var hidden_canvas;
+
+		var cameraStillTaken = false;
+		var autoPictSendInProg = false;
+		var timeInterval;     	//time interval for pics
+		var myIntervalTimer;  	//handle to interval timer
+		//var myCommStatTimer; 	//timer for the comm status
+		var commStatTimerInt = 3; 	//interval 
+		var commStopAuto; //stop the auto pics
+
+		var global_User_Id;
+		var global_Device_Id;
+		var global_Email_Id;
+		var sendObj = {
+			ball_samp_time: 0.00,
+			speed_up_fact: 0.00,
+			start_button: 0,
+			stop_button: 0,
+			hit_01: 0,
+			hit_02: 0,
+			place_ball_1: 0,
+			place_ball_2: 0
+		};
+
+
+
+		//sends a "hit" to the physics engine thru users
+		var sendPostHit = function () {
+			$.post("/users/mobile/hit",
+				sendObj,
+				function (data, status) {
+					if (data.errCode === 0) {
+						//there is no error
+						var userNum = parseInt($("#varb-storage").attr("data-user-num"));
+						window.location.href = "/users/mobile/" + userNum;
+					} else {
+						//what to do with error ?
+					};
+				});
+
+		};
+
+		//sends a "serve" to the physics engine thru users
+		var sendPostServe = function () {
+			$.post("/users/mobile/serve",
+				sendObj,
+				function (data, status) {
+					if (data.errCode === 0) {
+						//there is no error
+						var userNum = parseInt($("#varb-storage").attr("data-user-num"));
+						window.location.href = "/users/mobile/" + userNum;
+					} else {
+						//what to do with error ?
+					};
+				});
+
+		};
+
+		var sendPostGame = function () {
+			$.post("/physics/start",
+				sendObj,
+				function (data, status) {
+					if (data.errCode === 0) {
+						//there is no error
+						var userNum = parseInt($("#varb-storage").attr("data-user-num"));
+						window.location.href = "/users/mobile/" + userNum;
+					} else {
+						//what to do with error ?
+					};
+				});
+
+		};
+
+
+
+		$(document).ready(function () {
+			var timeVal = $('#varb-storage').attr("data-samp-time");
+			var speedUpFact = $('#varb-storage').attr("data-speed-fact");
+
+			$('#ball_samp_time').val(timeVal);
+			$('#spd_up_fact').val(speedUpFact);
+			$(document.body).on("click", ".sendButton", function () {
+				sendImageClick(false);
+			});
+			$(document.body).on("click", "#btn-start-game", function () {
+				sendObj.ball_samp_time = $('#ball_samp_time').val();
+				sendObj.speed_up_fact = $('#spd_up_fact').val();
+				sendObj.start_button = true;
+				sendObj.stop_button = false;
+				sendPostGame();
+			});
+
+			$(document.body).on("click", "#btn-hit-1", function () {
+				var userNum = parseInt($("#varb-storage").attr("data-user-num"));
+				sendObj.ball_samp_time = $('#ball_samp_time').val();
+				sendObj.speed_up_fact = $('#spd_up_fact').val();
+				sendObj.start_button = false;
+				sendObj.stop_button = false;
+				sendObj.place_ball_1 = 0;
+				sendObj.place_ball_2 = 0;
+				if (userNum == 1) {
+					sendObj.hit_01 = 1;
+					sendObj.hit_02 = 0;
+				} else {
+					sendObj.hit_01 = 0;
+					sendObj.hit_02 = 1;
+				};
+				sendPostHit();
+			});
+			$(document.body).on("click", "#btn-serve-1", function () {
+				var userNum = parseInt($("#varb-storage").attr("data-user-num"));
+				sendObj.ball_samp_time = $('#ball_samp_time').val();
+				sendObj.speed_up_fact = $('#spd_up_fact').val();
+				sendObj.start_button = false;
+				sendObj.stop_button = false;
+				sendObj.hit_01 = 0;
+				sendObj.hit_02 = 0;
+				if (userNum == 1) {
+					sendObj.place_ball_1 = 1;
+					sendObj.place_ball_2 = 0;
+				} else {
+					sendObj.place_ball_1 = 0;
+					sendObj.place_ball_2 = 1;
+				}
+				sendPostServe();
+			});
+			//			window.setTimeout( function() {
+			//				window.location.reload(true);
+			//			}, 10000 )
+
+		});
+
+	</script>
