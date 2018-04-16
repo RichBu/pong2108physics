@@ -132,11 +132,13 @@
 			};
 
 			if (window.DeviceOrientationEvent) {
+				alert("rotation avail");
 				deviceRotat.isValid = true;
 				window.addEventListener("deviceorientation", function(event){
 					deviceRotat.rotX = Math.round(event.gamma);
 					deviceRotat.rotY = Math.round(event.beta);
 					deviceRotat.rotZ = Math.round(event.alpha);
+					alert(deviceRotat.rotX);
 					//now check if armed
 					if ( deviceRotat.rotX < -100 ) {
 						deviceRotat.isArmedX = true;
