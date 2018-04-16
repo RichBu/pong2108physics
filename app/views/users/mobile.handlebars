@@ -138,24 +138,24 @@
 					deviceRotat.rotX = Math.round(event.gamma);
 					deviceRotat.rotY = Math.round(event.beta);
 					deviceRotat.rotZ = Math.round(event.alpha);
-					alert(deviceRotat.rotX);
+					//alert(deviceRotat.rotX);
 					//now check if armed
-					if ( deviceRotat.rotX < -100 ) {
+					if ( deviceRotat.rotX >25 deviceRotat.isArmedY === false ) {
 						deviceRotat.isArmedX = true;
-						alert( "armed on X");
+						//alert( "armed on X");
 					} else {
 						//rotat X is towards the positive side
-						if (deviceRotat.rotX > 100 && deviceRotat.isArmedX) {
+						if (deviceRotat.rotX < -25 && deviceRotat.isArmedX) {
 							//it is greater than 0, but is it above threshold
 							alert("swung the phone X axis");
 						};
 					};
-					if ( deviceRotat.rotY < -100 ) {
+					if ( deviceRotat.rotY > 25 && deviceRotat.isArmedX === false ) {
 						deviceRotat.isArmedY = true;
-						alert( "armed on Y");
+						//alert( "armed on Y");
 					} else {
 						//rotat X is towards the positive side
-						if (deviceRotat.rotY > 100 && deviceRotat.isArmedY) {
+						if (deviceRotat.rotY <-25 && deviceRotat.isArmedY) {
 							//it is greater than 0, but is it above threshold
 							alert("swung the phone Y axis");
 						};
