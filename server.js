@@ -340,13 +340,13 @@ var ball_pos_calcs = function (play_1, play_2, dist_play, dirFrom) {
     var dist_ball_meter;
     var dist_between_play;
     var distCoordArray;
-    if ( dirFrom == 1) {
+    if (dirFrom == 1) {
         //from player #1 to player #2
         azimuth = calculateBearing(play_1.locat_GPS_lat, play_1.locat_GPS_lon, play_2.locat_GPS_lat, play_2.locat_GPS_lon);
         dist_ball_meter = FtToMeter(dist_play);
         dist_between_play = getPathLength(play_1.locat_GPS_lat, play_1.locat_GPS_lon, play_2.locat_GPS_lat, play_2.locat_GPS_lon);
         distCoordArray = getDestLatLon(play_1.locat_GPS_lat, play_1.locat_GPS_lon, azimuth, dist_play);
-    } else if ( dirFrom == 2) {
+    } else if (dirFrom == 2) {
         azimuth = calculateBearing(play_2.locat_GPS_lat, play_2.locat_GPS_lon, play_1.locat_GPS_lat, play_1.locat_GPS_lon);
         dist_ball_meter = FtToMeter(dist_play);
         dist_between_play = getPathLength(play_1.locat_GPS_lat, play_1.locat_GPS_lon, play_2.locat_GPS_lat, play_2.locat_GPS_lon);
@@ -440,24 +440,32 @@ var ball_calcs = function (snap, useLocal) {
     };
 
     //check if there is a miss
-    //if it is beyon he players, kill it
-    if (Math.abs(parseFloat(fbo.time.play_2)) <= parseFloat(fbo.play_2.hit_time_win)) {
-        //valid hit for player #1
-        fbo.ball_active = 1;
-        fbo.dirFrom = 2;
+    //if it is beyond the players, kill it
+    if (fbo.dirFrom == 1) {
+        //it is going from player #1 to player #2
+        if ((parseFloat(fbo.time.play_2) < 0) && Math.abs(parseFloat(fbo.time.play_2)) > parseFloat(fbo.play_2.hit_time_win)) {
+            //missed
+            console.log("player #2 missed");
+            fbo.ball_active = 0;  //was 0
+            fbo.dirFrom = 0;
+            fbo.miss_play_2 = 1;
+        }
     } else {
-        //missed
-        console.log("player #2 missed");
-        fbo.ball_active = 0;  //was 0
-        fbo.dirFrom = 0;
-        fbo.miss_play_2 = 1;
-
+        //ball is going from player #2 to player #1
+        if ((parseFloat(fbo.time.play_1) < 0) && Math.abs(parseFloat(fbo.time.play_1)) > parseFloat(fbo.play_1.hit_time_win)) {
+            //missed
+            console.log("player #2 missed");
+            fbo.ball_active = 0;  //was 0
+            fbo.dirFrom = 0;
+            fbo.miss_play_2 = 1;
+        };
+    };
     fbo.time.elapsed_unix = timeElapsed_ms;
     var outBallPosObj;
     if (fbio.dirFrom == 1) {
         outBallPosObj = ball_pos_calcs(fbo.play_1, fbo.play_2, fbio.dist.play_1, fbio.dirFrom);
     } else if (fbio.dirFrom == 2) {
-        outBallPosObj = ball_pos_calcs(fbo.play_1, fbo.play_2, fbio.dist.play_2, fbio.dirFrom);        
+        outBallPosObj = ball_pos_calcs(fbo.play_1, fbo.play_2, fbio.dist.play_2, fbio.dirFrom);
     };
 
     if (isBallAct) {
@@ -465,14 +473,14 @@ var ball_calcs = function (snap, useLocal) {
         fbo.ball_curr_pos.pos_X = outBallPosObj.pos_X;
         fbo.ball_curr_pos.pos_Y = outBallPosObj.pos_Y;
         fbo.ball_curr_pos.loc_GPS_lat = outBallPosObj.loc_GPS_lat;
-        fbo.ball_curr_pos.loc_GPS_lon = outBallPosObj.loc_GPS_lon;    
+        fbo.ball_curr_pos.loc_GPS_lon = outBallPosObj.loc_GPS_lon;
     };
 
     //need to find the center of the field
     fbo.field.center_coord_X = (parseFloat(fbo.play_2.coord_X) - parseFloat(fbo.play_1.coord_X)) / 2.0 + parseFloat(fbo.play_1.coord_X);
     fbo.field.center_coord_Y = (parseFloat(fbo.play_2.coord_Y) - parseFloat(fbo.play_1.coord_Y)) / 2.0 + parseFloat(fbo.play_1.coord_Y);
     //in this case, the direction of the ball does not matter ?
-    var centerPosObj = ball_pos_calcs(fbo.play_1, fbo.play_2, fbio.dist.between / 2.0, 1 );
+    var centerPosObj = ball_pos_calcs(fbo.play_1, fbo.play_2, fbio.dist.between / 2.0, 1);
     fbo.field.center_locat_GPS_lat = centerPosObj.loc_GPS_lat;
     fbo.field.center_locat_GPS_lon = centerPosObj.loc_GPS_lon;
 
@@ -669,7 +677,7 @@ write_ball_hit_rec = function (_game_id, _player_num, _type_hit, _result_hit, _b
 };
 
 
-setBallToPlayer = function( fbaseTempObj, _playNum ) {
+setBallToPlayer = function (fbaseTempObj, _playNum) {
     if (_playNum == 1) {
         //put the ball on player #1 spot
         fbaseTempObj.ball_curr_pos.pos_X = parseFloat(fbase_ballpos_outputObj.play_1.coord_X);
@@ -684,10 +692,10 @@ setBallToPlayer = function( fbaseTempObj, _playNum ) {
         fbaseTempObj.time.play_1 = 0.0;
         fbaseTempObj.time.play_2 = fbaseTempObj.play_2.hit_time_win * 10.0;
         fbaseTempObj.dirFrom = 0;
-      };
-    
-    
-      if (_playNum == 2) {
+    };
+
+
+    if (_playNum == 2) {
         //put the ball on player #1 spot
         console.log("set ball to player #2");
         fbaseTempObj.ball_curr_pos.pos_X = parseFloat(fbase_ballpos_outputObj.play_2.coord_X);
@@ -704,7 +712,7 @@ setBallToPlayer = function( fbaseTempObj, _playNum ) {
         fbaseTempObj.dirFrom = 0;
         console.log("ball lat #1 = " + fbaseTempObj.ball_curr_pos.loc_GPS_lat);
         console.log("ball lon #1 = " + fbaseTempObj.ball_curr_pos.loc_GPS_lon);
-      };    
+    };
 }
 
 
@@ -788,9 +796,9 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
             if (_player_num == 1) {
                 fbase_ballpos_outputObj.ball_active = 1;
                 fbase_ballpos_outputObj.dirFrom = 1;
-            } else if (_player_num == 2) { 
+            } else if (_player_num == 2) {
                 fbase_ballpos_outputObj.ball_active = 1;
-                fbase_ballpos_outputObj.dirFrom = 2;                
+                fbase_ballpos_outputObj.dirFrom = 2;
             }
         } else {
             //check if it is valid hit
@@ -999,10 +1007,10 @@ var startConnection = function () {
     connectedRef.on("value", function (snap) {
         // If they are connected..
         if (snap.val()) {   //executes with the value is finally set to true
-
+ 
             // Add user to the connections list.
             var con = connectionsRef.push(true);
-
+ 
             // Remove user from the connection list when they disconnect.
             con.onDisconnect().remove();
         }
@@ -1042,7 +1050,7 @@ var startConnection = function () {
             connectionObj.writeCurrUserRec();
             //            dispAllUsersOnPage_start(true);   //refresh entire area
             showLinkButtonStatus();
-
+ 
             //now get the incoming record's location and set a listener on it
             dbIncomingRec = database.ref(connectionObj.currUserRec.outRec.ID + "/inRec");
             dbIncomingRec.on("value", function (snap) {
@@ -1056,7 +1064,7 @@ var startConnection = function () {
         //setTimeout(dispAllUsersOnPage_start(true), 5000);
     });
     */
-   writeFirebaseRec();   //write the firebase record once on startup
+    writeFirebaseRec();   //write the firebase record once on startup
 
 };
 
