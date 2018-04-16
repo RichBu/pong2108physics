@@ -203,7 +203,7 @@ app.listen(PORT, function () {
 var timerBallUpd;   //const variable for the update of the ball speed
 
 
-var ball_pos_calcs = function (play_1, play_2, dist_play1) {
+var ball_pos_calcs = function (play_1, play_2, dist_play, dirFrom) {
     //calculate the positon of the ball
     //works for player #1 to player #2
     //output 
@@ -318,29 +318,41 @@ var ball_pos_calcs = function (play_1, play_2, dist_play1) {
 
     if (play_2.coord_X === play_1.coord_X) {
         //they are vertical, so can not calculate slopw
-        PT_y = dist_play1;
+        PT_y = dist_play;
         PT_x = 0.0;
     } else {
         theta = Math.atan2(play_2.coord_Y - play_1.coord_Y, play_2.coord_X - play_1.coord_X);
-        PT_y = dist_play1 * Math.sin(theta);
+        PT_y = dist_play * Math.sin(theta);
         slope = (play_2.coord_Y - play_1.coord_Y) / (play_2.coord_X - play_1.coord_X);
         if (slope == 0) {
-            PT_x = dist_play1;
+            PT_x = dist_play;
         } else {
             PT_x = PT_y / slope;
         }
     };
 
+    //have not accounted for the direction of the ball
     var outputObj = {};
     outputObj.pos_X = play_1.coord_X + PT_x;
     outputObj.pos_Y = play_1.coord_Y + PT_y;
 
     //calculate the lat/lon coordinates
-    azimuth = calculateBearing(play_1.locat_GPS_lat, play_1.locat_GPS_lon, play_2.locat_GPS_lat, play_2.locat_GPS_lon);
-    var dist_ball_meter = FtToMeter(dist_play1);
-    var dist_between_play = getPathLength(play_1.locat_GPS_lat, play_1.locat_GPS_lon, play_2.locat_GPS_lat, play_2.locat_GPS_lon);
+    var dist_ball_meter;
+    var dist_between_play;
+    var distCoordArray;
+    if ( dirFrom == 1) {
+        //from player #1 to player #2
+        azimuth = calculateBearing(play_1.locat_GPS_lat, play_1.locat_GPS_lon, play_2.locat_GPS_lat, play_2.locat_GPS_lon);
+        dist_ball_meter = FtToMeter(dist_play);
+        dist_between_play = getPathLength(play_1.locat_GPS_lat, play_1.locat_GPS_lon, play_2.locat_GPS_lat, play_2.locat_GPS_lon);
+        distCoordArray = getDestLatLon(play_1.locat_GPS_lat, play_1.locat_GPS_lon, azimuth, dist_play);
+    } else if ( dirFrom == 2) {
+        azimuth = calculateBearing(play_2.locat_GPS_lat, play_2.locat_GPS_lon, play_1.locat_GPS_lat, play_1.locat_GPS_lon);
+        dist_ball_meter = FtToMeter(dist_play);
+        dist_between_play = getPathLength(play_1.locat_GPS_lat, play_1.locat_GPS_lon, play_2.locat_GPS_lat, play_2.locat_GPS_lon);
+        distCoordArray = getDestLatLon(play_2.locat_GPS_lat, play_2.locat_GPS_lon, azimuth, dist_play);
+    };
     //console.log("dist btw players = " + dist_between_play);
-    var distCoordArray = getDestLatLon(play_1.locat_GPS_lat, play_1.locat_GPS_lon, azimuth, dist_play1);
 
     outputObj.loc_GPS_lat = distCoordArray[0];
     outputObj.loc_GPS_lon = distCoordArray[1];
@@ -351,6 +363,7 @@ var ball_pos_calcs = function (play_1, play_2, dist_play1) {
 var ball_calcs = function (snap, useLocal) {
     //normally only called on a callback from the firebase read
     //but, if firebase is down, call this function also
+    var isBallAct;
 
     fbase_ball_pos_inputObj = {};
     if (useLocal == false) {
@@ -363,11 +376,22 @@ var ball_calcs = function (snap, useLocal) {
         //console.log("inputObj after copy=" + util.inspect(fbase_ball_pos_inputObj, false, null ) );
     };
     var fbio = fbase_ball_pos_inputObj;  //shorthand notation
+    if (fbio.ball_active == 1) {
+        isBallAct = true;
+    } else {
+        isBallAct = false;
+    };
+
     //   console.log("snap=" + util.inspect(fbase_ball_pos_inputObj, false, null ) );
     //only update after having read on in
     var timeNow_unix = moment().valueOf();
     var timeElapsed_ms = moment.duration(timeNow_unix - fbio.time.start_unix).valueOf();
-    timeElapsed_ms = timeElapsed_ms * fbio.speed_up_fact;
+    //if the ball is not active then time elapsed is set to 0
+    if (isBallAct) {
+        timeElapsed_ms = timeElapsed_ms * fbio.speed_up_fact;
+    } else {
+        timeElapsed_ms = 0;
+    };
     //solve dist = 1/2 * accel * t^2
     //in order to solve physics problem, need to find out how long accelerating
     //time accelerating can not be more than accel time limit
@@ -415,17 +439,26 @@ var ball_calcs = function (snap, useLocal) {
         fbo.time.play_2 = (fbo.dist.play_2 * 12) / fbo.ball_physics.curr_vel;
     };
     fbo.time.elapsed_unix = timeElapsed_ms;
-    var outBallPosObj = ball_pos_calcs(fbo.play_1, fbo.play_2, fbio.dist.play_1);
+    var outBallPosObj;
+    if (fbio.dirFrom == 1) {
+        outBallPosObj = ball_pos_calcs(fbo.play_1, fbo.play_2, fbio.dist.play_1, fbio.dirFrom);
+    } else if (fbio.dirFrom == 2) {
+        outBallPosObj = ball_pos_calcs(fbo.play_1, fbo.play_2, fbio.dist.play_2, fbio.dirFrom);        
+    };
 
-    fbo.ball_curr_pos.pos_X = outBallPosObj.pos_X;
-    fbo.ball_curr_pos.pos_Y = outBallPosObj.pos_Y;
-    fbo.ball_curr_pos.loc_GPS_lat = outBallPosObj.loc_GPS_lat;
-    fbo.ball_curr_pos.loc_GPS_lon = outBallPosObj.loc_GPS_lon;
+    if (isBallAct) {
+        //only update the ball position if the ball is active
+        fbo.ball_curr_pos.pos_X = outBallPosObj.pos_X;
+        fbo.ball_curr_pos.pos_Y = outBallPosObj.pos_Y;
+        fbo.ball_curr_pos.loc_GPS_lat = outBallPosObj.loc_GPS_lat;
+        fbo.ball_curr_pos.loc_GPS_lon = outBallPosObj.loc_GPS_lon;    
+    };
 
     //need to find the center of the field
     fbo.field.center_coord_X = (parseFloat(fbo.play_2.coord_X) - parseFloat(fbo.play_1.coord_X)) / 2.0 + parseFloat(fbo.play_1.coord_X);
     fbo.field.center_coord_Y = (parseFloat(fbo.play_2.coord_Y) - parseFloat(fbo.play_1.coord_Y)) / 2.0 + parseFloat(fbo.play_1.coord_Y);
-    var centerPosObj = ball_pos_calcs(fbo.play_1, fbo.play_2, fbio.dist.between / 2.0);
+    //in this case, the direction of the ball does not matter ?
+    var centerPosObj = ball_pos_calcs(fbo.play_1, fbo.play_2, fbio.dist.between / 2.0, 1 );
     fbo.field.center_locat_GPS_lat = centerPosObj.loc_GPS_lat;
     fbo.field.center_locat_GPS_lon = centerPosObj.loc_GPS_lon;
 
@@ -525,9 +558,11 @@ function game_rec_type(
 };
 
 
-writeFirebaseRec = function() {
+writeFirebaseRec = function () {
     if (configData.firebaseActive == true) {
         dbUserGameStorageMain.set(fbase_ballpos_outputObj);
+        console.log("ball lat #5 = " + fbase_ballpos_outputObj.ball_curr_pos.loc_GPS_lat);
+        console.log("ball lon #5 = " + fbase_ballpos_outputObj.ball_curr_pos.loc_GPS_lon);      
     };
 };
 
@@ -695,6 +730,13 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
             //the ball was not active so it is a serve
             _type_hit_int = 0;  //serve
             //need to find out who should serve
+            if (_player_num == 1) {
+                fbase_ballpos_outputObj.ball_active = 1;
+                fbase_ballpos_outputObj.dirFrom = 1;
+            } else if (_player_num == 2) { 
+                fbase_ballpos_outputObj.ball_active = 1;
+                fbase_ballpos_outputObj.dirFrom = 2;                
+            }
         } else {
             //check if it is valid hit
             if (_player_num == 1) {
@@ -704,7 +746,7 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
                     fbase_ballpos_outputObj.dirFrom = 1;
                 } else {
                     //missed
-                    fbase_ballpos_outputObj.ball_active = 0;
+                    fbase_ballpos_outputObj.ball_active = 1;  //was 0
                     fbase_ballpos_outputObj.dirFrom = 0;
                 };
             } else {
@@ -715,7 +757,7 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
                     fbase_ballpos_outputObj.dirFrom = 2;
                 } else {
                     //missed
-                    fbase_ballpos_outputObj.ball_active = 0;
+                    fbase_ballpos_outputObj.ball_active = 1;  //was 0
                     fbase_ballpos_outputObj.dirFrom = 0;
                 };
             };
