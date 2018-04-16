@@ -8,6 +8,7 @@
 <br/>
 
 <div id="varb-in" data-tim-int={{commTimeInt}}></div>
+<wrapper> 
 <div class="row">
 	<div class="col-md-3">
 		<h4>Engine Running</h4>
@@ -15,17 +16,33 @@
 		<h5 id="time_elapsed">{{time_elapsed}}</h5>
 	</div>
 </div>
-<div class="row">
-	<button class='btn btn-success' style="float: right;" id="btn-start-game">Start Game</button>
+	<button class='jumbotron btn-large btn-success' style="float: right;" id="btn-start-game">Start Game</button>
 </div>
 
 <div class="row">
 	<div class="col-md-4">
-		<button class='btn btn-warning' style="float: left;" id="btn-hit-1">Hit Ball</button>
-		<button class='btn btn-info' style="float: right;" id="btn-serve-1">Serve</button>
+		<button class='jumbotron btn-large btn-danger' style="float: left;" id="btn-hit-1">Hit Ball</button>
+		<button class='jumbotron btn-large btn-warning' style="float: right;" id="btn-serve-1">Serve</button>
 	</div>
 </div>
 
+    <style>
+        header {
+            color: white;
+            background-image: linear-gradient(180deg, rgba(224, 133, 14, 1), rgba(173, 52, 62, 1));
+        }
+
+        body {
+            background-image: url('./images/matrixgridfloor.png');
+        }
+
+       .monotonFont {
+        font-family: 'Monoton', cursive;
+        }
+    </style>
+
+
+</wrapper>
 <br/>
 <br/>
 <br/>
@@ -33,6 +50,8 @@
 
 <p class="clear">
 	{{logged_in}} | {{{ body }}}
+
+
 
 	<script>
 		var snap;

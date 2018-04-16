@@ -1,0 +1,78 @@
+Arguments: 
+  /usr/local/Cellar/node/9.9.0/bin/node /usr/local/bin/yarn start
+
+PATH: 
+  /Library/Frameworks/Python.framework/Versions/3.6/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Frameworks/Python.framework/Versions/3.6/bin
+
+Yarn version: 
+  1.5.1
+
+Node version: 
+  9.9.0
+
+Platform: 
+  darwin x64
+
+npm manifest: 
+  {
+    "name": "pong2108physics",
+    "version": "1.0.0",
+    "description": "physics portion of the project",
+    "main": "server.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "start": "node server.js"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/RichBu/pong2108physics.git"
+    },
+    "author": "RPB",
+    "license": "MIT",
+    "bugs": {
+      "url": "https://github.com/RichBu/pong2108physics/issues"
+    },
+    "homepage": "https://github.com/RichBu/pong2108physics#readme",
+    "dependencies": {
+      "bcryptjs": "^2.4.3",
+      "body-parser": "^1.18.2",
+      "cookie-parser": "^1.4.3",
+      "express": "^4.16.3",
+      "express-handlebars": "^3.0.0",
+      "express-session": "^1.15.6",
+      "firebase-admin": "^5.12.0",
+      "mathjs": "^4.1.1",
+      "method-override": "^2.3.10",
+      "moment": "^2.22.0",
+      "moment-duration-format": "^2.2.2",
+      "morgan": "^1.9.0",
+      "multer": "^1.3.0",
+      "mysql": "^2.15.0",
+      "node-extend": "^0.2.0",
+      "nodemailer": "^4.6.4",
+      "numeral": "^2.0.6",
+      "path": "^0.12.7",
+      "util": "^0.10.3"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
+
+Trace: 
+  Error: Command failed.
+  Exit code: 1
+  Command: sh
+  Arguments: -c node server.js
+  Directory: /Users/ryanwalters/Documents/assignmentsandprojects/pong2108physics
+  Output:
+  
+      at ProcessTermError.MessageError (/usr/local/lib/node_modules/yarn/lib/cli.js:186:110)
+      at new ProcessTermError (/usr/local/lib/node_modules/yarn/lib/cli.js:226:113)
+      at ChildProcess.<anonymous> (/usr/local/lib/node_modules/yarn/lib/cli.js:30281:17)
+      at ChildProcess.emit (events.js:180:13)
+      at maybeClose (internal/child_process.js:936:16)
+      at Process.ChildProcess._handle.onexit (internal/child_process.js:220:5)
