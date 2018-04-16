@@ -118,30 +118,45 @@
 
 		};
 
-
+		var hitBall() {
+			var userNum = parseInt($("#varb-storage").attr("data-user-num"));
+			sendObj.ball_samp_time = $('#ball_samp_time').val();
+			sendObj.speed_up_fact = $('#spd_up_fact').val();
+			sendObj.start_button = false;
+			sendObj.stop_button = false;
+			sendObj.place_ball_1 = 0;
+			sendObj.place_ball_2 = 0;
+			if (userNum == 1) {
+				sendObj.hit_01 = 1;
+				sendObj.hit_02 = 0;
+			} else {
+				sendObj.hit_01 = 0;
+				sendObj.hit_02 = 1;
+			};
+			sendPostHit();
+		};
 
 		$(document).ready(function () {
 			//for device orientation
 			var deviceRotat = {
-				rotX : 0,
-				rotY : 0,
-				rotZ : 0,
-				isValid : false,
-				isArmedX : false,
-				isArmedY : false
+				rotX: 0,
+				rotY: 0,
+				rotZ: 0,
+				isValid: false,
+				isArmedX: false,
+				isArmedY: false
 			};
 
 			if (window.DeviceOrientationEvent) {
-				alert("rotation avail");
 				deviceRotat.isValid = true;
-				window.addEventListener("deviceorientation", function(event){
+				window.addEventListener("deviceorientation", function (event) {
 					deviceRotat.rotX = Math.round(event.gamma);
 					deviceRotat.rotY = Math.round(event.beta);
 					deviceRotat.rotZ = Math.round(event.alpha);
 					//alert(deviceRotat.rotX);
 					//now check if armed
 					//if ( deviceRotat.rotX >25 deviceRotat.isArmedY === false ) {
-					if ( deviceRotat.rotX >25  ) {
+					if (deviceRotat.rotX > 25) {
 						deviceRotat.isArmedX = true;
 						//alert( "armed on X");
 					} else {
@@ -150,26 +165,28 @@
 							//it is greater than 0, but is it above threshold
 							deviceRotat.isArmedX = false;
 							deviceRotat.isArmedY = false;
-							alert("swung the phone X axis");
+							hitBall();
+							//alert("swung the phone X axis");
 						};
 					};
 					//if ( deviceRotat.rotY > 25 && deviceRotat.isArmedX === false ) {
-					if ( deviceRotat.rotY > 25  ) {
+					if (deviceRotat.rotY > 25) {
 						deviceRotat.isArmedY = true;
 						//alert( "armed on Y");
 					} else {
 						//rotat X is towards the positive side
-						if (deviceRotat.rotY <-25 && deviceRotat.isArmedY) {
+						if (deviceRotat.rotY < -25 && deviceRotat.isArmedY) {
 							//it is greater than 0, but is it above threshold
 							deviceRotat.isArmedX = false;
 							deviceRotat.isArmedY = false;
-							alert("swung the phone Y axis");
+							hitBall();
+							//alert("swung the phone Y axis");
 						};
 					};
-				}, true );
+				}, true);
 			} else {
 				deviceRotat.isValid = false;
-				alert( "sorry your browser does not support gyro");
+				alert("sorry your browser does not support gyro");
 			};
 
 			var timeVal = $('#varb-storage').attr("data-samp-time");
@@ -189,21 +206,7 @@
 			});
 
 			$(document.body).on("click", "#btn-hit-1", function () {
-				var userNum = parseInt($("#varb-storage").attr("data-user-num"));
-				sendObj.ball_samp_time = $('#ball_samp_time').val();
-				sendObj.speed_up_fact = $('#spd_up_fact').val();
-				sendObj.start_button = false;
-				sendObj.stop_button = false;
-				sendObj.place_ball_1 = 0;
-				sendObj.place_ball_2 = 0;
-				if (userNum == 1) {
-					sendObj.hit_01 = 1;
-					sendObj.hit_02 = 0;
-				} else {
-					sendObj.hit_01 = 0;
-					sendObj.hit_02 = 1;
-				};
-				sendPostHit();
+				hitBall();
 			});
 			$(document.body).on("click", "#btn-serve-1", function () {
 				var userNum = parseInt($("#varb-storage").attr("data-user-num"));
