@@ -435,9 +435,23 @@ var ball_calcs = function (snap, useLocal) {
         fbo.time.play_1 = 0.0;
         fbo.time.play_2 = 0.0;
     } else {
-        fbo.time.play_1 = (fbo.dist.play_1 * 12) / fbo.ball_physics.curr_vel;
-        fbo.time.play_2 = (fbo.dist.play_2 * 12) / fbo.ball_physics.curr_vel;
+        fbo.time.play_1 = ((fbo.dist.play_1 * 12) / fbo.ball_physics.curr_vel) / fbo.speed_up_fact;
+        fbo.time.play_2 = ((fbo.dist.play_2 * 12) / fbo.ball_physics.curr_vel) / fbo.speed_up_fact;
     };
+
+    //check if there is a miss
+    //if it is beyon he players, kill it
+    if (Math.abs(parseFloat(fbo.time.play_2)) <= parseFloat(fbo.play_2.hit_time_win)) {
+        //valid hit for player #1
+        fbo.ball_active = 1;
+        fbo.dirFrom = 2;
+    } else {
+        //missed
+        console.log("player #2 missed");
+        fbo.ball_active = 0;  //was 0
+        fbo.dirFrom = 0;
+        fbo.miss_play_2 = 1;
+
     fbo.time.elapsed_unix = timeElapsed_ms;
     var outBallPosObj;
     if (fbio.dirFrom == 1) {
@@ -566,6 +580,8 @@ writeFirebaseRec = function () {
     };
 };
 
+
+
 var read_game_rec = function (_game_id) {
     //constructor for record coming from the database
     var query = "SELECT * FROM games WHERE game_id=?";
@@ -651,6 +667,45 @@ write_ball_hit_rec = function (_game_id, _player_num, _type_hit, _result_hit, _b
         }); //connection query
     });
 };
+
+
+setBallToPlayer = function( fbaseTempObj, _playNum ) {
+    if (_playNum == 1) {
+        //put the ball on player #1 spot
+        fbaseTempObj.ball_curr_pos.pos_X = parseFloat(fbase_ballpos_outputObj.play_1.coord_X);
+        fbaseTempObj.ball_curr_pos.pos_Y = parseFloat(fbase_ballpos_outputObj.play_1.coord_Y);
+        fbaseTempObj.ball_curr_pos.loc_GPS_lat = parseFloat(fbase_ballpos_outputObj.play_1.locat_GPS_lat);
+        fbaseTempObj.ball_curr_pos.loc_GPS_lon = parseFloat(fbase_ballpos_outputObj.play_1.locat_GPS_lon);
+        fbaseTempObj.ball_active = 0;
+        fbaseTempObj.hit_play_1 = 0;
+        fbaseTempObj.hit_play_2 = 0;
+        fbaseTempObj.miss_play_1 = 0;
+        fbaseTempObj.miss_play_2 = 0;
+        fbaseTempObj.time.play_1 = 0.0;
+        fbaseTempObj.time.play_2 = fbaseTempObj.play_2.hit_time_win * 10.0;
+        fbaseTempObj.dirFrom = 0;
+      };
+    
+    
+      if (_playNum == 2) {
+        //put the ball on player #1 spot
+        console.log("set ball to player #2");
+        fbaseTempObj.ball_curr_pos.pos_X = parseFloat(fbase_ballpos_outputObj.play_2.coord_X);
+        fbaseTempObj.ball_curr_pos.pos_Y = parseFloat(fbase_ballpos_outputObj.play_2.coord_Y);
+        fbaseTempObj.ball_curr_pos.loc_GPS_lat = parseFloat(fbase_ballpos_outputObj.play_2.locat_GPS_lat);
+        fbaseTempObj.ball_curr_pos.loc_GPS_lon = parseFloat(fbase_ballpos_outputObj.play_2.locat_GPS_lon);
+        fbaseTempObj.ball_active = 0;
+        fbaseTempObj.hit_play_1 = 0;
+        fbaseTempObj.hit_play_2 = 0;
+        fbaseTempObj.miss_play_1 = 0;
+        fbaseTempObj.miss_play_2 = 0;
+        fbaseTempObj.time.play_1 = fbaseTempObj.play_1.hit_time_win * 10.0;
+        fbaseTempObj.time.play_2 = 0.0;
+        fbaseTempObj.dirFrom = 0;
+        console.log("ball lat #1 = " + fbaseTempObj.ball_curr_pos.loc_GPS_lat);
+        console.log("ball lon #1 = " + fbaseTempObj.ball_curr_pos.loc_GPS_lon);
+      };    
+}
 
 
 
@@ -739,6 +794,7 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
             }
         } else {
             //check if it is valid hit
+            //if the ball was not coming to the user, then ignore it
             if (_player_num == 1) {
                 if (Math.abs(parseFloat(fbase_ballpos_outputObj.time.play_1)) <= parseFloat(fbase_ballpos_outputObj.play_1.hit_time_win)) {
                     //valid hit for player #1
@@ -746,8 +802,10 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
                     fbase_ballpos_outputObj.dirFrom = 1;
                 } else {
                     //missed
-                    fbase_ballpos_outputObj.ball_active = 1;  //was 0
+                    console.log("player #1 missed");
+                    fbase_ballpos_outputObj.ball_active = 0;  //was 0
                     fbase_ballpos_outputObj.dirFrom = 0;
+                    fbase_ballpos_outputObj.miss_play_1 = 1;
                 };
             } else {
                 //must be player num 2
@@ -757,8 +815,10 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
                     fbase_ballpos_outputObj.dirFrom = 2;
                 } else {
                     //missed
-                    fbase_ballpos_outputObj.ball_active = 1;  //was 0
+                    console.log("player #2 missed ");
+                    fbase_ballpos_outputObj.ball_active = 0;  //was 0
                     fbase_ballpos_outputObj.dirFrom = 0;
+                    fbase_ballpos_outputObj.miss_play_2 = 1;
                 };
             };
         };
@@ -996,6 +1056,8 @@ var startConnection = function () {
         //setTimeout(dispAllUsersOnPage_start(true), 5000);
     });
     */
+   writeFirebaseRec();   //write the firebase record once on startup
+
 };
 
 

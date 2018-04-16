@@ -88,6 +88,19 @@
 			place_ball_2: 0
 		};
 
+		var timerLockOutBit = false;
+		var timerLock;
+
+		var deviceRotat = {
+			rotX: 0,
+			rotY: 0,
+			rotZ: 0,
+			isValid: false,
+			isArmedX: false,
+			isArmedY: false
+		};
+
+
 
 
 		//sends a "hit" to the physics engine thru users
@@ -98,7 +111,8 @@
 					if (data.errCode === 0) {
 						//there is no error
 						var userNum = parseInt($("#varb-storage").attr("data-user-num"));
-						window.location.href = "/users/mobile/" + userNum;
+						//do I need to reload the page ?
+						//window.location.href = "/users/mobile/" + userNum;
 					} else {
 						//what to do with error ?
 					};
@@ -114,7 +128,8 @@
 					if (data.errCode === 0) {
 						//there is no error
 						var userNum = parseInt($("#varb-storage").attr("data-user-num"));
-						window.location.href = "/users/mobile/" + userNum;
+						//do I need to reload the page ?
+						//window.location.href = "/users/mobile/" + userNum;
 					} else {
 						//what to do with error ?
 					};
@@ -129,7 +144,8 @@
 					if (data.errCode === 0) {
 						//there is no error
 						var userNum = parseInt($("#varb-storage").attr("data-user-num"));
-						window.location.href = "/users/mobile/" + userNum;
+						//do I need to reload the page ???
+						//window.location.href = "/users/mobile/" + userNum;
 					} else {
 						//what to do with error ?
 					};
@@ -137,38 +153,45 @@
 
 		};
 
+		var clearTimer = function () {
+			console.log("can hit again");
+			timerLockOutBit = false;
+			timerLock = null;
+		};
+
 		var hitBall = function () {
-			if (navigator.vibrate) {
-				//vibratation is active
-				navigator.vibrate([200, 100, 200]);
-			};
-			var userNum = parseInt($("#varb-storage").attr("data-user-num"));
-			sendObj.ball_samp_time = $('#ball_samp_time').val();
-			sendObj.speed_up_fact = $('#spd_up_fact').val();
-			sendObj.start_button = false;
-			sendObj.stop_button = false;
-			sendObj.place_ball_1 = 0;
-			sendObj.place_ball_2 = 0;
-			if (userNum == 1) {
-				sendObj.hit_01 = 1;
-				sendObj.hit_02 = 0;
+			if (timerLockOutBit == false) {
+				console.log("lock out multiple hits");
+				timerLock = setTimeout(clearTimer, 3000);
+				timerLockOutBit = true;
+				if (navigator.vibrate) {
+					//vibratation is active
+					navigator.vibrate([200, 100, 200]);
+				};
+				var userNum = parseInt($("#varb-storage").attr("data-user-num"));
+				sendObj.ball_samp_time = $('#ball_samp_time').val();
+				sendObj.speed_up_fact = $('#spd_up_fact').val();
+				sendObj.start_button = false;
+				sendObj.stop_button = false;
+				sendObj.place_ball_1 = 0;
+				sendObj.place_ball_2 = 0;
+				if (userNum == 1) {
+					sendObj.hit_01 = 1;
+					sendObj.hit_02 = 0;
+				} else {
+					sendObj.hit_01 = 0;
+					sendObj.hit_02 = 1;
+				};
+				sendPostHit();
 			} else {
-				sendObj.hit_01 = 0;
-				sendObj.hit_02 = 1;
+				//keep resetting the 
+				deviceRotat.isArmedX = false;
+				deviceRotat.isArmedY = false;
 			};
-			sendPostHit();
 		};
 
 		$(document).ready(function () {
 			//for device orientation
-			var deviceRotat = {
-				rotX: 0,
-				rotY: 0,
-				rotZ: 0,
-				isValid: false,
-				isArmedX: false,
-				isArmedY: false
-			};
 
 			//set up vibration
 			navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
@@ -183,11 +206,13 @@
 					//now check if armed
 					//if ( deviceRotat.rotX >25 deviceRotat.isArmedY === false ) {
 					if (deviceRotat.rotX > 25) {
-						deviceRotat.isArmedX = true;
-						if (navigator.vibrate) {
-							//vibratation is active
-							navigator.vibrate(100);
-						};
+						if (deviceRotat.isArmedX == false) {
+							deviceRotat.isArmedX = true;
+							if (navigator.vibrate) {
+								//vibratation is active
+								navigator.vibrate(100);
+							};
+						}
 						//alert( "armed on X");
 					} else {
 						//rotat X is towards the positive side
@@ -201,12 +226,13 @@
 					};
 					//if ( deviceRotat.rotY > 25 && deviceRotat.isArmedX === false ) {
 					if (deviceRotat.rotY > 25) {
-						deviceRotat.isArmedY = true;
-						if (navigator.vibrate) {
-							//vibratation is active
-							navigator.vibrate(100);
+						if (deviceRotat.isArmedY == false) {
+							deviceRotat.isArmedY = true;
+							if (navigator.vibrate) {
+								//vibratation is active
+								navigator.vibrate(100);
+							};
 						};
-						//alert( "armed on Y");
 					} else {
 						//rotat X is towards the positive side
 						if (deviceRotat.rotY < -25 && deviceRotat.isArmedY) {
