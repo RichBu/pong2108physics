@@ -118,7 +118,11 @@
 
 		};
 
-		var hitBall = function() {
+		var hitBall = function () {
+			if (navigator.vibrate) {
+				//vibratation is active
+				navigator.vibrate([200, 100, 200]);
+			};
 			var userNum = parseInt($("#varb-storage").attr("data-user-num"));
 			sendObj.ball_samp_time = $('#ball_samp_time').val();
 			sendObj.speed_up_fact = $('#spd_up_fact').val();
@@ -147,6 +151,9 @@
 				isArmedY: false
 			};
 
+			//set up vibration
+			navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
+
 			if (window.DeviceOrientationEvent) {
 				deviceRotat.isValid = true;
 				window.addEventListener("deviceorientation", function (event) {
@@ -158,6 +165,10 @@
 					//if ( deviceRotat.rotX >25 deviceRotat.isArmedY === false ) {
 					if (deviceRotat.rotX > 25) {
 						deviceRotat.isArmedX = true;
+						if (navigator.vibrate) {
+							//vibratation is active
+							navigator.vibrate(100);
+						};
 						//alert( "armed on X");
 					} else {
 						//rotat X is towards the positive side
@@ -172,6 +183,10 @@
 					//if ( deviceRotat.rotY > 25 && deviceRotat.isArmedX === false ) {
 					if (deviceRotat.rotY > 25) {
 						deviceRotat.isArmedY = true;
+						if (navigator.vibrate) {
+							//vibratation is active
+							navigator.vibrate(100);
+						};
 						//alert( "armed on Y");
 					} else {
 						//rotat X is towards the positive side
