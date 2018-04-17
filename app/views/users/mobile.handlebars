@@ -8,38 +8,43 @@
 <br/>
 
 <div id="varb-in" data-tim-int={{commTimeInt}}></div>
-<wrapper> 
-<div class="row">
-	<div class="col-md-3">
-		<h4>Engine Running</h4>
-		<h5 id="is_started">{{isRunning}} </h5>
-		<h5 id="time_elapsed">{{time_elapsed}}</h5>
+<wrapper>
+	<div class="row">
+		<div class="col-md-3">
+			<h4>Engine Running</h4>
+			<h5 id="is_started">{{isRunning}} </h5>
+			<h5 id="time_elapsed">{{time_elapsed}}</h5>
+		</div>
 	</div>
-</div>
-	<button class='jumbotron btn-large btn-success' style="float: right;" id="btn-start-game">Start Game</button>
-</div>
-
-<div class="row">
-	<div class="col-md-4">
-		<button class='jumbotron btn-large btn-danger' style="float: left;" id="btn-hit-1">Hit Ball</button>
-		<button class='jumbotron btn-large btn-warning' style="float: right;" id="btn-serve-1">Serve</button>
+	<div class="row">
+		<div class="col-md-6 col-lg-12">
+			<button class='jumbotron btn-large btn-danger' style="float: left;" id="btn-hit-1">Hit Ball</button>
+			<button class='jumbotron btn-large btn-success' style="float: right;" id="btn-start-game">Start Game</button>
+			<button class='jumbotron btn-large btn-warning' style="float: right;" id="btn-serve-1">Serve</button>
+		</div>
+	</div>     
+	<div class="row">
+		<div class="col-md-6 col-lg-12">
+			<button class='btn-large btn-warning' style="float: right; margin: 5px;" id="btn-stats" onclick="location.href='https://richbu.github.io/Pong2180_user_demo/'" >stats</button>
+			<button class='btn-large btn-warning' style="float: right; margin: 5px;" id="btn-user-2" onclick="location.href='https://pong2180-physics.herokuapp.com/users/mobile/2'">user 2</button>
+			<button class='btn-large btn-warning' style="float: right; margin: 5px;" id="btn-user-1" onclick="location.href='https://pong2180-physics.herokuapp.com/users/mobile/1'">user 1</button>
+		</div>
 	</div>
-</div>
 
-    <style>
-        header {
-            color: white;
-            background-image: linear-gradient(180deg, rgba(224, 133, 14, 1), rgba(173, 52, 62, 1));
-        }
+	<style>
+		header {
+			color: white;
+			background-image: linear-gradient(180deg, rgba(224, 133, 14, 1), rgba(173, 52, 62, 1));
+		}
 
-        body {
-            background-image: url('/images/matrixgridfloor.png');
-        }
+		body {
+			background-image: url('matrixgridfloor.png');
+		}
 
-       .monotonFont {
-        font-family: 'Monoton', cursive;
-        }
-    </style>
+		.monotonFont {
+			font-family: 'Monoton', cursive;
+		}
+	</style>
 
 
 </wrapper>
