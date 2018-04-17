@@ -457,7 +457,7 @@ var ball_calcs = function (snap, useLocal) {
             console.log("player #2 missed");
             fbo.ball_active = 0;  //was 0
             fbo.dirFrom = 0;
-            fbo.miss_play_2 = 1;
+            fbo.miss_play_1 = 1;
         };
     };
     fbo.time.elapsed_unix = timeElapsed_ms;
