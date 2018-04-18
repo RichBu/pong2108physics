@@ -5,53 +5,55 @@
  defer></script>
 <script src="https://apis.google.com/js/api.js" type="text/javascript"></script>
 
+<style>
+	header {
+		color: white;
+		background-image: linear-gradient(180deg, rgba(224, 133, 14, 1), rgba(173, 52, 62, 1));
+	}
+
+	body {
+		background-image: url('matrixgridfloor.png');
+	}
+
+	.monotonFont {
+		font-family: 'Monoton', cursive;
+	}
+</style>
 
 
-<h2> Audit Log </h2>
-<hr>
-<h4>Pick one:</h4>
+<h2> Users Listing </h2>
 <button class='btn btn-primary' id="btn-log">Audit Log</button>
-<button class='btn btn-primary' id="btn-admin-list">Admin List</button>
 <button class='btn btn-primary btn-users' id="btn-users">User List</button>
-<button class='btn btn-primary btn-admin-pics' id="btn-admin-games">Games List</button>
-<button class='btn btn-primary btn-admin-pics' id="btn-admin-physics">Physics Engine</button>
+<button class='btn btn-primary btn-users' id="btn-add">Add User</button>
+<button class='btn btn-primary' id="btn-admin-physics">Physics Engine</button>
 <hr>
-
 
 <table style="width:100%" class="table table-bordered table-condensed table-hover">
 	<tr>
 		<strong>
-			<th>Type of Rec</th>
-			<th>Time</th>
+			<th>User id</th>
 			<th>User Name</th>
-			<th>Email</th>
-			<th>Outcome</th>
-			<th>Browser id</th>
-			<th>ip addr</th>
+			<th>Email as stored</th>
+			<th>Email decrypted</th>
+			<th>Password hash</th>
 		</strong>
 	</tr>
 	{{#each outputLines}}
 	<tr>
 		<td>
-			<h5>{{this.typeRec}}</h5>
+			<h5>{{this.id}}</h5>
 		</td>
 		<td>
-			<h5>{{this.timeStampStr}}</h5>
+			<h5>{{this.name}}</h5>
 		</td>
 		<td>
-			<h5>{{this.user_name}}</h5>
+			<h5>{{this.email_hash}}</h5>
 		</td>
 		<td>
-			<h5>{{this.user_email}}</h5>
+			<h5>{{this.email}}</h5>
 		</td>
 		<td>
-			<h5>{{this.fault}}</h5>
-		</td>
-		<td>
-			<h5>{{this.browser_id}}</h5>
-		</td>
-		<td>
-			<h5>{{this.ip_addr}}</h5>
+			<h5>{{this.password_hash}}</h5>
 		</td>
 	</tr>
 	{{/each}}
@@ -74,6 +76,12 @@
 		//document is ready, so move the incoming data over
 		$(document.body).on("click", "#btn-users", function () {
 			window.location = "/admin/admin_users";
+		});        
+		$(document.body).on("click", "#btn-add", function () {
+			window.location = "/admin/create";
+		});
+		$(document.body).on("click", "#btn-log", function () {
+			window.location = "/admin/log-disp";
 		});
 		$(document.body).on("click", "#btn-admin-list", function () {
 			window.location = "/admin/admin_list";
@@ -84,19 +92,6 @@
 		$(document.body).on("click", "#btn-admin-pics", function () {
 			window.location = "/admin/files";
 		});
-			//hit the users buttonz
-			/*
-			var url = "/admin/admin_users"
-			$.post(url, {
-				user: "test"
-			}, function () {
-			});
-			*/
-		//});
-		$(document.body).on("click", "#btn-log", function () {
-			window.location = "/admin/log-disp";
-		});
 	});
-
 
 </script>

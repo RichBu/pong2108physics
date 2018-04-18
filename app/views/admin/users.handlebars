@@ -23,6 +23,7 @@
 
 <h2> Users Listing </h2>
 <button class='btn btn-primary' id="btn-log">Audit Log</button>
+<button class='btn btn-primary' id="btn-admin-list">Admin List</button>
 <button class='btn btn-primary btn-users' id="btn-add">Add User</button>
 <button class='btn btn-primary' id="btn-admin-physics">Physics Engine</button>
 <hr>
@@ -78,6 +79,9 @@
 		});
 		$(document.body).on("click", "#btn-log", function () {
 			window.location = "/admin/log-disp";
+		});
+		$(document.body).on("click", "#btn-admin-list", function () {
+			window.location = "/admin/admin_list";
 		});
 		$(document.body).on("click", "#btn-admin-physics", function () {
 			window.location = "/physics";

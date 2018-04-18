@@ -13,137 +13,20 @@ var nodemailer = require('nodemailer');
 var crypto = require('crypto');
 var glob = require("glob");
 var fs = require('fs');
+var loginMod = require('../modules/login-mod.js');
+var auditMod = require('../modules/auditLog-mod.js');
+
 
 momentDurationFormatSetup(moment);  //setup formatting for durations
 
+
 //setup with password
-var transporter = nodemailer.createTransport({
+var transporterObj = {
   service: 'gmail',
   auth: {
-    user: 'tabletopgenieproj@gmail.com',
-    pass: 'projpassword1'
+    user: '2180pong@gmail.com',
+    pass: 'ping2180'
   }
-});
-
-
-var hackCheck = function (str1, str2, str3, str4) {
-  //hack attack should look for 
-  //  <, >, !, &, /, \, '
-
-  var chkStr = function (_strIn) {
-    var outVal = false;
-    if (_strIn === undefined || _strIn === null) {
-      //it's a null or undefined so can't be hack
-      outVal = false;
-    } else {
-      if (_strIn.indexOf('<') >= 0) outVal = true;
-      if (_strIn.indexOf('>') >= 0) outVal = true;
-      if (_strIn.indexOf('&') >= 0) outVal = true;
-      if (_strIn.indexOf('/') >= 0) outVal = true;
-      if (_strIn.indexOf('\\') >= 0) outVal = true;
-      if (_strIn.indexOf("'") >= 0) outVal = true;
-      if (_strIn.indexOf("!") >= 0) outVal = true;
-    };
-    return outVal;
-  };
-
-  var sendHackEmail = function () {
-    var mailOptions = function (_to, _subject, _html) {
-      this.from = 'TableTopGenieProj@gmail.com'; // sender address
-      this.to = _to;                   // list of receivers
-      this.subject = _subject;          // Subject line
-      this.html = _html                 // plain text body
-    };
-
-    var subjectStr = "HACKING attempt at Table Top Genie @ " + moment().format("YYYY-MM-DD  HH:mm a");
-    var messageStr = "<h3>User is attempting to use unauthorized characters</h3><br/>";
-    messageStr += "<h3>Characters were detected and input was sanitized.<h3>";
-    messageStr += "<h3>You can check on the status by using  /Admin/1  page.<h3><br/>";
-
-    //var mailTo = "RichBu001@gmail.com";
-    var mailTo = "RichBu001@gmail.com";
-    var mailOptionsObj = new mailOptions(mailTo, subjectStr, messageStr);
-    transporter.sendMail(mailOptionsObj, function (err, info) {
-      if (err)
-        console.log(err)
-      else
-        //shoud audit log
-        console.log();
-    });
-  };
-
-  var fullOutVal = false;
-  fullOutVal = chkStr(str1) || chkStr(str2) || chkStr(str3) || chkStr(str4);
-
-  if (fullOutVal) {
-    //there was a hacking attempt
-    if (str1 === undefined || str1 === null) str1 = " ";
-    if (str2 === undefined || str2 === null) str2 = " ";
-    if (str3 === undefined || str3 === null) str3 = " ";
-    if (str4 === undefined || str4 === null) str4 = " ";
-
-    sendHackEmail();
-    writeAuditLog("HACK ATTEMPT", str1, str2, " ", " ", " ");
-  };
-  return fullOutVal;
-};
-
-
-
-function encrypt(text) {
-  var crypto_algorithm = 'aes-256-ctr';
-  var crypto_password = 'HeLlo';
-  var cipher = crypto.createCipher(crypto_algorithm, crypto_password)
-  var crypted = cipher.update(text, 'utf8', 'hex')
-  crypted += cipher.final('hex');
-  return crypted;
-};
-
-
-function decrypt(text) {
-  var crypto_algorithm = 'aes-256-ctr';
-  var crypto_password = 'HeLlo';
-  var decipher = crypto.createDecipher(crypto_algorithm, crypto_password)
-  var dec = decipher.update(text, 'hex', 'utf8')
-  dec += decipher.final('utf8');
-  return dec;
-};
-
-
-var writeAuditLog = function (_typeRec, _user_name, _user_email, _fault, _browser_id, _ip_addr) {
-  //write to the audit file
-  //first make sure none are blank
-  if (_typeRec === undefined || _typeRec === null) {
-    _typeRec = " ";
-  };
-  if (_user_name === undefined || _user_name === null) {
-    _user_name = " ";
-  };
-  if (_user_email === undefined || _user_email === null) {
-    _user_email = " ";
-  };
-  if (_fault === undefined || _fault === null) {
-    _fault = " ";
-  };
-  _fault = _fault + "                                              ";
-  _fault = _fault.substring(0, 28);
-  if (_browser_id === undefined || _browser_id === null) {
-    _browser_id = " ";
-  };
-  if (_ip_addr === undefined || _ip_addr === null) {
-    _ip_addr = " ";
-  };
-
-  var timeStamp = moment().unix();
-
-  var query = "INSERT INTO audit_log ( typeRec, time_stamp, user_name, user_email, fault, browser_id, ip_addr ) VALUES (?, ?, ?, ?, ?, ?, ? )";
-
-
-  connection.query(query, [_typeRec, timeStamp, _user_name, _user_email, _fault, _browser_id, _ip_addr], function (err, response) {
-    console.log("error at audit = \n" + err);
-    //write to audit file
-    //if (err) throw err;
-  });
 };
 
 
@@ -167,7 +50,7 @@ router.post('/check', function (req, res) {
     //email has something in it
     user_email = req.body.user_email;
     user_email = user_email.trim();
-    user_email_hash = encrypt(user_email);
+    user_email_hash = loginMod.encrypt(user_email);
     if (req.body.user_password === undefined || req.body.user_password === null || req.body.user_password === "") {
       console.log("no match #2");
       return res.render('../app/views/admin/login');
@@ -193,9 +76,9 @@ router.post('/check', function (req, res) {
       password_compare = "$2a$10$.XWUoWrZR7UJTgFkcKT6zeu5bjNMU/ohUQFKyVy.O0GuuYhIzvxJ.";
       bcrypt.compare(user_password, password_compare, function (err, result) {
         //the password matches
-        if (user_email_hash === "047bd4b5d70d1985eee8aff143" || 
-            user_email_hash === "1468cda5f320158debaae2fd41c4" ||
-            user_email_hash === "0270daa2d70d1985eee8aff143"  ) {
+        if (user_email_hash === "047bd4b5d70d1985eee8aff143" ||
+          user_email_hash === "1468cda5f320158debaae2fd41c4" ||
+          user_email_hash === "0270daa2d70d1985eee8aff143") {
           console.log("password match for hard coded list");
           return dispAuditPage(res);
         } else {
@@ -340,7 +223,7 @@ router.post('/deleteAll', function (req, res) {
   };
 
   var sendObjBack = function (errCode, errMsg, errLine, errExp, _user_name, _user_email, _user_id, _device_id) {
-    writeAuditLog("Delete All", "Admin", "root@email.com", "code: " + errCode + " = " + errMsg, " ", " ");
+    auditMod.writeAuditLog(connection, "Delete All", "Admin", "root@email.com", "code: " + errCode + " = " + errMsg, " ", " ");
     respondObj.errCode = errCode;
     respondObj.errLine = errLine;
     respondObj.errMsg = errMsg;
@@ -476,10 +359,10 @@ var dispAdminUsersPage = function (res) {
       var testStr = response[i].email_hash;
       //encryption / decrypt can not be done on null strings
       if (testStr === undefined || testStr === null || testStr === "") {
-        testStr = encrypt(" ");
-        testStr = encrypt(testStr);
+        testStr = loginMod.encrypt(" ");
+        testStr = loginMod.encrypt(testStr);
       };
-      var emailDecrypt = decrypt(testStr);
+      var emailDecrypt = loginMod.decrypt(testStr);
       auditOutput.push(new auditOutputObj(
         response[i].user_id,
         response[i].name,
@@ -534,7 +417,7 @@ router.post('/create', function (req, res) {
     errExp: ""   //error explanation
   };
 
-  if (hackCheck(userName, userEmail, userPassword, userPassword2)) {
+  if (auditMod.hackCheck(connection, transporterObj, userName, userEmail, userPassword, userPassword2)) {
     userName = "invalid";
     userEmail = "invalid";
     userPassword = "invalid1";
@@ -543,7 +426,7 @@ router.post('/create', function (req, res) {
 
 
   var sendObjBack = function (errCode, errMsg, errLine, errExp, _user_name, _user_email) {
-    writeAuditLog("login attempt", _user_name, _user_email, "code: " + errCode + " = " + errMsg, " ", " ");
+    auditMod.writeAuditLog(connection, "login attempt", _user_name, _user_email, "code: " + errCode + " = " + errMsg, " ", " ");
     respondObj.errCode = errCode;
     respondObj.errLine = errLine;
     respondObj.errMsg = errMsg;
@@ -702,7 +585,7 @@ router.post('/create', function (req, res) {
     return;
   };
 
-  var emailEnc = encrypt(req.body.user_email)
+  var emailEnc = loginMod.encrypt(req.body.user_email)
   connection.query(query, [emailEnc], function (err, response) {
     console.log(response)
     if (response != undefined && response != null && response.length > 0) {
@@ -719,14 +602,14 @@ router.post('/create', function (req, res) {
       bcrypt.genSalt(10, function (err, salt) {
         bcrypt.hash(userPassword, salt, function (err, hash) {
           var query = "INSERT INTO users (name, email_hash, password_hash, account_id, is_this_master_for_acct ) VALUES (?, ?, ?, ?, ? )";
-          var emailEnc = encrypt(userEmail);
+          var emailEnc = loginMod.encrypt(userEmail);
           connection.query(query, [userName, emailEnc, hash, 0, true], function (err, response) {
             //need to add error 
             console.log(err);
             //now need to requery to make sure that the user just entered to get the user id
             var query = "SELECT * FROM users WHERE email_hash = ?";
 
-            var emailEnc = encrypt(userEmail);
+            var emailEnc = loginMod.encrypt(userEmail);
             connection.query(query, [emailEnc], function (err, response) {
               req.session.user_id = response[0].id;
               req.session.logged_in = true;
