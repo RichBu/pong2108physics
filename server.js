@@ -388,7 +388,7 @@ var ball_calcs = function (snap, useLocal) {
     var timeElapsed_ms = moment.duration(timeNow_unix - fbio.time.start_unix).valueOf();
     //if the ball is not active then time elapsed is set to 0
     if (isBallAct) {
-        timeElapsed_ms = timeElapsed_ms * fbio.speed_up_fact;
+        timeElapsed_ms = timeElapsed_ms;  //had speed up here
     } else {
         timeElapsed_ms = 0;
     };
@@ -409,7 +409,7 @@ var ball_calcs = function (snap, useLocal) {
     //find out what the velocity is after accel is done
     //console.log("accel = " + timeAccel);
     //console.log("time vel = " + timeVel);
-    let velConst = (fbio.ball_physics.accel_val * timeAccel);
+    let velConst = (fbio.ball_physics.accel_val * timeAccel) * fbio.speed_up_fact;
     //console.log('veloc = ' + velConst);
     let distTravel_in = (0.5 * fbio.ball_physics.accel_val * timeAccel * timeAccel) + velConst * timeVel;
 
@@ -435,8 +435,8 @@ var ball_calcs = function (snap, useLocal) {
         fbo.time.play_1 = 0.0;
         fbo.time.play_2 = 0.0;
     } else {
-        fbo.time.play_1 = ((fbo.dist.play_1 * 12) / fbo.ball_physics.curr_vel) / fbo.speed_up_fact;
-        fbo.time.play_2 = ((fbo.dist.play_2 * 12) / fbo.ball_physics.curr_vel) / fbo.speed_up_fact;
+        fbo.time.play_1 = ((fbo.dist.play_1 * 12) / fbo.ball_physics.curr_vel); //had speed up fact here before ?
+        fbo.time.play_2 = ((fbo.dist.play_2 * 12) / fbo.ball_physics.curr_vel);
     };
 
     //check if there is a miss
@@ -690,7 +690,8 @@ setBallToPlayer = function (fbaseTempObj, _playNum) {
         fbaseTempObj.miss_play_1 = 0;
         fbaseTempObj.miss_play_2 = 0;
         fbaseTempObj.time.play_1 = 0.0;
-        fbaseTempObj.time.play_2 = fbaseTempObj.play_2.hit_time_win * 10.0;
+        //fbaseTempObj.time.play_2 = fbaseTempObj.play_2.hit_time_win * 10.0;
+        fbaseTempObj.time.play_2 = 0.0;
         fbaseTempObj.dirFrom = 0;
     };
 
@@ -707,11 +708,10 @@ setBallToPlayer = function (fbaseTempObj, _playNum) {
         fbaseTempObj.hit_play_2 = 0;
         fbaseTempObj.miss_play_1 = 0;
         fbaseTempObj.miss_play_2 = 0;
-        fbaseTempObj.time.play_1 = fbaseTempObj.play_1.hit_time_win * 10.0;
+        //fbaseTempObj.time.play_1 = fbaseTempObj.play_1.hit_time_win * 10.0;
+        fbaseTempObj.time.play_1 = 0.0;
         fbaseTempObj.time.play_2 = 0.0;
         fbaseTempObj.dirFrom = 0;
-        console.log("ball lat #1 = " + fbaseTempObj.ball_curr_pos.loc_GPS_lat);
-        console.log("ball lon #1 = " + fbaseTempObj.ball_curr_pos.loc_GPS_lon);
     };
 }
 
@@ -791,14 +791,34 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
         //check if the ball was not active then it was a server
         if (fbase_ballpos_outputObj.ball_active === 0) {
             //the ball was not active so it is a serve
-            _type_hit_int = 0;  //serve
             //need to find out who should serve
             if (_player_num == 1) {
-                fbase_ballpos_outputObj.ball_active = 1;
-                fbase_ballpos_outputObj.dirFrom = 1;
+                //first check if the position match exactly
+                //otherwise, do nothing because it's not ready to server
+                var fbo = fbase_ballpos_outputObj;
+                if (parseFloat(fbo.ball_curr_pos.loc_GPS_lat) == parseFloat(fbo.play_1.locat_GPS_lat) &&
+                    parseFloat(fbo.ball_curr_pos.loc_GPS_lon) == parseFloat(fbo.play_1.locat_GPS_lon)) {
+                    //ball is EXACTLY in the same spot as the player, so it is a valid serve
+                    fbo.ball_active = 1;
+                    fbo.dirFrom = 1;
+                    fbo.miss_play_1 = 0;
+                    fbo.miss_play_2 = 0;
+                    _type_hit_int = 0;  //serve
+                } else {
+                    //what to do if trying to server and the ball is not in position ?
+                };
             } else if (_player_num == 2) {
-                fbase_ballpos_outputObj.ball_active = 1;
-                fbase_ballpos_outputObj.dirFrom = 2;
+                var fbo = fbase_ballpos_outputObj;
+                if (parseFloat(fbo.ball_curr_pos.loc_GPS_lat) == parseFloat(fbo.play_2.locat_GPS_lat) &&
+                    parseFloat(fbo.ball_curr_pos.loc_GPS_lon) == parseFloat(fbo.play_2.locat_GPS_lon)) {
+                    fbo.ball_active = 1;
+                    fbo.dirFrom = 2;
+                    fbo.miss_play_1 = 0;
+                    fbo.miss_play_2 = 0;
+                    _type_hit_int = 0;  //serve
+                } else {
+                    //what to do if trying to serve and the ball not exactly in the same position ?
+                };
             }
         } else {
             //check if it is valid hit
@@ -806,11 +826,13 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
             if (_player_num == 1) {
                 if (Math.abs(parseFloat(fbase_ballpos_outputObj.time.play_1)) <= parseFloat(fbase_ballpos_outputObj.play_1.hit_time_win)) {
                     //valid hit for player #1
+                    _type_hit_int = 1;
                     fbase_ballpos_outputObj.ball_active = 1;
                     fbase_ballpos_outputObj.dirFrom = 1;
+                    fbase_ballpos_outputObj.miss_play_1 = 0;
                 } else {
                     //missed
-                    console.log("player #1 missed");
+                    _type_hit_int = 2;  //swinging miss
                     fbase_ballpos_outputObj.ball_active = 0;  //was 0
                     fbase_ballpos_outputObj.dirFrom = 0;
                     fbase_ballpos_outputObj.miss_play_1 = 1;
@@ -819,11 +841,12 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
                 //must be player num 2
                 if (Math.abs(parseFloat(fbase_ballpos_outputObj.time.play_2)) <= parseFloat(fbase_ballpos_outputObj.play_2.hit_time_win)) {
                     //valid hit for player #1
+                    _type_hit_int = 1;
                     fbase_ballpos_outputObj.ball_active = 1;
                     fbase_ballpos_outputObj.dirFrom = 2;
                 } else {
                     //missed
-                    console.log("player #2 missed ");
+                    _type_hit_int = 2;
                     fbase_ballpos_outputObj.ball_active = 0;  //was 0
                     fbase_ballpos_outputObj.dirFrom = 0;
                     fbase_ballpos_outputObj.miss_play_2 = 1;
@@ -838,8 +861,19 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
                 write_ball_hit_rec(_game_id, _player_num, _type_hit, _type_result, 1);
                 break;
             case 1:        //good hit
+                _type_hit = "hit";
+                _type_result = "good";
+                write_ball_hit_rec(_game_id, _player_num, _type_hit, _type_result, 1);
                 break;
-            case 2:        //miss
+            case 2:        //swinging miss
+                _type_hit = "miss";
+                _type_result = "swing and miss";
+                write_ball_hit_rec(_game_id, _player_num, _type_hit, _type_result, 1);
+                break;
+            case 3:        //miss and did not swing
+                _type_hit = "miss";
+                _type_result = "did not swing";
+                write_ball_hit_rec(_game_id, _player_num, _type_hit, _type_result, 1);
                 break;
         };
 

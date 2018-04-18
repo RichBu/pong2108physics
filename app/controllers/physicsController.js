@@ -9,6 +9,8 @@ var moment = require("moment");
 var momentDurationFormatSetup = require("moment-duration-format");
 var numeral = require("numeral");
 var extend = require('extend');
+var loginMod = require('../modules/login-mod.js');
+var auditMod = require('../modules/auditLog-mod.js');
 
 
 
@@ -26,43 +28,6 @@ momentDurationFormatSetup(moment);  //setup formatting for durations
 
 console.log('physics controller is loaded...');
 
-
-
-
-
-var writeAuditLog = function (_typeRec, _user_name, _user_email, _fault, _browser_id, _ip_addr) {
-  //write to the audit file
-  //first make sure none are blank
-  if (_typeRec === undefined || _typeRec === null) {
-    _typeRec = " ";
-  };
-  if (_user_name === undefined || _user_name === null) {
-    _user_name = " ";
-  };
-  if (_user_email === undefined || _user_email === null) {
-    _user_email = " ";
-  };
-  if (_fault === undefined || _fault === null) {
-    _fault = " ";
-  };
-  if (_browser_id === undefined || _browser_id === null) {
-    _browser_id = " ";
-  };
-  if (_ip_addr === undefined || _ip_addr === null) {
-    _ip_addr = " ";
-  };
-
-  var timeStamp = moment().unix();
-
-  var query = "INSERT INTO audit_log ( typeRec, time_stamp, user_name, user_email, fault, browser_id, ip_addr ) VALUES (?, ?, ?, ?, ?, ?, ? )";
-
-
-  connection.query(query, [_typeRec, timeStamp, _user_name, _user_email, _fault, _browser_id, _ip_addr], function (err, response) {
-    if (err) console.log("error at audit = \n" + err);
-    //write to audit file
-    //if (err) throw err;
-  });
-};
 
 
 //this is the picture_controller.js file
@@ -121,9 +86,8 @@ router.post('/button', function (req, res) {
       if (stop_button_stat === 'true') {
         timeStop_unix = moment().valueOf();
         running_stat = 0;
-        writeAuditLog( "Stop engine", "Admin", " ", " ", " ", " ");
+        auditMod.writeAuditLog(connection, "Stop engine", "Admin", " ", "thru admin screen", " ", " ");
       } else {
-        writeAuditLog( "Start engine", "Admin", " ", " ", " ", " ");
         running_stat = 1;
       };
     } else {
@@ -131,6 +95,7 @@ router.post('/button', function (req, res) {
       if (start_button_stat == 'true') {
         timeStart_unix = moment().valueOf();
         running_stat = 1;
+        auditMod.writeAuditLog(connection, "Start engine", "Admin", " ", "thru admin screen", " ", " ");
       } else {
         running_stat = 0;
       };
@@ -232,16 +197,18 @@ router.post('/button/serve', function (req, res) {
     playToTaxfr = 2;
   };
 
+  fbase_ballpos_outputObj.miss_play_1 = 0;
+  fbase_ballpos_outputObj.hit_play_1 = 0;
+  fbase_ballpos_outputObj.miss_play_2 = 0;
+  fbase_ballpos_outputObj.hit_play_2 = 0;
+  writeFirebaseRec();
+
 
   setBallToPlayer(fbaseTempObj, playToTaxfr);
 
 
   extend(true, fbase_ballpos_outputObj, fbaseTempObj);
-  console.log("ball lat #3 = " + fbase_ballpos_outputObj.ball_curr_pos.loc_GPS_lat);
-  console.log("ball lon #3 = " + fbase_ballpos_outputObj.ball_curr_pos.loc_GPS_lon);
   writeFirebaseRec();
-  console.log("ball lat #4 = " + fbase_ballpos_outputObj.ball_curr_pos.loc_GPS_lat);
-  console.log("ball lon #4 = " + fbase_ballpos_outputObj.ball_curr_pos.loc_GPS_lon);
   //write a few time in case there was another write going on
   // extend(true, fbase_ballpos_outputObj, fbaseTempObj );
   // writeFirebaseRec();

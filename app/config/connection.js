@@ -6,6 +6,9 @@
 //var mysql = require('mysql');
 var mysql = require('mysql');
 var app = require('../../server');
+var loginMod = require('../modules/login-mod.js');
+var auditMod = require('../modules/auditLog-mod.js');
+
 
 /*var connection = mysql.createConnection({
     port: 3306,
@@ -52,6 +55,7 @@ connection.connect(function (err) {
         return;
     }
     console.log("connected as id " + connection.threadId);
+    auditMod.writeAuditLog(connection, "Reboot", "system", " ", "entire server rebooted", " ", " ");
 });
 //To run Database on JAWSDB
 
