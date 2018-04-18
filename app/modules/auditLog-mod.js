@@ -41,3 +41,13 @@ exports.writeAuditLog = function ( connMod, _typeRec, _user_name, _user_email, _
   };
   
   
+  exports.sendObjBack = function (connMod, resObj, errCode, errMsg, errLine, errExp, _user_name, _user_email, _user_id, _device_id) {
+    writeAuditLog(connMod, "Delete All", "Admin", "root@email.com", "code: " + errCode + " = " + errMsg, " ", " ");
+    respondObj.errCode = errCode;
+    respondObj.errLine = errLine;
+    respondObj.errMsg = errMsg;
+    respondObj.errExp = errExp;
+    // respondObj.user_id = _user_id;
+    // respondObj.device_id = _device_id;
+    resObj.send(respondObj);  //send the object
+};

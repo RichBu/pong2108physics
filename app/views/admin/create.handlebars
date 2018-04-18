@@ -80,7 +80,10 @@
 				<div class="row">
 					<!-- split remaining column into 2 -->
 					<div class="col-xs-12 col-md-3 col-xl-3 col-lg-3">
-						<button style="width: 90%; margin: 5px 0px 5px 0px;" class='btn btn-primary bttn-register' type='button' id="btn-create">Create</button>
+						<button style="width: 95%; margin: 5px 0px 5px 0px;" class='btn btn-primary bttn-register' type='button' id="btn-create">Create User</button>
+					</div>
+					<div class="col-xs-12 col-md-3 col-xl-3 col-lg-3">
+						<button style="width: 95%; margin: 5px 0px 5px 0px;" class='btn btn-primary bttn-register' type='button' id="btn-admin">Create Admin</button>
 					</div>
 				</div>
 			</form>
@@ -204,12 +207,40 @@
 			});
 	};
 
+	var createNewAdmin = function () {
+		//clear out the warning first
+		$("#newUserWarning").text(" ");
+		$.post("/admin/createadmin",
+			{
+				user_name: $("#user_name").val(),
+				user_email: $("#user_email").val(),
+				user_password: $("#user_password").val(),
+				user_password2: $("#user_password_2").val()
+			},
+			function (data, status) {
+				if (data.errCode === 0) {
+					//there is no error
+					$("#newUserWarning").text(" ");
+					dispHelpNew(false);
+					window.location.href = "/admin/admin_users"
+				} else {
+					currErrorObj.errCode = data.errCode;
+					currErrorObj.errLine = data.errLine;
+					currErrorObj.errMsg = data.errMsg;
+					currErrorObj.errExp = data.errExp;
+					$("#newUserWarning").text(data.errMsg);
+					dispHelpNew(true);
+				};
+			});
+	};
+
 
 
 	$(document).ready(function () {
 		dispNewUserForm();
 	});
 	$(document.body).on("click", "#btn-create", createNewUser);
+	$(document.body).on("click", "#btn-admin", createNewAdmin);
 	//$(document.body).on("click", ".bttn-login", checkLogin);
 	$(document.body).on("click", ".bttn-help-user", dispModalHelp);
 	$(document.body).on("click", ".bttn-help-new", dispModalHelp);
