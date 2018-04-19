@@ -214,7 +214,7 @@ clearHitMissFirebaseObj = function () {
 };
 
 
-toggleFirebaseScreenRefresh = function() {
+toggleFirebaseScreenRefresh = function () {
     //toggle the screen refresh by setting then resetting the time
     var temp = fbase_ballpos_outputObj.time.elapsed_unix;
     fbase_ballpos_outputObj.time.elapsed_unix = -1.0;
@@ -835,8 +835,14 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
                     _type_hit_int = 0;  //serve
                 } else {
                     //what to do if trying to server and the ball is not in position ?
+                    fbo.hit_play_1 = 0;
+                    fbo.miss_play_1 = 0;
+                    fbo.hit_play_2 = 0;
+                    fbo.miss_play_2 = 0;
+                    _type_hit_int = -1;
                 };
             } else if (_player_num == 2) {
+                console.log("player two tried to hit with ball while idle");
                 var fbo = fbase_ballpos_outputObj;
                 if (parseFloat(fbo.ball_curr_pos.loc_GPS_lat) == parseFloat(fbo.play_2.locat_GPS_lat) &&
                     parseFloat(fbo.ball_curr_pos.loc_GPS_lon) == parseFloat(fbo.play_2.locat_GPS_lon)) {
@@ -847,6 +853,12 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
                     _type_hit_int = 0;  //serve
                 } else {
                     //what to do if trying to serve and the ball not exactly in the same position ?
+                    console.log("detected missed ball");
+                    fbo.hit_play_1 = 0;
+                    fbo.miss_play_1 = 0;
+                    fbo.hit_play_2 = 0;
+                    fbo.miss_play_2 = 0;
+                    _type_hit_int = -1;
                 };
             }
         } else {
@@ -887,80 +899,84 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
             };
         };
 
-        switch (_type_hit_int) {
-            case 0:        //serve
-                _type_hit = "serve";
-                _type_result = "good";
-                write_ball_hit_rec(_game_id, _player_num, _type_hit, _type_result, 1);
-                break;
-            case 1:        //good hit
-                _type_hit = "hit";
-                _type_result = "good";
-                write_ball_hit_rec(_game_id, _player_num, _type_hit, _type_result, 1);
-                break;
-            case 2:        //swinging miss
-                _type_hit = "miss";
-                _type_result = "swing and miss";
-                write_ball_hit_rec(_game_id, _player_num, _type_hit, _type_result, 1);
-                break;
-            case 3:        //miss and did not swing
-                _type_hit = "miss";
-                _type_result = "did not swing";
-                write_ball_hit_rec(_game_id, _player_num, _type_hit, _type_result, 1);
-                break;
-        };
+
+        if (_type_hit_int != -1) {  //it was a swing and a miss so do nothing
+            //it was a swing at the wrong time
+            switch (_type_hit_int) {
+                case 0:        //serve
+                    _type_hit = "serve";
+                    _type_result = "good";
+                    write_ball_hit_rec(_game_id, _player_num, _type_hit, _type_result, 1);
+                    break;
+                case 1:        //good hit
+                    _type_hit = "hit";
+                    _type_result = "good";
+                    write_ball_hit_rec(_game_id, _player_num, _type_hit, _type_result, 1);
+                    break;
+                case 2:        //swinging miss
+                    _type_hit = "miss";
+                    _type_result = "swing and miss";
+                    write_ball_hit_rec(_game_id, _player_num, _type_hit, _type_result, 1);
+                    break;
+                case 3:        //miss and did not swing
+                    _type_hit = "miss";
+                    _type_result = "did not swing";
+                    write_ball_hit_rec(_game_id, _player_num, _type_hit, _type_result, 1);
+                    break;
+            };
 
 
-        if (_player_num === 1) {
-            //first player   
-            out_ball_hit_rec = new ball_hit_rec_type(
-                _game_id,
-                0, //ball hit id
-                init_ball_active,
-                moment().format("YYYY-MM-DD HH:mm:ss a"),
-                moment().valueOf(),
-                0,
-                rc.player_1_locat_GPS_lat,
-                rc.player_1_locat_GPS_lon,
-                0.00,
-                0.00,
-                rc.dist_players,
-                _type_hit,
-                _result_hit,
-                1, //play num
-                init_ball_accel_val,
-                init_ball_accel_tim,
-                init_ball_vel,
-                init_ball_angle,
-                init_speed_up_fact
-            );
-            fbase_ballpos_outputObj.hit_play_1 = 1;
-            fbase_ballpos_outputObj.hit_play_2 = 0;
-        } else {
-            //second player
-            out_ball_hit_rec = new ball_hit_rec_type(
-                _game_id,
-                0, //ball hit id
-                moment().format("YYYY-MM-DD HH:mm:ss a"),
-                moment().valueOf(),
-                0,
-                rc.player_2_locat_GPS_lat,
-                rc.player_2_locat_GPS_lon,
-                0.00,
-                0.00,
-                rc.dist_players,
-                _type_hit,
-                _result_hit,
-                2, //play num
-                init_ball_accel_val,
-                init_ball_accel_tim,
-                init_ball_vel,
-                init_ball_angle,
-                init_speed_up_fact
-            );
-            fbase_ballpos_outputObj.hit_play_1 = 0;
-            fbase_ballpos_outputObj.hit_play_2 = 1;
-        };
+            if (_player_num === 1) {
+                //first player   
+                out_ball_hit_rec = new ball_hit_rec_type(
+                    _game_id,
+                    0, //ball hit id
+                    init_ball_active,
+                    moment().format("YYYY-MM-DD HH:mm:ss a"),
+                    moment().valueOf(),
+                    0,
+                    rc.player_1_locat_GPS_lat,
+                    rc.player_1_locat_GPS_lon,
+                    0.00,
+                    0.00,
+                    rc.dist_players,
+                    _type_hit,
+                    _result_hit,
+                    1, //play num
+                    init_ball_accel_val,
+                    init_ball_accel_tim,
+                    init_ball_vel,
+                    init_ball_angle,
+                    init_speed_up_fact
+                );
+                fbase_ballpos_outputObj.hit_play_1 = 1;
+                fbase_ballpos_outputObj.hit_play_2 = 0;
+            } else if (_player_num === 2) {
+                //second player
+                out_ball_hit_rec = new ball_hit_rec_type(
+                    _game_id,
+                    0, //ball hit id
+                    moment().format("YYYY-MM-DD HH:mm:ss a"),
+                    moment().valueOf(),
+                    0,
+                    rc.player_2_locat_GPS_lat,
+                    rc.player_2_locat_GPS_lon,
+                    0.00,
+                    0.00,
+                    rc.dist_players,
+                    _type_hit,
+                    _result_hit,
+                    2, //play num
+                    init_ball_accel_val,
+                    init_ball_accel_tim,
+                    init_ball_vel,
+                    init_ball_angle,
+                    init_speed_up_fact
+                );
+                fbase_ballpos_outputObj.hit_play_1 = 0;
+                fbase_ballpos_outputObj.hit_play_2 = 1;
+            };
+        }; //valid hit
 
         //setup the firebase variables
         var fbo = fbase_ballpos_outputObj; //shorthand
@@ -969,8 +985,11 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
         fbo.ball_physics.accel_val = init_ball_accel_val;
         fbo.ball_physics.accel_time = init_ball_accel_tim;
         fbo.ball_physics.angle = init_ball_angle;
-        fbo.ball_curr_pos.loc_GPS_lat = out_ball_hit_rec.start_pos_loc_GPS_lat;
-        fbo.ball_curr_pos.loc_GPS_lon = out_ball_hit_rec.start_pos_loc_GPS_lon;
+        if ( _type_hit_int != -1 ) {
+            //only update the position of the ball if it is a valid hit
+            fbo.ball_curr_pos.loc_GPS_lat = out_ball_hit_rec.start_pos_loc_GPS_lat;
+            fbo.ball_curr_pos.loc_GPS_lon = out_ball_hit_rec.start_pos_loc_GPS_lon;
+        };
         if (fbo.miss_play_1 == false && fbo.miss_play_2 == false) {
             //only update if the player did not miss
             if (fbo.hit_play_1 === 1) {
@@ -984,7 +1003,7 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
                 fbo.dist.between = rc.dist_players;
                 fbo.dist.play_1 = 0.0;
                 fbo.dist.play_2 = rc.dist_players;
-            } else {
+            } else if (fbo.hit_play_2 === 1) { //don't assume it's an automatic hit
                 //must be player #1
                 fbo.ball_curr_pos.loc_GPS_lat = rc.player_2_locat_GPS_lat;
                 fbo.ball_curr_pos.loc_GPS_lon = rc.player_2_locat_GPS_lon;
