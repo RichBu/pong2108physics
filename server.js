@@ -203,6 +203,27 @@ app.listen(PORT, function () {
 var timerBallUpd;   //const variable for the update of the ball speed
 
 
+clearHitMissFirebaseObj = function () {
+    //init Firebase object to not be hitting or running
+    fbase_ballpos_outputObj.hit_play_1 = 0;
+    fbase_ballpos_outputObj.hit_play_2 = 0;
+    fbase_ballpos_outputObj.miss_play_1 = 0;
+    fbase_ballpos_outputObj.miss_play_2 = 0;
+    fbase_ballpos_outputObj.dirFrom = 0;
+    writeFirebaseRec();
+};
+
+
+toggleFirebaseScreenRefresh = function() {
+    //toggle the screen refresh by setting then resetting the time
+    var temp = fbase_ballpos_outputObj.time.elapsed_unix;
+    fbase_ballpos_outputObj.time.elapsed_unix = -1.0;
+    writeFirebaseRec();
+    fbase_ballpos_outputObj.time.elapsed_unix = temp;
+    writeFirebaseRec();
+};
+
+
 var ball_pos_calcs = function (play_1, play_2, dist_play, dirFrom) {
     //calculate the positon of the ball
     //works for player #1 to player #2
@@ -390,7 +411,8 @@ var ball_calcs = function (snap, useLocal) {
     if (isBallAct) {
         timeElapsed_ms = timeElapsed_ms;  //had speed up here
     } else {
-        timeElapsed_ms = 0;
+        timeElapsed_ms = 0;  //stops updating the screen
+        //timeElapsed_ms = timeElapsed_ms;  //had speed up here
     };
     //solve dist = 1/2 * accel * t^2
     //in order to solve physics problem, need to find out how long accelerating
@@ -411,7 +433,7 @@ var ball_calcs = function (snap, useLocal) {
     //console.log("time vel = " + timeVel);
     let velConst = (fbio.ball_physics.accel_val * timeAccel) * fbio.speed_up_fact;
     //console.log('veloc = ' + velConst);
-    let distTravel_in = (0.5 * fbio.ball_physics.accel_val * timeAccel * timeAccel) + velConst * timeVel;
+    let distTravel_in = (0.5 * fbio.ball_physics.accel_val * timeAccel * timeAccel) * fbio.speed_up_fact + velConst * timeVel;
 
     fbio.time.elapsed_unix = timeElapsed_ms;
     var fbo = fbase_ballpos_outputObj; //shorthand notation
@@ -446,6 +468,8 @@ var ball_calcs = function (snap, useLocal) {
         if ((parseFloat(fbo.time.play_2) < 0) && Math.abs(parseFloat(fbo.time.play_2)) > parseFloat(fbo.play_2.hit_time_win)) {
             //missed
             console.log("player #2 missed");
+            console.log("time to play #1 = " + parseFloat(fbo.time.play_1));
+            console.log("time to play #2 = " + parseFloat(fbo.time.play_2));
             fbo.ball_active = 0;  //was 0
             fbo.dirFrom = 0;
             fbo.miss_play_2 = 1;
@@ -454,7 +478,9 @@ var ball_calcs = function (snap, useLocal) {
         //ball is going from player #2 to player #1
         if ((parseFloat(fbo.time.play_1) < 0) && Math.abs(parseFloat(fbo.time.play_1)) > parseFloat(fbo.play_1.hit_time_win)) {
             //missed
-            console.log("player #2 missed");
+            console.log("player #1 missed");
+            console.log("time to play #1 = " + parseFloat(fbo.time.play_1));
+            console.log("time to play #2 = " + parseFloat(fbo.time.play_2));
             fbo.ball_active = 0;  //was 0
             fbo.dirFrom = 0;
             fbo.miss_play_1 = 1;
@@ -713,7 +739,7 @@ setBallToPlayer = function (fbaseTempObj, _playNum) {
         fbaseTempObj.time.play_2 = 0.0;
         fbaseTempObj.dirFrom = 0;
     };
-}
+};
 
 
 
@@ -763,8 +789,11 @@ function ball_hit_rec_type(
 
 hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
     //incoming player_num is player who hit the ball
-    console.log("sub = hit_ball");
-    console.log("player = ", _player_num);
+    console.log("sub = hit_ball" + "  player = ", _player_num);
+
+    //stop the interval timer, calculate the ball position first, then see if it matches the time window
+    //after that, turn on the interval timer again
+    //update_ball_pos();
 
     //write to Firebase first, then mySQl
     //this will allow the remotes to begin to catch up
@@ -836,6 +865,8 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
                     fbase_ballpos_outputObj.ball_active = 0;  //was 0
                     fbase_ballpos_outputObj.dirFrom = 0;
                     fbase_ballpos_outputObj.miss_play_1 = 1;
+                    console.log("time to play #1 = " + parseFloat(fbase_ballpos_outputObj.time.play_1));
+                    console.log("time to play #2 = " + parseFloat(fbase_ballpos_outputObj.time.play_2));
                 };
             } else {
                 //must be player num 2
@@ -850,6 +881,8 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
                     fbase_ballpos_outputObj.ball_active = 0;  //was 0
                     fbase_ballpos_outputObj.dirFrom = 0;
                     fbase_ballpos_outputObj.miss_play_2 = 1;
+                    console.log("time to play #1 = " + parseFloat(fbase_ballpos_outputObj.time.play_1));
+                    console.log("time to play #2 = " + parseFloat(fbase_ballpos_outputObj.time.play_2));
                 };
             };
         };
@@ -876,6 +909,7 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
                 write_ball_hit_rec(_game_id, _player_num, _type_hit, _type_result, 1);
                 break;
         };
+
 
         if (_player_num === 1) {
             //first player   
@@ -937,29 +971,31 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
         fbo.ball_physics.angle = init_ball_angle;
         fbo.ball_curr_pos.loc_GPS_lat = out_ball_hit_rec.start_pos_loc_GPS_lat;
         fbo.ball_curr_pos.loc_GPS_lon = out_ball_hit_rec.start_pos_loc_GPS_lon;
-        if (fbo.hit_play_1 === 1) {
-            //player #1 hit the ball, so move his recs from game rec
-            //to firebase
-            fbo.ball_curr_pos.loc_GPS_lat = rc.player_1_locat_GPS_lat;
-            fbo.ball_curr_pos.loc_GPS_lon = rc.player_1_locat_GPS_lon;
-            fbo.ball_curr_pos.pos_X = rc.player_1_coord_X;
-            fbo.ball_curr_pos.pos_Y = rc.player_1_coord_Y;
-            fbo.ball_curr_pos.pos_Z = init_ball_pos_Z;
-            fbo.dist.between = rc.dist_players;
-            fbo.dist.play_1 = 0.0;
-            fbo.dist.play_2 = rc.dist_players;
-        } else {
-            //must be player #1
-            fbo.ball_curr_pos.loc_GPS_lat = rc.player_2_locat_GPS_lat;
-            fbo.ball_curr_pos.loc_GPS_lon = rc.player_2_locat_GPS_lon;
-            fbo.ball_curr_pos.pos_X = rc.player_2_coord_X;
-            fbo.ball_curr_pos.pos_Y = rc.player_2_coord_Y;
-            fbo.ball_curr_pos.pos_Z = init_ball_pos_Z;
-            fbo.dist.between = rc.dist_players;
-            fbo.dist.play_1 = rc.dist_players;
-            fbo.dist.play_2 = 0.0;
+        if (fbo.miss_play_1 == false && fbo.miss_play_2 == false) {
+            //only update if the player did not miss
+            if (fbo.hit_play_1 === 1) {
+                //player #1 hit the ball, so move his recs from game rec
+                //to firebase
+                fbo.ball_curr_pos.loc_GPS_lat = rc.player_1_locat_GPS_lat;
+                fbo.ball_curr_pos.loc_GPS_lon = rc.player_1_locat_GPS_lon;
+                fbo.ball_curr_pos.pos_X = rc.player_1_coord_X;
+                fbo.ball_curr_pos.pos_Y = rc.player_1_coord_Y;
+                fbo.ball_curr_pos.pos_Z = init_ball_pos_Z;
+                fbo.dist.between = rc.dist_players;
+                fbo.dist.play_1 = 0.0;
+                fbo.dist.play_2 = rc.dist_players;
+            } else {
+                //must be player #1
+                fbo.ball_curr_pos.loc_GPS_lat = rc.player_2_locat_GPS_lat;
+                fbo.ball_curr_pos.loc_GPS_lon = rc.player_2_locat_GPS_lon;
+                fbo.ball_curr_pos.pos_X = rc.player_2_coord_X;
+                fbo.ball_curr_pos.pos_Y = rc.player_2_coord_Y;
+                fbo.ball_curr_pos.pos_Z = init_ball_pos_Z;
+                fbo.dist.between = rc.dist_players;
+                fbo.dist.play_1 = rc.dist_players;
+                fbo.dist.play_2 = 0.0;
+            };
         };
-
     }, function (err) {
         //invalid read
         console.log("can not hit ball no game stored");
@@ -1002,6 +1038,7 @@ var timer_check_if_update = function () {
         };
     });
 };
+
 
 
 var initRoutines = function () {
@@ -1098,8 +1135,7 @@ var startConnection = function () {
         //setTimeout(dispAllUsersOnPage_start(true), 5000);
     });
     */
-    writeFirebaseRec();   //write the firebase record once on startup
-
+    clearHitMissFirebaseObj();  //write the record once on startup
 };
 
 

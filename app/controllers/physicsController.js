@@ -94,6 +94,7 @@ router.post('/button', function (req, res) {
       //was not running, so only evaluate start button
       if (start_button_stat == 'true') {
         timeStart_unix = moment().valueOf();
+        clearHitMissFirebaseObj();
         running_stat = 1;
         auditMod.writeAuditLog(connection, "Start engine", "Admin", " ", "thru admin screen", " ", " ");
       } else {
@@ -152,7 +153,6 @@ router.post('/button/hit', function (req, res) {
   console.log("player hit = " + player_hit);
   console.log(button_hit_01);
   console.log(button_hit_02);
-  console.log("before the hit_ball");
   hit_ball(fixed_game_id, player_hit, fixed_type_hit_int, fixed_result_hit);
   //write_ball_hit_rec(1, "serve", "good");
   res.send({
@@ -197,18 +197,20 @@ router.post('/button/serve', function (req, res) {
     playToTaxfr = 2;
   };
 
+  /*
   fbase_ballpos_outputObj.miss_play_1 = 0;
   fbase_ballpos_outputObj.hit_play_1 = 0;
   fbase_ballpos_outputObj.miss_play_2 = 0;
   fbase_ballpos_outputObj.hit_play_2 = 0;
   writeFirebaseRec();
-
+*/
 
   setBallToPlayer(fbaseTempObj, playToTaxfr);
 
 
   extend(true, fbase_ballpos_outputObj, fbaseTempObj);
   writeFirebaseRec();
+  toggleFirebaseScreenRefresh();
   //write a few time in case there was another write going on
   // extend(true, fbase_ballpos_outputObj, fbaseTempObj );
   // writeFirebaseRec();
@@ -317,14 +319,14 @@ router.post('/start/:typeStart', function (req, res) {
     42.050377, //_player_1_locat_GPS_lat,
     -87.684347, //_player_1_locat_GPS_lon,
     "1801 Maple Ave.,  Evanston, IL 60208", // _player_1_locat_addr,
-    3.00, //_player_1_hit_time_win,
+    4.00, //_player_1_hit_time_win,
     2, //_player_2_id,
     67056.00, //_player_2_coord_X,
     0.00, //_player_2_coord_Y,
     41.896041,  //_player_2_locat_GPS_lat,
     -87.618772, //_player_2_locat_GPS_lon,
     "340 E. Superior St., Chicago, IL 60611", //_player_2_locat_addr,
-    3.00, //_player_2_hit_time_win,
+    4.00, //_player_2_hit_time_win,
     4000.00, //_field_size_X,
     4000.00, //_field_size_Y,
     1.00, //_field_scale_X,
