@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/RichBu/pong2108physics#readme",
   "dependencies": {
+    "axios": "^0.18.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.2",
     "cookie-parser": "^1.4.3",
@@ -36,6 +37,7 @@
     "nodemailer": "^4.6.4",
     "numeral": "^2.0.6",
     "path": "^0.12.7",
+    "require": "^2.4.20",
     "util": "^0.10.3"
   }
 }

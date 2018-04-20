@@ -5,6 +5,8 @@
 
 configData = {
     mySQLforceRemote: true,
+    gKeyOther : "AIzaSyAE03QBe5yDXRr1fzDvkWs9i_E_BIyCDhk",
+    gKeyRich  : "AIzaSyCrHKoPEISSoDAClePzcHVJVHB7G1-xb6s",
     firebaseStorage: "/games/user",         //prior to tacking on user number
     firebaseMainGame: "/games",
     firebaseStatusFolder: "/status",
@@ -89,6 +91,7 @@ var moment = require("moment");
 var momentDurationFormatSetup = require("moment-duration-format");
 var numeral = require("numeral");
 var math = require('mathjs');
+
 
 
 // Configure the Express application

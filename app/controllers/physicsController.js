@@ -11,6 +11,7 @@ var numeral = require("numeral");
 var extend = require('extend');
 var loginMod = require('../modules/login-mod.js');
 var auditMod = require('../modules/auditLog-mod.js');
+var GPSmod = require('../modules/gps-mod.js');
 
 
 
@@ -118,6 +119,71 @@ router.post('/button', function (req, res) {
   });
 
 });
+
+
+
+router.post('/game-change', function (req, res) {
+  //for address or speed up fact change
+  console.log('game change');
+  /*
+    expecting a record to come in with following data:
+      - game_id: 0           //game id
+      - play_num: 0          //player num
+      - isAddrChange: true   //addr flag
+      - addrString     //addr string
+      - isGeoChange: false    //did the geo location change
+      - geo_loc :      //geo loc
+          { 
+            lat : 00.0000,
+            lon : 00.0000
+          };
+      - speed_up_fact      
+  */
+
+  //if it is an addr change, then need to take addr and change to 
+  var _game_id = req.body.game_id;
+  var _play_num = req.body.play_num;
+  if (req.body.isAddrChange == true) {
+    //it's an address change
+    //call the addr to geo routine
+    //write sql record
+    //save to firebase
+    //recalc the data ?
+    //create sendObj
+    //send the sendObj back
+  } else if (req.body.isGeoChange == true) {
+    //its a geo change
+    //call the geo to addr routine
+    //write sql record
+    //save to firebase
+    //recalc the data
+    //create sendObj
+    //send the sendObj back
+  };
+
+  //check the speedup fact if it has changed
+  //if req.body.speed_fact <> fbase_ballpos_outputObj.speed_up_fact
+  //--- store the data to fbase
+  //--- 
+
+  fbase_ballpos_outputObj.speed_up_fact = parseFloat(req.body.speed_up_fact);
+
+  //fixed strings right now
+  var fixed_game_id = 1;
+  var fixed_type_hit_int = 0;  //for serve
+
+  //turn off the ball placement
+  var fbo = fbase_ballpos_outputObj;
+
+
+  //should it be the object or will they get from fbase ?
+  res.send({
+    errCode: 0,
+    Status: "OK"
+  });
+});
+
+
 
 
 
@@ -480,6 +546,16 @@ router.post('/start/:typeStart', function (req, res) {
 
 
 });
+
+
+
+GPSmod.checkAndConvertAddrToGeo({ addrStr: "65 Dover Drive Des Plaines, IL 60018" }, configData.gKeyOther).then(
+  (result, error) => {
+    var addressObj = result;
+    console.log("geo location = " + addressObj.addrStr);
+    console.log("geo location = " + addressObj.geoLat + "  " + addressObj.geoLon );
+  });
+
 
 
 module.exports = router;
