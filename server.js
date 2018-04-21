@@ -91,6 +91,7 @@ var moment = require("moment");
 var momentDurationFormatSetup = require("moment-duration-format");
 var numeral = require("numeral");
 var math = require('mathjs');
+var bcalcs = require('./app/modules/bcalcs-mod.js');
 
 
 
@@ -239,104 +240,102 @@ var ball_pos_calcs = function (play_1, play_2, dist_play, dirFrom) {
     var azimuth;
     var coords;
 
-    var degToRad = function (degree) {
-        //returns the angle in radians
-        var outVal = degree * Math.PI / 180.0;
-        return outVal;
-    };
+    // var degToRad = function (degree) {
+    //     //returns the angle in radians
+    //     var outVal = degree * Math.PI / 180.0;
+    //     return outVal;
+    // };
 
 
-    var radToDeg = function (radians) {
-        var outVal = radians * 180.0 / Math.PI;
-        return outVal;
-    };
+    // var radToDeg = function (radians) {
+    //     var outVal = radians * 180.0 / Math.PI;
+    //     return outVal;
+    // };
 
-    var meterToFt = function (_meter) {
-        var outVal = parseFloat(_meter) * 3.2808;
-        return parseFloat(outVal.toFixed(6))
-    };
+    // var meterToFt = function (_meter) {
+    //     var outVal = parseFloat(_meter) * 3.2808;
+    //     return parseFloat(outVal.toFixed(6))
+    // };
 
-    var FtToMeter = function (_feet) {
-        var outVal = parseFloat(_feet) / 3.2808;
-        return parseFloat(outVal.toFixed(6))
-    };
-
-
-    var getPathLength = function (lat1, lon1, lat2, lon2) {
-        var lat1_rad, lat2_rad, delta_lat, delta_lon, a, c, dist_meter, R;
-
-        //make sure all the coords are there
-        if (lat1 == lat2 && lon1 == lon2) {
-            //same set of coords
-            return 0;
-        };
-
-        R = 6371000;  //rad of earth in meters
-        lat1_rad = degToRad(lat1);
-        lat2_rad = degToRad(lat2);
-        delta_lat = degToRad(lat2 - lat1);
-        delta_lon = degToRad(lon2 - lon1);
-
-        a = Math.sin(delta_lat / 2) * Math.sin(delta_lat / 2) + Math.cos(lat1_rad) * Math.cos(lat2_rad) * Math.sin(delta_lon / 2.0) * Math.sin(delta_lon / 2.0);
-        c = 2.0 * Math.atan2(Math.sqrt(a), Math.sqrt(1.0 - a));
-
-        dist_meter = R * c;
-        if (isNaN(dist_meter)) {
-            return 0;
-        };
-        var dist_ft = meterToFt(dist_meter);
-        return dist_ft;
-    };  //getPathLength
+    // var FtToMeter = function (_feet) {
+    //     var outVal = parseFloat(_feet) / 3.2808;
+    //     return parseFloat(outVal.toFixed(6))
+    // };
 
 
-    var getDestLatLon = function (lat, lon, azimuth, dist_ft) {
-        var lat2, lon2, R, brng, d_km, lat1, lon1;
-        var dist_meter = FtToMeter(dist_ft);
-        R = 6378.1;  //radius of the earh in km
+    // var getPathLength = function (lat1, lon1, lat2, lon2) {
+    //     var lat1_rad, lat2_rad, delta_lat, delta_lon, a, c, dist_meter, R;
 
-        //brng is the degrees converted to radians of the azimuth
-        brng = degToRad(azimuth);
-        d_km = dist_meter / 1000.0
-        lat1 = degToRad(lat);
-        lon1 = degToRad(lon);
-        lat2 = Math.asin(Math.sin(lat1) * Math.cos(d_km / R) + Math.cos(lat1) * Math.sin(d_km / R) * Math.cos(brng));
-        lon2 = lon1 + Math.atan2(Math.sin(brng) * Math.sin(d_km / R) * Math.cos(lat1), Math.cos(d_km / R) - Math.sin(lat1) * Math.sin(lat2));
+    //     //make sure all the coords are there
+    //     if (lat1 == lat2 && lon1 == lon2) {
+    //         //same set of coords
+    //         return 0;
+    //     };
 
-        //now need it back to degrees
-        lat2 = radToDeg(lat2);
-        lon2 = radToDeg(lon2);
-        return [parseFloat(lat2.toFixed(6)), parseFloat(lon2.toFixed(6))];
-    };
+    //     R = 6371000;  //rad of earth in meters
+    //     lat1_rad = degToRad(lat1);
+    //     lat2_rad = degToRad(lat2);
+    //     delta_lat = degToRad(lat2 - lat1);
+    //     delta_lon = degToRad(lon2 - lon1);
 
+    //     a = Math.sin(delta_lat / 2) * Math.sin(delta_lat / 2) + Math.cos(lat1_rad) * Math.cos(lat2_rad) * Math.sin(delta_lon / 2.0) * Math.sin(delta_lon / 2.0);
+    //     c = 2.0 * Math.atan2(Math.sqrt(a), Math.sqrt(1.0 - a));
 
-    var calculateBearing = function (lat1, lon1, lat2, lon2) {
-        var startLat, startLon, endLat, endLon, dLon, dPhi, bearing;
-
-        startLat = degToRad(lat1);
-        startLon = degToRad(lon1);
-        endLat = degToRad(lat2);
-        endLon = degToRad(lon2);
-        dLon = endLon - startLon;
-        dPhi = Math.log(Math.tan(endLat / 2.0 + Math.PI / 4.0) / Math.tan(startLat / 2.0 + Math.PI / 4.0));
-
-        if (Math.abs(dLon) > Math.PI) {
-            if (dLon > 0) {
-                dLon = -(2.0 * Math.PI - dLon)
-            } else {
-                dLon = (2.0 * Math.PI + dLon)
-            }
-        }
-
-        bearing = (radToDeg(Math.atan2(dLon, dPhi)) + 360.0) % 360.0;
-        return bearing;
-    };
+    //     dist_meter = R * c;
+    //     if (isNaN(dist_meter)) {
+    //         return 0;
+    //     };
+    //     var dist_ft = meterToFt(dist_meter);
+    //     return dist_ft;
+    // };  //getPathLength
 
 
-    var getCoordinates = function (lat1, lon1, lat2, lon2) {
+    // var getDestLatLon = function (lat, lon, azimuth, dist_ft) {
+    //     var lat2, lon2, R, brng, d_km, lat1, lon1;
+    //     var dist_meter = FtToMeter(dist_ft);
+    //     R = 6378.1;  //radius of the earh in km
 
-    };
+    //     //brng is the degrees converted to radians of the azimuth
+    //     brng = degToRad(azimuth);
+    //     d_km = dist_meter / 1000.0
+    //     lat1 = degToRad(lat);
+    //     lon1 = degToRad(lon);
+    //     lat2 = Math.asin(Math.sin(lat1) * Math.cos(d_km / R) + Math.cos(lat1) * Math.sin(d_km / R) * Math.cos(brng));
+    //     lon2 = lon1 + Math.atan2(Math.sin(brng) * Math.sin(d_km / R) * Math.cos(lat1), Math.cos(d_km / R) - Math.sin(lat1) * Math.sin(lat2));
+
+    //     //now need it back to degrees
+    //     lat2 = radToDeg(lat2);
+    //     lon2 = radToDeg(lon2);
+    //     return [parseFloat(lat2.toFixed(6)), parseFloat(lon2.toFixed(6))];
+    // };
 
 
+    // var calculateBearing = function (lat1, lon1, lat2, lon2) {
+    //     var startLat, startLon, endLat, endLon, dLon, dPhi, bearing;
+
+    //     startLat = degToRad(lat1);
+    //     startLon = degToRad(lon1);
+    //     endLat = degToRad(lat2);
+    //     endLon = degToRad(lon2);
+    //     dLon = endLon - startLon;
+    //     dPhi = Math.log(Math.tan(endLat / 2.0 + Math.PI / 4.0) / Math.tan(startLat / 2.0 + Math.PI / 4.0));
+
+    //     if (Math.abs(dLon) > Math.PI) {
+    //         if (dLon > 0) {
+    //             dLon = -(2.0 * Math.PI - dLon)
+    //         } else {
+    //             dLon = (2.0 * Math.PI + dLon)
+    //         }
+    //     }
+
+    //     bearing = (radToDeg(Math.atan2(dLon, dPhi)) + 360.0) % 360.0;
+    //     return bearing;
+    // };
+
+
+    // var getCoordinates = function (lat1, lon1, lat2, lon2) {
+
+    // };
 
 
 
@@ -366,15 +365,15 @@ var ball_pos_calcs = function (play_1, play_2, dist_play, dirFrom) {
     var distCoordArray;
     if (dirFrom == 1) {
         //from player #1 to player #2
-        azimuth = calculateBearing(play_1.locat_GPS_lat, play_1.locat_GPS_lon, play_2.locat_GPS_lat, play_2.locat_GPS_lon);
-        dist_ball_meter = FtToMeter(dist_play);
-        dist_between_play = getPathLength(play_1.locat_GPS_lat, play_1.locat_GPS_lon, play_2.locat_GPS_lat, play_2.locat_GPS_lon);
-        distCoordArray = getDestLatLon(play_1.locat_GPS_lat, play_1.locat_GPS_lon, azimuth, dist_play);
+        azimuth = bcalcs.calculateBearing(play_1.locat_GPS_lat, play_1.locat_GPS_lon, play_2.locat_GPS_lat, play_2.locat_GPS_lon);
+        dist_ball_meter = bcalcs.FtToMeter(dist_play);
+        dist_between_play = bcalcs.getPathLength(play_1.locat_GPS_lat, play_1.locat_GPS_lon, play_2.locat_GPS_lat, play_2.locat_GPS_lon);
+        distCoordArray = bcalcs.getDestLatLon(play_1.locat_GPS_lat, play_1.locat_GPS_lon, azimuth, dist_play);
     } else if (dirFrom == 2) {
-        azimuth = calculateBearing(play_2.locat_GPS_lat, play_2.locat_GPS_lon, play_1.locat_GPS_lat, play_1.locat_GPS_lon);
-        dist_ball_meter = FtToMeter(dist_play);
-        dist_between_play = getPathLength(play_1.locat_GPS_lat, play_1.locat_GPS_lon, play_2.locat_GPS_lat, play_2.locat_GPS_lon);
-        distCoordArray = getDestLatLon(play_2.locat_GPS_lat, play_2.locat_GPS_lon, azimuth, dist_play);
+        azimuth = bcalcs.calculateBearing(play_2.locat_GPS_lat, play_2.locat_GPS_lon, play_1.locat_GPS_lat, play_1.locat_GPS_lon);
+        dist_ball_meter = bcalcs.FtToMeter(dist_play);
+        dist_between_play = bcalcs.getPathLength(play_1.locat_GPS_lat, play_1.locat_GPS_lon, play_2.locat_GPS_lat, play_2.locat_GPS_lon);
+        distCoordArray = bcalcs.getDestLatLon(play_2.locat_GPS_lat, play_2.locat_GPS_lon, azimuth, dist_play);
     };
     //console.log("dist btw players = " + dist_between_play);
 

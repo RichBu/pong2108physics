@@ -122,7 +122,7 @@ router.post('/button', function (req, res) {
 
 
 
-router.post('/game-change', function (req, res) {
+router.post('/game-change', function (req, resMain) {
   //for address or speed up fact change
   console.log('game change');
   /*
@@ -146,8 +146,31 @@ router.post('/game-change', function (req, res) {
   if (req.body.isAddrChange == true) {
     //it's an address change
     //call the addr to geo routine
+    var searchLoc = {
+      geoLoc: {
+        geoLoc: req.body.geo_loc,
+      },
+      addrString: req.body.addrString
+    };
+
+    GPSmod.checkAndConvertAddrToGeo(searchLoc, configData.gKeyOther)
+      .then((result, error) => {
+        var addressObj = result;
+        //save to firebase
+        var fbo = fbase_ballpos_outputObj; //for shorthand
+        if (req.body.play_num == 1) {
+          fbo.play_1.locat_GPS_lat = addressObj.geoLat;
+          fbo.play_1.locat_GPS_lon = addressObj.geoLon;
+          fbo.play_1.locat_addr = addressObj.addrStr;
+        } else if (req.body.play_num == 2) {
+          fbo.play_2.locat_GPS_lat = addressObj.geoLat;
+          fbo.play_2.locat_GPS_lon = addressObj.geoLon;
+          fbo.play_2.locat_addr = addressObj.addrStr;
+        };
+        writeFirebaseRec();
+        toggleFirebaseScreenRefresh();
+      });
     //write sql record
-    //save to firebase
     //recalc the data ?
     //create sendObj
     //send the sendObj back
@@ -546,15 +569,6 @@ router.post('/start/:typeStart', function (req, res) {
 
 
 });
-
-
-
-GPSmod.checkAndConvertAddrToGeo({ addrStr: "65 Dover Drive Des Plaines, IL 60018" }, configData.gKeyOther).then(
-  (result, error) => {
-    var addressObj = result;
-    console.log("geo location = " + addressObj.addrStr);
-    console.log("geo location = " + addressObj.geoLat + "  " + addressObj.geoLon );
-  });
 
 
 
