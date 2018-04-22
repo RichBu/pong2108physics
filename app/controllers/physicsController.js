@@ -12,6 +12,7 @@ var extend = require('extend');
 var loginMod = require('../modules/login-mod.js');
 var auditMod = require('../modules/auditLog-mod.js');
 var GPSmod = require('../modules/gps-mod.js');
+var bcalcs = require('../modules/bcalcs-mod.js');
 
 
 
@@ -31,8 +32,6 @@ console.log('physics controller is loaded...');
 
 
 
-//this is the picture_controller.js file
-//really /picture
 router.get('/', function (req, res) {
   console.log("at the physics engine");
 
@@ -143,31 +142,48 @@ router.post('/game-change', function (req, resMain) {
   //if it is an addr change, then need to take addr and change to 
   var _game_id = req.body.game_id;
   var _play_num = req.body.play_num;
+  req.body.isAddrChange = req.body.isAddrChange == 'true';
+  req.body.isGeoChange = req.body.isGeoChange == 'true'; 
+  req.body.play_num = parseInt(req.body.play_num);
+  console.log( req.body.isAddrChange );
+  console.log ( req.body.isAddrChange == true  );
   if (req.body.isAddrChange == true) {
+    console.log("there is an addr change");
     //it's an address change
     //call the addr to geo routine
     var searchLoc = {
       geoLoc: {
         geoLoc: req.body.geo_loc,
       },
-      addrString: req.body.addrString
+      addrStr: req.body.addrString
     };
-
+console.log( req.body.addrString );    
+console.log( searchLoc.addrString );
     GPSmod.checkAndConvertAddrToGeo(searchLoc, configData.gKeyOther)
       .then((result, error) => {
         var addressObj = result;
+        console.log("\nback from geo = " + error);
+        console.log(addressObj);
         //save to firebase
         var fbo = fbase_ballpos_outputObj; //for shorthand
         if (req.body.play_num == 1) {
           fbo.play_1.locat_GPS_lat = addressObj.geoLat;
           fbo.play_1.locat_GPS_lon = addressObj.geoLon;
           fbo.play_1.locat_addr = addressObj.addrStr;
+          fbo.dist.between = bcalcs.getPathLength(fbo.play_1.locat_GPS_lat, fbo.play_1.locat_GPS_lon, fbo.play_2.locat_GPS_lat, fbo.play_2.locat_GPS_lon );
         } else if (req.body.play_num == 2) {
           fbo.play_2.locat_GPS_lat = addressObj.geoLat;
           fbo.play_2.locat_GPS_lon = addressObj.geoLon;
           fbo.play_2.locat_addr = addressObj.addrStr;
+          fbo.dist.between = bcalcs.getPathLength(fbo.play_1.locat_GPS_lat, fbo.play_1.locat_GPS_lon, fbo.play_2.locat_GPS_lat, fbo.play_2.locat_GPS_lon );
         };
-        writeFirebaseRec();
+        var _type_hit = "move";
+        var _type_result = "good";
+        write_ball_hit_rec(_game_id, req.body.play_num, _type_hit, _type_result, 1);
+
+        console.log( "got new address = \n");
+        console.log( addressObj.geoLat + " , " + addressObj.geoLon );
+        // writeFirebaseRec();
         toggleFirebaseScreenRefresh();
       });
     //write sql record
@@ -200,7 +216,7 @@ router.post('/game-change', function (req, resMain) {
 
 
   //should it be the object or will they get from fbase ?
-  res.send({
+  resMain.send({
     errCode: 0,
     Status: "OK"
   });

@@ -646,16 +646,27 @@ write_ball_hit_rec = function (_game_id, _player_num, _type_hit, _result_hit, _b
     var _ball_hit_id = 1;
     var _time_start_str = startTime_str;
 
+    var fbo = fbase_ballpos_outputObj;
+    fbo.dirFrom = parseInt(fbo.dirFrom);
     var _time_start_unix = 0;
     var _time_stop_unix = 0;
-    var _start_pos_loc_GPS_lat = 42.050377;
-    var _start_pos_loc_GPS_lon = -87.684347;
-    var _stop_pos_loc_GPS_lat = 41.896041;
-    var _stop_pos_loc_GPS_lon = -87.618772;
-    var _dist_between = 100.45;   //feet between
-    //var _type_hit = "SERVE";
-    //var _result_hit = "GOOD";
-    //var _player_num = 1;          comes in from the params
+
+    var _start_pos_loc_GPS_lat;
+    var _start_pos_loc_GPS_lon;
+
+    var _start_pos_loc_GPS_lat = fbo.ball_curr_pos.loc_GPS_lat;
+    var _start_pos_loc_GPS_lon = fbo.ball_curr_pos.loc_GPS_lat;
+    var _stop_pos_loc_GPS_lat;
+    var _stop_pos_loc_GPS_lon;
+    if ( fbo.dirFrom == 1) {
+        //that means from 1 to 2 so start position was player #1
+        _stop_pos_loc_GPS_lat = fbo.play_1.locat_GPS_lat;
+        _stop_pos_loc_GPS_lon = fbo.play_1.locat_GPS_lon;
+    } else if ( fbo.dirFrom == 2 ) {
+        _stop_pos_loc_GPS_lat = fbo.play_2.locat_GPS_lat;
+        _stop_pos_loc_GPS_lon = fbo.play_2.locat_GPS_lon;        
+    };
+    var _dist_between = fbo.dist.between;   //feet between
     var _ball_accel_val = 0.00;
     var _ball_accel_tim = 0.00;
     var _ball_vel = 5.00;         //in per second

@@ -75,6 +75,9 @@ exports.checkAndConvertAddrToGeo = async (_geoLoc, _apKey) => {
             outObj.geoLat = numeral( parseFloat(response.data.results[0].geometry.location.lat)).format("+0000.000000");
             outObj.geoLon = numeral( parseFloat(response.data.results[0].geometry.location.lng)).format("+0000.000000");
             outObj.addrStr = response.data.results[0].formatted_address;
+console.log( "lat=" + outObj.geoLat );            
+console.log( "lon=" + outObj.geoLon );            
+console.log( "address =" + outObj.addrStr );            
         })
         .catch(function(error) {
             console.log("GPS addr to geo error " + error );
@@ -84,3 +87,11 @@ exports.checkAndConvertAddrToGeo = async (_geoLoc, _apKey) => {
 };
 
 
+// GPSmod.checkAndConvertAddrToGeo({ addrStr: "65 Dover Drive Des Plaines, IL 60018" }, configData.gKeyOther).then(
+//     (result, error) => {
+//       var addressObj = result;
+//       console.log("geo location = " + addressObj.addrStr);
+//       console.log("geo location = " + addressObj.geoLat + "  " + addressObj.geoLon );
+//     });
+  
+  
