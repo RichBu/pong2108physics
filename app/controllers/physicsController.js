@@ -143,10 +143,10 @@ router.post('/game-change', function (req, resMain) {
   var _game_id = req.body.game_id;
   var _play_num = req.body.play_num;
   req.body.isAddrChange = req.body.isAddrChange == 'true';
-  req.body.isGeoChange = req.body.isGeoChange == 'true'; 
+  req.body.isGeoChange = req.body.isGeoChange == 'true';
   req.body.play_num = parseInt(req.body.play_num);
-  console.log( req.body.isAddrChange );
-  console.log ( req.body.isAddrChange == true  );
+  console.log(req.body.isAddrChange);
+  console.log(req.body.isAddrChange == true);
   if (req.body.isAddrChange == true) {
     console.log("there is an addr change");
     //it's an address change
@@ -157,8 +157,8 @@ router.post('/game-change', function (req, resMain) {
       },
       addrStr: req.body.addrString
     };
-console.log( req.body.addrString );    
-console.log( searchLoc.addrString );
+    console.log(req.body.addrString);
+    console.log(searchLoc.addrString);
     GPSmod.checkAndConvertAddrToGeo(searchLoc, configData.gKeyOther)
       .then((result, error) => {
         var addressObj = result;
@@ -170,19 +170,19 @@ console.log( searchLoc.addrString );
           fbo.play_1.locat_GPS_lat = addressObj.geoLat;
           fbo.play_1.locat_GPS_lon = addressObj.geoLon;
           fbo.play_1.locat_addr = addressObj.addrStr;
-          fbo.dist.between = bcalcs.getPathLength(fbo.play_1.locat_GPS_lat, fbo.play_1.locat_GPS_lon, fbo.play_2.locat_GPS_lat, fbo.play_2.locat_GPS_lon );
+          fbo.dist.between = bcalcs.getPathLength(fbo.play_1.locat_GPS_lat, fbo.play_1.locat_GPS_lon, fbo.play_2.locat_GPS_lat, fbo.play_2.locat_GPS_lon);
         } else if (req.body.play_num == 2) {
           fbo.play_2.locat_GPS_lat = addressObj.geoLat;
           fbo.play_2.locat_GPS_lon = addressObj.geoLon;
           fbo.play_2.locat_addr = addressObj.addrStr;
-          fbo.dist.between = bcalcs.getPathLength(fbo.play_1.locat_GPS_lat, fbo.play_1.locat_GPS_lon, fbo.play_2.locat_GPS_lat, fbo.play_2.locat_GPS_lon );
+          fbo.dist.between = bcalcs.getPathLength(fbo.play_1.locat_GPS_lat, fbo.play_1.locat_GPS_lon, fbo.play_2.locat_GPS_lat, fbo.play_2.locat_GPS_lon);
         };
         var _type_hit = "move";
         var _type_result = "good";
         write_ball_hit_rec(_game_id, req.body.play_num, _type_hit, _type_result, 1);
 
-        console.log( "got new address = \n");
-        console.log( addressObj.geoLat + " , " + addressObj.geoLon );
+        console.log("got new address = \n");
+        console.log(addressObj.geoLat + " , " + addressObj.geoLon);
         writeFirebaseRec();
         toggleFirebaseScreenRefresh();
       });
@@ -414,6 +414,9 @@ router.post('/start/:typeStart', function (req, res) {
     fbase_ballpos_outputObj.speed_up_fact = parseFloat(req.body.speed_up_fact);
   };
   console.log("after req.body ");
+
+  var fbo = fbase_ballpos_outputObj; //shorthand notation
+
   //create a record for the start of the game
   //initialize with values
   var gr = new game_rec_type(
@@ -449,6 +452,25 @@ router.post('/start/:typeStart', function (req, res) {
     0, //_stop_time_unix,
     true //_isGameRunning
   );
+
+  if (fbo.play_1.locat_GPS_lat == undefined || fbo.play_1.locat_GPS_lat == undefined || fbo.play_1.locat_GPS_lat == "") {
+    //the firebase was null so keep the game rec variables
+  } else {
+    //player #1 was not blank so use the firebase data
+    gr.player_1_locat_GPS_lat = fbo.play_1.locat_GPS_lat;
+    gr.player_1_locat_GPS_lon = fbo.play_1.locat_GPS_lon;
+    gr.player_1_locat_addr = fbo.play_1.locat_addr;
+  };
+
+  if (fbo.play_2.locat_GPS_lat == undefined || fbo.play_2.locat_GPS_lat == undefined || fbo.play_2.locat_GPS_lat == "") {
+    //the firebase was null so keep the game rec variables
+  } else {
+    //player #1 was not blank so use the firebase data
+    gr.player_2_locat_GPS_lat = fbo.play_2.locat_GPS_lat;
+    gr.player_2_locat_GPS_lon = fbo.play_2.locat_GPS_lon;
+    gr.player_2_locat_addr = fbo.play_2.locat_addr;
+  };
+
 
 
   var gameRecArray = [
@@ -522,7 +544,6 @@ router.post('/start/:typeStart', function (req, res) {
   //then get his position and stats to impart on the ball
 
   //move data over to the firebase object so that it can be written
-  var fbo = fbase_ballpos_outputObj; //shorthand notation
 
   fbo.play_1.id = gr.player_1_id;
   fbo.play_1.coord_X = gr.player_1_coord_X;
@@ -583,7 +604,9 @@ router.post('/start/:typeStart', function (req, res) {
     Status: "OK"
   });
 
-
+  setBallToPlayer(fbo, 1);  //set the ball on player #1
+  clearHitMissFirebaseObj();
+  toggleFirebaseScreenRefresh();
 });
 
 

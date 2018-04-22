@@ -373,11 +373,13 @@
 				sendPostAddr();
 			});
 			$(document.body).on("click", "#btn-addr-2", function () {
+				var addrStr = $("#play-2-addr").val()
 				sendObj2.ball_samp_time = $('#ball_samp_time').val();
 				sendObj2.speed_up_fact = $('#spd_up_fact').val();
 				sendObj2.game_id = 1;
 				sendObj2.play_num = 2;
 				sendObj2.isAddrChange = true;
+				sendObj2.addrString = addrStr;
 				sendObj2.isGeoChange = false;
 				sendPostAddr();
 			});

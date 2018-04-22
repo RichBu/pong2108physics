@@ -655,7 +655,7 @@ write_ball_hit_rec = function (_game_id, _player_num, _type_hit, _result_hit, _b
     var _start_pos_loc_GPS_lon;
 
     var _start_pos_loc_GPS_lat = fbo.ball_curr_pos.loc_GPS_lat;
-    var _start_pos_loc_GPS_lon = fbo.ball_curr_pos.loc_GPS_lat;
+    var _start_pos_loc_GPS_lon = fbo.ball_curr_pos.loc_GPS_lon;
     var _stop_pos_loc_GPS_lat;
     var _stop_pos_loc_GPS_lon;
     if ( fbo.dirFrom == 1) {
@@ -810,15 +810,18 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
 
     //write to Firebase first, then mySQl
     //this will allow the remotes to begin to catch up
-    fbase_ballpos_outputObj.time_start_str = moment().format("YYYY-MM-DD  HH:mm:ss a");
-    fbase_ballpos_outputObj.time.start_unix = moment().valueOf();
+    var fbo = fbase_ballpos_outputObj;
+    fbo.dist.between = bcalcs.getPathLength(fbo.play_1.locat_GPS_lat, fbo.play_1.locat_GPS_lon, fbo.play_2.locat_GPS_lat, fbo.play_2.locat_GPS_lon );
+    fbo.time_start_str = moment().format("YYYY-MM-DD  HH:mm:ss a");
+    fbo.time.start_unix = moment().valueOf();
+
     //fbase_ballpos_outputObj.speed_up_fact = 1.0;
 
     var init_ball_accel_val = 410.0;
     var init_ball_accel_tim = 3.00;
     var init_ball_vel = 1232.00;    //in/sec  or 70mph
     var init_ball_angle = 0.00;
-    var init_speed_up_fact = fbase_ballpos_outputObj.speed_up_fact;
+    var init_speed_up_fact = fbo.speed_up_fact;
 
     var init_ball_pos_Z = 10.00;
 
@@ -829,15 +832,18 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
     //game settings and push it onto a single player
     read_game_rec(_game_id).then(function (result) {
         var rc = result[0]; //short hand
+        var fbo = fbase_ballpos_outputObj; //need to define again in the callback
+
+        fbo.dist.between = bcalcs.getPathLength(fbo.play_1.locat_GPS_lat, fbo.play_1.locat_GPS_lon, fbo.play_2.locat_GPS_lat, fbo.play_2.locat_GPS_lon );
         //a valid game rec has been read
         //check if the ball was not active then it was a server
-        if (fbase_ballpos_outputObj.ball_active === 0) {
+        if (fbo.ball_active === 0) {
             //the ball was not active so it is a serve
             //need to find out who should serve
             if (_player_num == 1) {
                 //first check if the position match exactly
                 //otherwise, do nothing because it's not ready to server
-                var fbo = fbase_ballpos_outputObj;
+                // var fbo = fbase_ballpos_outputObj;
                 if (parseFloat(fbo.ball_curr_pos.loc_GPS_lat) == parseFloat(fbo.play_1.locat_GPS_lat) &&
                     parseFloat(fbo.ball_curr_pos.loc_GPS_lon) == parseFloat(fbo.play_1.locat_GPS_lon)) {
                     //ball is EXACTLY in the same spot as the player, so it is a valid serve
@@ -1013,9 +1019,9 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
                 fbo.ball_curr_pos.pos_X = rc.player_1_coord_X;
                 fbo.ball_curr_pos.pos_Y = rc.player_1_coord_Y;
                 fbo.ball_curr_pos.pos_Z = init_ball_pos_Z;
-                fbo.dist.between = rc.dist_players;
+                //fbo.dist.between = rc.dist_players;
                 fbo.dist.play_1 = 0.0;
-                fbo.dist.play_2 = rc.dist_players;
+                fbo.dist.play_2 = fbo.dist.between;
             } else if (fbo.hit_play_2 === 1) { //don't assume it's an automatic hit
                 //must be player #1
                 fbo.ball_curr_pos.loc_GPS_lat = rc.player_2_locat_GPS_lat;
@@ -1023,8 +1029,8 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
                 fbo.ball_curr_pos.pos_X = rc.player_2_coord_X;
                 fbo.ball_curr_pos.pos_Y = rc.player_2_coord_Y;
                 fbo.ball_curr_pos.pos_Z = init_ball_pos_Z;
-                fbo.dist.between = rc.dist_players;
-                fbo.dist.play_1 = rc.dist_players;
+                //fbo.dist.between = rc.dist_players;
+                fbo.dist.play_1 = fbo.dist.between;
                 fbo.dist.play_2 = 0.0;
             };
         };
