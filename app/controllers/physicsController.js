@@ -183,7 +183,7 @@ console.log( searchLoc.addrString );
 
         console.log( "got new address = \n");
         console.log( addressObj.geoLat + " , " + addressObj.geoLon );
-        // writeFirebaseRec();
+        writeFirebaseRec();
         toggleFirebaseScreenRefresh();
       });
     //write sql record
