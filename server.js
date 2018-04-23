@@ -12,19 +12,21 @@ configData = {
     firebaseStatusFolder: "/status",
     firebaseRefreshBit: "/status/refreshUsers",
     firebaseActive: true,
-    isDemoMode: false,
+    isDemoMode: falseif ,
     demoNumHits: 0,     //number of hits 
+    demoMaxNumHits: 2,
     demoAddrNum: 0,
+    demoAddrArray = [
+        '1801 Maple Ave. Evanston IL 60208',
+        '340 E. Superior St. Chicago, IL 60611',
+        '233 S. Wacker Dr Chicago, IL 60606',
+        '65 Dover Drive Des Plaines, IL 60018',
+        '340 E. Superior St. Chicago, IL 60611',
+        '1200 W. Harrison St. Chicago, IL 60607'
+    ]
+    
 };
 
-demoAddrArray = [
-    '1801 Maple Ave. Evanston IL 60208',
-    '340 E. Superior St. Chicago, IL 60611',
-    '233 S. Wacker Dr Chicago, IL 60606',
-    '65 Dover Drive Des Plaines, IL 60018',
-    '340 E. Superior St. Chicago, IL 60611',
-    '1200 W. Harrison St. Chicago, IL 60607'
-]
 
 
 fbase_ballpos_outputObj = {  //variable written to in Firebase
@@ -462,6 +464,24 @@ var update_ball_pos = function () {
             if (Math.abs(parseFloat(fbo.time.play_1)) < parseFloat(fbo.play_1.hit_time_win)) {
                 //the ball should be hit from player #1 to player #2
                 configData.demoNumHits++;  //increase the number of hit
+                if ( configData.demoNumHits > configData.demoMaxNumHits ) {
+                    //need to move the player
+                    //first stop the action by "serving the ball" at player #1
+                    configData.demoNumHits = 0;
+                    setBallToPlayer( fbase_ballpos_outputObj, 1);
+                    if (configData.demoAddrNum > configData.demoAddrArray.length) {
+                        configData.demoAddrNum = 1;
+                    };
+                    var playAddrStr = configData.demoAddrArray[configData.demoAddrNum-1];
+                    var playGeoLoc = {
+                        lat: 0.0,
+                        lon: 0.0
+                    };
+                    movePlayerPos( fixed_game_id, 1, playAddrStr, playGeoLoc, true, false, false ); //last false is update
+                    setBallToPlayer( fbase_ballpos_outputObj, 1);
+                    playAddrStr = configData.demoAddrArray[configData.demoAddrNum];
+                    movePlayerPos( fixed_game_id, 2, playAddrStr, playGeoLoc, true, false, true ); //last false is update
+                };
                 player_hit = 1;
                 hit_ball(fixed_game_id, player_hit, fixed_type_hit_int, fixed_result_hit);
             };
