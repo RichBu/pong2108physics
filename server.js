@@ -16,7 +16,7 @@ configData = {
     demoNumHits: 0,     //number of hits 
     demoMaxNumHits: 2,
     demoAddrNum: 0,
-    demoAddrArray = [
+    demoAddrArray: [
         '1801 Maple Ave. Evanston IL 60208',
         '340 E. Superior St. Chicago, IL 60611',
         '233 S. Wacker Dr Chicago, IL 60606',
