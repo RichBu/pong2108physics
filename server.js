@@ -430,9 +430,9 @@ var ball_calcs = function (snap, useLocal) {
 var update_ball_pos = function () {
     //console.log('update position');
     //this is the update ball position, so check if it is demo mode
-    if (configData.isDemoMode == true) {
+    var fbo = fbase_ballpos_outputObj;
+    if ( fbo.ball_active == 1 && configData.isDemoMode == true) {
         //it is a demo mode so now check which direction and if should hit
-        var fbo = fbase_ballpos_outputObj;
         var fixed_game_id = 1;
         var fixed_type_hit_int = 0;  //for serve
         var fixed_type_hit = "serve";
