@@ -12,8 +12,19 @@ configData = {
     firebaseStatusFolder: "/status",
     firebaseRefreshBit: "/status/refreshUsers",
     firebaseActive: true,
-    isDemoMode: true
+    isDemoMode: false,
+    demoNumHits: 0,     //number of hits 
+    demoAddrNum: 0,
 };
+
+demoAddrArray = [
+    '1801 Maple Ave. Evanston IL 60208',
+    '340 E. Superior St. Chicago, IL 60611',
+    '233 S. Wacker Dr Chicago, IL 60606',
+    '65 Dover Drive Des Plaines, IL 60018',
+    '340 E. Superior St. Chicago, IL 60611',
+    '1200 W. Harrison St. Chicago, IL 60607'
+]
 
 
 fbase_ballpos_outputObj = {  //variable written to in Firebase
@@ -450,6 +461,7 @@ var update_ball_pos = function () {
         } else if (fbo.dirFrom == 2 && parseFloat(fbo.time.play_1) != 0.0) {
             if (Math.abs(parseFloat(fbo.time.play_1)) < parseFloat(fbo.play_1.hit_time_win)) {
                 //the ball should be hit from player #1 to player #2
+                configData.demoNumHits++;  //increase the number of hit
                 player_hit = 1;
                 hit_ball(fixed_game_id, player_hit, fixed_type_hit_int, fixed_result_hit);
             };

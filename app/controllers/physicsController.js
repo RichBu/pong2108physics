@@ -120,6 +120,62 @@ router.post('/button', function (req, res) {
 });
 
 
+movePlayerPos = function (_game_id, _play_num, _isAddrChange, _isGeoChange, _isUpdDisp) {
+
+  if (_isAddrChange == true) {
+    //it's an address change
+    //call the addr to geo routine
+    var searchLoc = {
+      geoLoc: {
+        geoLoc: req.body.geo_loc,
+      },
+      addrStr: req.body.addrString
+    };
+    GPSmod.checkAndConvertAddrToGeo(searchLoc, configData.gKeyOther)
+      .then((result, error) => {
+        var addressObj = result;
+        //save to firebase
+        var fbo = fbase_ballpos_outputObj; //for shorthand
+        if (req.body.play_num == 1) {
+          fbo.play_1.locat_GPS_lat = addressObj.geoLat;
+          fbo.play_1.locat_GPS_lon = addressObj.geoLon;
+          fbo.play_1.locat_addr = addressObj.addrStr;
+          fbo.dist.between = bcalcs.getPathLength(fbo.play_1.locat_GPS_lat, fbo.play_1.locat_GPS_lon, fbo.play_2.locat_GPS_lat, fbo.play_2.locat_GPS_lon);
+        } else if (req.body.play_num == 2) {
+          fbo.play_2.locat_GPS_lat = addressObj.geoLat;
+          fbo.play_2.locat_GPS_lon = addressObj.geoLon;
+          fbo.play_2.locat_addr = addressObj.addrStr;
+          fbo.dist.between = bcalcs.getPathLength(fbo.play_1.locat_GPS_lat, fbo.play_1.locat_GPS_lon, fbo.play_2.locat_GPS_lat, fbo.play_2.locat_GPS_lon);
+        };
+        var _type_hit = "move";
+        var _type_result = "good";
+        write_ball_hit_rec(_game_id, _play_num, _type_hit, _type_result, 1);
+        if (_isUpdDisp == true) {
+          writeFirebaseRec();
+          toggleFirebaseScreenRefresh();
+        };
+      });
+    //write sql record
+    //recalc the data ?
+    //create sendObj
+    //send the sendObj back
+  } else if (_isGeoChange == true) {
+    //its a geo change
+    //call the geo to addr routine
+    //write sql record
+    //save to firebase
+    //recalc the data
+    //create sendObj
+    //send the sendObj back
+  };
+
+  //check the speedup fact if it has changed
+  //if req.body.speed_fact <> fbase_ballpos_outputObj.speed_up_fact
+  //--- store the data to fbase
+  //--- 
+
+};
+
 
 router.post('/game-change', function (req, resMain) {
   //for address or speed up fact change
@@ -145,65 +201,8 @@ router.post('/game-change', function (req, resMain) {
   req.body.isAddrChange = req.body.isAddrChange == 'true';
   req.body.isGeoChange = req.body.isGeoChange == 'true';
   req.body.play_num = parseInt(req.body.play_num);
-  console.log(req.body.isAddrChange);
-  console.log(req.body.isAddrChange == true);
-  if (req.body.isAddrChange == true) {
-    console.log("there is an addr change");
-    //it's an address change
-    //call the addr to geo routine
-    var searchLoc = {
-      geoLoc: {
-        geoLoc: req.body.geo_loc,
-      },
-      addrStr: req.body.addrString
-    };
-    console.log(req.body.addrString);
-    console.log(searchLoc.addrString);
-    GPSmod.checkAndConvertAddrToGeo(searchLoc, configData.gKeyOther)
-      .then((result, error) => {
-        var addressObj = result;
-        console.log("\nback from geo = " + error);
-        console.log(addressObj);
-        //save to firebase
-        var fbo = fbase_ballpos_outputObj; //for shorthand
-        if (req.body.play_num == 1) {
-          fbo.play_1.locat_GPS_lat = addressObj.geoLat;
-          fbo.play_1.locat_GPS_lon = addressObj.geoLon;
-          fbo.play_1.locat_addr = addressObj.addrStr;
-          fbo.dist.between = bcalcs.getPathLength(fbo.play_1.locat_GPS_lat, fbo.play_1.locat_GPS_lon, fbo.play_2.locat_GPS_lat, fbo.play_2.locat_GPS_lon);
-        } else if (req.body.play_num == 2) {
-          fbo.play_2.locat_GPS_lat = addressObj.geoLat;
-          fbo.play_2.locat_GPS_lon = addressObj.geoLon;
-          fbo.play_2.locat_addr = addressObj.addrStr;
-          fbo.dist.between = bcalcs.getPathLength(fbo.play_1.locat_GPS_lat, fbo.play_1.locat_GPS_lon, fbo.play_2.locat_GPS_lat, fbo.play_2.locat_GPS_lon);
-        };
-        var _type_hit = "move";
-        var _type_result = "good";
-        write_ball_hit_rec(_game_id, req.body.play_num, _type_hit, _type_result, 1);
 
-        console.log("got new address = \n");
-        console.log(addressObj.geoLat + " , " + addressObj.geoLon);
-        writeFirebaseRec();
-        toggleFirebaseScreenRefresh();
-      });
-    //write sql record
-    //recalc the data ?
-    //create sendObj
-    //send the sendObj back
-  } else if (req.body.isGeoChange == true) {
-    //its a geo change
-    //call the geo to addr routine
-    //write sql record
-    //save to firebase
-    //recalc the data
-    //create sendObj
-    //send the sendObj back
-  };
-
-  //check the speedup fact if it has changed
-  //if req.body.speed_fact <> fbase_ballpos_outputObj.speed_up_fact
-  //--- store the data to fbase
-  //--- 
+  movePlayerPos(_game_id, _play_num, req.body.isAddrChange, req.body.isGeoChange, true );
 
   fbase_ballpos_outputObj.speed_up_fact = parseFloat(req.body.speed_up_fact);
 
@@ -553,7 +552,7 @@ router.post('/start/:typeStart', function (req, res) {
   fbo.play_1.locat_addr = gr.player_1_locat_addr;
   fbo.play_1.hit_time_win = gr.player_1_hit_time_win;
   //fbo.play_1.serve_in_prog = 0;
-  
+
   fbo.play_2.id = gr.player_2_id;
   fbo.play_2.coord_X = gr.player_2_coord_X;
   fbo.play_2.coord_Y = gr.player_2_coord_Y;
@@ -562,7 +561,9 @@ router.post('/start/:typeStart', function (req, res) {
   fbo.play_2.locat_addr = gr.player_2_locat_addr;
   fbo.play_2.hit_time_win = gr.player_2_hit_time_win;
   //fbo.play_2.serve_in_prog = 0;
-  
+
+  configData.demoNumHits = 0;
+  configData.demoAddrNum = 0;
 
   //first find out if game exists
   var query1 = "SELECT * FROM games WHERE game_id=?";
