@@ -136,12 +136,12 @@ movePlayerPos = function (_game_id, _play_num, _addrString, _geo_loc, _isAddrCha
         var addressObj = result;
         //save to firebase
         var fbo = fbase_ballpos_outputObj; //for shorthand
-        if (req.body.play_num == 1) {
+        if (_play_num == 1) {
           fbo.play_1.locat_GPS_lat = addressObj.geoLat;
           fbo.play_1.locat_GPS_lon = addressObj.geoLon;
           fbo.play_1.locat_addr = addressObj.addrStr;
           fbo.dist.between = bcalcs.getPathLength(fbo.play_1.locat_GPS_lat, fbo.play_1.locat_GPS_lon, fbo.play_2.locat_GPS_lat, fbo.play_2.locat_GPS_lon);
-        } else if (req.body.play_num == 2) {
+        } else if (_play_num == 2) {
           fbo.play_2.locat_GPS_lat = addressObj.geoLat;
           fbo.play_2.locat_GPS_lon = addressObj.geoLon;
           fbo.play_2.locat_addr = addressObj.addrStr;
