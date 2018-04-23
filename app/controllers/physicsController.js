@@ -120,16 +120,16 @@ router.post('/button', function (req, res) {
 });
 
 
-movePlayerPos = function (_game_id, _play_num, _isAddrChange, _isGeoChange, _isUpdDisp) {
+movePlayerPos = function (_game_id, _play_num, _addrString, _geo_loc, _isAddrChange, _isGeoChange, _isUpdDisp) {
 
   if (_isAddrChange == true) {
     //it's an address change
     //call the addr to geo routine
     var searchLoc = {
       geoLoc: {
-        geoLoc: req.body.geo_loc,
+        geoLoc: _geo_loc,
       },
-      addrStr: req.body.addrString
+      addrStr: _addrString, 
     };
     GPSmod.checkAndConvertAddrToGeo(searchLoc, configData.gKeyOther)
       .then((result, error) => {
@@ -202,7 +202,7 @@ router.post('/game-change', function (req, resMain) {
   req.body.isGeoChange = req.body.isGeoChange == 'true';
   req.body.play_num = parseInt(req.body.play_num);
 
-  movePlayerPos(_game_id, _play_num, req.body.isAddrChange, req.body.isGeoChange, true );
+  movePlayerPos(_game_id, _play_num, req.body.addrString, req.body.geo_loc, req.body.isAddrChange, req.body.isGeoChange, true );
 
   fbase_ballpos_outputObj.speed_up_fact = parseFloat(req.body.speed_up_fact);
 
