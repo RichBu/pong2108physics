@@ -12,7 +12,7 @@ configData = {
     firebaseStatusFolder: "/status",
     firebaseRefreshBit: "/status/refreshUsers",
     firebaseActive: true,
-    isDemoMode: falseif ,
+    isDemoMode: true,
     demoNumHits: 0,     //number of hits 
     demoMaxNumHits: 2,
     demoAddrNum: 0,
