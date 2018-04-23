@@ -52,7 +52,8 @@ fbase_ballpos_outputObj = {  //variable written to in Firebase
         locat_GPS_lat: 0.0,
         locat_GPS_lon: 0.0,
         locat_addr: "",
-        hit_time_win: 0.0
+        hit_time_win: 0.0,
+        //serve_in_prog: 0        //serve in progress
     },
     play_2: {
         id: 1,
@@ -61,7 +62,8 @@ fbase_ballpos_outputObj = {  //variable written to in Firebase
         locat_GPS_lat: 0.0,
         locat_GPS_lon: 0.0,
         locat_addr: "",
-        hit_time_win: 0.0
+        hit_time_win: 0.0,
+        //serve_in_prog: 0        //serve in progress
     },
     field: {
         center_coord_X: 0.0,
@@ -431,7 +433,7 @@ var update_ball_pos = function () {
     //console.log('update position');
     //this is the update ball position, so check if it is demo mode
     var fbo = fbase_ballpos_outputObj;
-    if ( fbo.ball_active == 1 && configData.isDemoMode == true) {
+    if (fbo.ball_active == 1 && configData.isDemoMode == true) {
         //it is a demo mode so now check which direction and if should hit
         var fixed_game_id = 1;
         var fixed_type_hit_int = 0;  //for serve
@@ -439,13 +441,13 @@ var update_ball_pos = function () {
         var fixed_result_hit = "good";
         var player_hit;
 
-        if (fbo.dirFrom == 1) {
+        if (fbo.dirFrom == 1 && parseFloat(fbo.time.play_2) != 0.0) {
             if (Math.abs(parseFloat(fbo.time.play_2)) < parseFloat(fbo.play_2.hit_time_win)) {
                 //the ball should be hit from player #2 to player #1
                 player_hit = 2;
                 hit_ball(fixed_game_id, player_hit, fixed_type_hit_int, fixed_result_hit);
             };
-        } else if (fbo.dirFrom == 2) {
+        } else if (fbo.dirFrom == 2 && parseFloat(fbo.time.play_1) != 0.0) {
             if (Math.abs(parseFloat(fbo.time.play_1)) < parseFloat(fbo.play_1.hit_time_win)) {
                 //the ball should be hit from player #1 to player #2
                 player_hit = 1;
@@ -660,6 +662,7 @@ setBallToPlayer = function (fbaseTempObj, _playNum) {
         //fbaseTempObj.time.play_2 = fbaseTempObj.play_2.hit_time_win * 10.0;
         fbaseTempObj.time.play_2 = 0.0;
         fbaseTempObj.dirFrom = 0;
+        //fbaseTempObj.play_1.serve_in_prog = 1;
     };
 
 
@@ -679,6 +682,7 @@ setBallToPlayer = function (fbaseTempObj, _playNum) {
         fbaseTempObj.time.play_1 = 0.0;
         fbaseTempObj.time.play_2 = 0.0;
         fbaseTempObj.dirFrom = 0;
+        //fbaseTempObj.play_2.serve_in_prog = 1;
     };
 };
 

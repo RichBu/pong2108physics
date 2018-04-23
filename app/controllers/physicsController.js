@@ -552,7 +552,8 @@ router.post('/start/:typeStart', function (req, res) {
   fbo.play_1.locat_GPS_lon = gr.player_1_locat_GPS_lon;
   fbo.play_1.locat_addr = gr.player_1_locat_addr;
   fbo.play_1.hit_time_win = gr.player_1_hit_time_win;
-
+  //fbo.play_1.serve_in_prog = 0;
+  
   fbo.play_2.id = gr.player_2_id;
   fbo.play_2.coord_X = gr.player_2_coord_X;
   fbo.play_2.coord_Y = gr.player_2_coord_Y;
@@ -560,7 +561,8 @@ router.post('/start/:typeStart', function (req, res) {
   fbo.play_2.locat_GPS_lon = gr.player_2_locat_GPS_lon;
   fbo.play_2.locat_addr = gr.player_2_locat_addr;
   fbo.play_2.hit_time_win = gr.player_2_hit_time_win;
-
+  //fbo.play_2.serve_in_prog = 0;
+  
 
   //first find out if game exists
   var query1 = "SELECT * FROM games WHERE game_id=?";
