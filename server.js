@@ -16,7 +16,7 @@ configData = {
     demoNumHits: 0,     //number of hits 
     demoMaxNumHits: 2,
     demoAddrNum: 0,
-    demoAddrArray: [
+    demoAddrArray= [
         '1801 Maple Ave. Evanston IL 60208',
         '340 E. Superior St. Chicago, IL 60611',
         '233 S. Wacker Dr Chicago, IL 60606',
@@ -473,6 +473,7 @@ var update_ball_pos = function () {
                         configData.demoAddrNum = 1;
                     };
                     var playAddrStr = configData.demoAddrArray[configData.demoAddrNum-1];
+                    console.log("addr = \n" + playAddrStr);
                     var playGeoLoc = {
                         lat: 0.0,
                         lon: 0.0
@@ -480,6 +481,7 @@ var update_ball_pos = function () {
                     movePlayerPos( fixed_game_id, 1, playAddrStr, playGeoLoc, true, false, false ); //last false is update
                     setBallToPlayer( fbase_ballpos_outputObj, 1);
                     playAddrStr = configData.demoAddrArray[configData.demoAddrNum];
+                    console.log("addr = \n" + playAddrStr);
                     movePlayerPos( fixed_game_id, 2, playAddrStr, playGeoLoc, true, false, true ); //last false is update
                 };
                 player_hit = 1;
