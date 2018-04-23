@@ -5,13 +5,14 @@
 
 configData = {
     mySQLforceRemote: true,
-    gKeyOther : "AIzaSyAE03QBe5yDXRr1fzDvkWs9i_E_BIyCDhk",
-    gKeyRich  : "AIzaSyCrHKoPEISSoDAClePzcHVJVHB7G1-xb6s",
+    gKeyOther: "AIzaSyAE03QBe5yDXRr1fzDvkWs9i_E_BIyCDhk",
+    gKeyRich: "AIzaSyCrHKoPEISSoDAClePzcHVJVHB7G1-xb6s",
     firebaseStorage: "/games/user",         //prior to tacking on user number
     firebaseMainGame: "/games",
     firebaseStatusFolder: "/status",
     firebaseRefreshBit: "/status/refreshUsers",
-    firebaseActive: true
+    firebaseActive: true,
+    isDemoMode: true
 };
 
 
@@ -240,103 +241,6 @@ var ball_pos_calcs = function (play_1, play_2, dist_play, dirFrom) {
     var azimuth;
     var coords;
 
-    // var degToRad = function (degree) {
-    //     //returns the angle in radians
-    //     var outVal = degree * Math.PI / 180.0;
-    //     return outVal;
-    // };
-
-
-    // var radToDeg = function (radians) {
-    //     var outVal = radians * 180.0 / Math.PI;
-    //     return outVal;
-    // };
-
-    // var meterToFt = function (_meter) {
-    //     var outVal = parseFloat(_meter) * 3.2808;
-    //     return parseFloat(outVal.toFixed(6))
-    // };
-
-    // var FtToMeter = function (_feet) {
-    //     var outVal = parseFloat(_feet) / 3.2808;
-    //     return parseFloat(outVal.toFixed(6))
-    // };
-
-
-    // var getPathLength = function (lat1, lon1, lat2, lon2) {
-    //     var lat1_rad, lat2_rad, delta_lat, delta_lon, a, c, dist_meter, R;
-
-    //     //make sure all the coords are there
-    //     if (lat1 == lat2 && lon1 == lon2) {
-    //         //same set of coords
-    //         return 0;
-    //     };
-
-    //     R = 6371000;  //rad of earth in meters
-    //     lat1_rad = degToRad(lat1);
-    //     lat2_rad = degToRad(lat2);
-    //     delta_lat = degToRad(lat2 - lat1);
-    //     delta_lon = degToRad(lon2 - lon1);
-
-    //     a = Math.sin(delta_lat / 2) * Math.sin(delta_lat / 2) + Math.cos(lat1_rad) * Math.cos(lat2_rad) * Math.sin(delta_lon / 2.0) * Math.sin(delta_lon / 2.0);
-    //     c = 2.0 * Math.atan2(Math.sqrt(a), Math.sqrt(1.0 - a));
-
-    //     dist_meter = R * c;
-    //     if (isNaN(dist_meter)) {
-    //         return 0;
-    //     };
-    //     var dist_ft = meterToFt(dist_meter);
-    //     return dist_ft;
-    // };  //getPathLength
-
-
-    // var getDestLatLon = function (lat, lon, azimuth, dist_ft) {
-    //     var lat2, lon2, R, brng, d_km, lat1, lon1;
-    //     var dist_meter = FtToMeter(dist_ft);
-    //     R = 6378.1;  //radius of the earh in km
-
-    //     //brng is the degrees converted to radians of the azimuth
-    //     brng = degToRad(azimuth);
-    //     d_km = dist_meter / 1000.0
-    //     lat1 = degToRad(lat);
-    //     lon1 = degToRad(lon);
-    //     lat2 = Math.asin(Math.sin(lat1) * Math.cos(d_km / R) + Math.cos(lat1) * Math.sin(d_km / R) * Math.cos(brng));
-    //     lon2 = lon1 + Math.atan2(Math.sin(brng) * Math.sin(d_km / R) * Math.cos(lat1), Math.cos(d_km / R) - Math.sin(lat1) * Math.sin(lat2));
-
-    //     //now need it back to degrees
-    //     lat2 = radToDeg(lat2);
-    //     lon2 = radToDeg(lon2);
-    //     return [parseFloat(lat2.toFixed(6)), parseFloat(lon2.toFixed(6))];
-    // };
-
-
-    // var calculateBearing = function (lat1, lon1, lat2, lon2) {
-    //     var startLat, startLon, endLat, endLon, dLon, dPhi, bearing;
-
-    //     startLat = degToRad(lat1);
-    //     startLon = degToRad(lon1);
-    //     endLat = degToRad(lat2);
-    //     endLon = degToRad(lon2);
-    //     dLon = endLon - startLon;
-    //     dPhi = Math.log(Math.tan(endLat / 2.0 + Math.PI / 4.0) / Math.tan(startLat / 2.0 + Math.PI / 4.0));
-
-    //     if (Math.abs(dLon) > Math.PI) {
-    //         if (dLon > 0) {
-    //             dLon = -(2.0 * Math.PI - dLon)
-    //         } else {
-    //             dLon = (2.0 * Math.PI + dLon)
-    //         }
-    //     }
-
-    //     bearing = (radToDeg(Math.atan2(dLon, dPhi)) + 360.0) % 360.0;
-    //     return bearing;
-    // };
-
-
-    // var getCoordinates = function (lat1, lon1, lat2, lon2) {
-
-    // };
-
 
 
     if (play_2.coord_X === play_1.coord_X) {
@@ -475,7 +379,7 @@ var ball_calcs = function (snap, useLocal) {
             fbo.ball_active = 0;  //was 0
             fbo.dirFrom = 0;
             fbo.miss_play_2 = 1;
-        }
+        };
     } else {
         //ball is going from player #2 to player #1
         if ((parseFloat(fbo.time.play_1) < 0) && Math.abs(parseFloat(fbo.time.play_1)) > parseFloat(fbo.play_1.hit_time_win)) {
@@ -525,6 +429,30 @@ var ball_calcs = function (snap, useLocal) {
 //put in the logic to run the physics engine now
 var update_ball_pos = function () {
     //console.log('update position');
+    //this is the update ball position, so check if it is demo mode
+    if (configData.isDemoMode == true) {
+        //it is a demo mode so now check which direction and if should hit
+        var fbo = fbase_ballpos_outputObj;
+        var fixed_game_id = 1;
+        var fixed_type_hit_int = 0;  //for serve
+        var fixed_type_hit = "serve";
+        var fixed_result_hit = "good";
+        var player_hit;
+
+        if (fbo.dirFrom == 1) {
+            if (Math.abs(parseFloat(fbo.time.play_2)) < parseFloat(fbo.play_2.hit_time_win)) {
+                //the ball should be hit from player #2 to player #1
+                player_hit = 2;
+                hit_ball(fixed_game_id, player_hit, fixed_type_hit_int, fixed_result_hit);
+            };
+        } else if (fbo.dirFrom == 2) {
+            if (Math.abs(parseFloat(fbo.time.play_1)) < parseFloat(fbo.play_1.hit_time_win)) {
+                //the ball should be hit from player #1 to player #2
+                player_hit = 1;
+                hit_ball(fixed_game_id, player_hit, fixed_type_hit_int, fixed_result_hit);
+            };
+        };
+    };
     if (configData.firebaseActive == true) {
         //only run these routines if firebase is active
         dbIncomingRec = database.ref(configData.firebaseMainGame);
@@ -658,13 +586,13 @@ write_ball_hit_rec = function (_game_id, _player_num, _type_hit, _result_hit, _b
     var _start_pos_loc_GPS_lon = fbo.ball_curr_pos.loc_GPS_lon;
     var _stop_pos_loc_GPS_lat;
     var _stop_pos_loc_GPS_lon;
-    if ( fbo.dirFrom == 1) {
+    if (fbo.dirFrom == 1) {
         //that means from 1 to 2 so start position was player #1
         _stop_pos_loc_GPS_lat = fbo.play_1.locat_GPS_lat;
         _stop_pos_loc_GPS_lon = fbo.play_1.locat_GPS_lon;
-    } else if ( fbo.dirFrom == 2 ) {
+    } else if (fbo.dirFrom == 2) {
         _stop_pos_loc_GPS_lat = fbo.play_2.locat_GPS_lat;
-        _stop_pos_loc_GPS_lon = fbo.play_2.locat_GPS_lon;        
+        _stop_pos_loc_GPS_lon = fbo.play_2.locat_GPS_lon;
     };
     var _dist_between = fbo.dist.between;   //feet between
     var _ball_accel_val = 0.00;
@@ -811,7 +739,7 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
     //write to Firebase first, then mySQl
     //this will allow the remotes to begin to catch up
     var fbo = fbase_ballpos_outputObj;
-    fbo.dist.between = bcalcs.getPathLength(fbo.play_1.locat_GPS_lat, fbo.play_1.locat_GPS_lon, fbo.play_2.locat_GPS_lat, fbo.play_2.locat_GPS_lon );
+    fbo.dist.between = bcalcs.getPathLength(fbo.play_1.locat_GPS_lat, fbo.play_1.locat_GPS_lon, fbo.play_2.locat_GPS_lat, fbo.play_2.locat_GPS_lon);
     fbo.time_start_str = moment().format("YYYY-MM-DD  HH:mm:ss a");
     fbo.time.start_unix = moment().valueOf();
 
@@ -834,7 +762,7 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
         var rc = result[0]; //short hand
         var fbo = fbase_ballpos_outputObj; //need to define again in the callback
 
-        fbo.dist.between = bcalcs.getPathLength(fbo.play_1.locat_GPS_lat, fbo.play_1.locat_GPS_lon, fbo.play_2.locat_GPS_lat, fbo.play_2.locat_GPS_lon );
+        fbo.dist.between = bcalcs.getPathLength(fbo.play_1.locat_GPS_lat, fbo.play_1.locat_GPS_lon, fbo.play_2.locat_GPS_lat, fbo.play_2.locat_GPS_lon);
         //a valid game rec has been read
         //check if the ball was not active then it was a server
         if (fbo.ball_active === 0) {
@@ -1004,7 +932,7 @@ hit_ball = function (_game_id, _player_num, _type_hit_int, _result_hit) {
         fbo.ball_physics.accel_val = init_ball_accel_val;
         fbo.ball_physics.accel_time = init_ball_accel_tim;
         fbo.ball_physics.angle = init_ball_angle;
-        if ( _type_hit_int != -1 ) {
+        if (_type_hit_int != -1) {
             //only update the position of the ball if it is a valid hit
             fbo.ball_curr_pos.loc_GPS_lat = out_ball_hit_rec.start_pos_loc_GPS_lat;
             fbo.ball_curr_pos.loc_GPS_lon = out_ball_hit_rec.start_pos_loc_GPS_lon;
