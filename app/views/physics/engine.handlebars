@@ -316,9 +316,10 @@
 				sendObj.start_button = true;
 				sendObj.stop_button = false;
 				sendObj.isDemoMode = 1;
-				sendPost();
+				sendPostGame();
 			});
-			$(document.body).on("click", "#btn-demo", function () {
+			//btn-start is the start engine
+			$(document.body).on("click", "#btn-start", function () {
 				sendObj.ball_samp_time = $('#ball_samp_time').val();
 				sendObj.speed_up_fact = $('#spd_up_fact').val();
 				sendObj.start_button = true;
