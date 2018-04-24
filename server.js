@@ -13,6 +13,7 @@ configData = {
     firebaseRefreshBit: "/status/refreshUsers",
     firebaseActive: true,
     isDemoMode: true,
+    demoTimWin: 1.0,    //time window for demo
     demoNumHits: 0,     //number of hits 
     demoMaxNumHits: 2,
     demoAddrNum: 0,

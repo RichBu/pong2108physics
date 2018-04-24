@@ -640,9 +640,9 @@ router.post('/start/:typeStart', function (req, res) {
     Status: "OK"
   });
 
-  setBallToPlayer(fbo, 1);  //set the ball on player #1
-  clearHitMissFirebaseObj();
-  toggleFirebaseScreenRefresh();
+  // setBallToPlayer(fbo, 1);  //set the ball on player #1
+  // clearHitMissFirebaseObj();
+  // toggleFirebaseScreenRefresh();
 });
 
 
