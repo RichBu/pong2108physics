@@ -420,6 +420,12 @@ router.post('/start/:typeStart', function (req, res) {
     fbase_ballpos_outputObj.speed_up_fact = parseFloat(req.body.speed_up_fact);
   };
   console.log("after req.body ");
+  if (parseInt(req.body.isDemoMode) == 1) {
+    configData.isDemoMode = true;
+  } else {
+    configData.isDemoMode = false;
+  };
+
 
   var fbo = fbase_ballpos_outputObj; //shorthand notation
 

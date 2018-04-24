@@ -123,6 +123,7 @@
 		<button class='jumbotron btn btn-success btn-lg' style="font-size: 20px" id="btn-start">Start Engine</button>
 		<button class='jumbotron btn btn-danger btn-lg' style="font-size: 20px;" id="btn-stop">Stop Engine</button>
 		<button class='jumbotron btn btn-info btn-lg' style="font-size: 20px;" id="btn-start-game">Start Game</button>
+		<button class='jumbotron btn btn-warning btn-lg' style="font-size: 20px;" id="btn-start-demo">Start Demo</button>
 	</div>
 </div>
 <div class="col-md-1">
@@ -197,6 +198,7 @@
 			speed_up_fact: 0.00,
 			start_button: 0,
 			stop_button: 0,
+			isDemoMode: 0,
 			hit_01: 0,
 			hit_02: 0,
 			place_ball_1: 0,
@@ -305,9 +307,18 @@
 				sendObj.speed_up_fact = $('#spd_up_fact').val();
 				sendObj.start_button = true;
 				sendObj.stop_button = false;
+				sendObj.isDemoMode = 0;
 				sendPostGame();
 			});
-			$(document.body).on("click", "#btn-start", function () {
+			$(document.body).on("click", "#btn-start-demo", function () {
+				sendObj.ball_samp_time = $('#ball_samp_time').val();
+				sendObj.speed_up_fact = $('#spd_up_fact').val();
+				sendObj.start_button = true;
+				sendObj.stop_button = false;
+				sendObj.isDemoMode = 1;
+				sendPost();
+			});
+			$(document.body).on("click", "#btn-demo", function () {
 				sendObj.ball_samp_time = $('#ball_samp_time').val();
 				sendObj.speed_up_fact = $('#spd_up_fact').val();
 				sendObj.start_button = true;
