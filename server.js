@@ -14,7 +14,7 @@ configData = {
     firebaseActive: true,
     isDemoMode: true,
     demoNumHits: 0,     //number of hits 
-    demoMaxNumHits: 1,
+    demoMaxNumHits: 2,
     demoAddrNum: 0,
     demoAddrArray: [
         '1801 Maple Ave. Evanston, IL 60208',
@@ -446,96 +446,99 @@ var ball_calcs = function (snap, useLocal) {
 var update_ball_pos = function () {
     //console.log('update position');
     //this is the update ball position, so check if it is demo mode
-    clearInterval(timerBallUpd);
+    //clearInterval(timerBallUpd);
 
-    var fbo = fbase_ballpos_outputObj;
-    fbo.dirFrom = parseInt(fbo.dirFrom);
-    if (fbo.ball_active == 1 && configData.isDemoMode == true) {
-        //it is a demo mode so now check which direction and if should hit
-        var fixed_game_id = 1;
-        var fixed_type_hit_int = 0;  //for serve
-        var fixed_type_hit = "serve";
-        var fixed_result_hit = "good";
-        var player_hit;
+    if (configData.isMovingPlayer != 1) {
+        //only update the routine if not in process of moving a player
+        var fbo = fbase_ballpos_outputObj;
+        fbo.dirFrom = parseInt(fbo.dirFrom);
+        if (fbo.ball_active == 1 && configData.isDemoMode == true) {
+            //it is a demo mode so now check which direction and if should hit
+            var fixed_game_id = 1;
+            var fixed_type_hit_int = 0;  //for serve
+            var fixed_type_hit = "serve";
+            var fixed_result_hit = "good";
+            var player_hit;
 
-        //console.log("dir=" + fbo.dirFrom);
-        if (fbo.dirFrom == 1 && parseFloat(fbo.time.play_2) != 0.0) {
-            if (Math.abs(parseFloat(fbo.time.play_2)) < parseFloat(fbo.play_2.hit_time_win)) {
-                //the ball should be hit from player #2 to player #1
-                player_hit = 2;
-                console.log("demo mode play #2 hit");
-                console.log("dir before=" + fbo.dirFrom);
-                hit_ball(fixed_game_id, player_hit, fixed_type_hit_int, fixed_result_hit);
-                console.log("dir after=" + fbo.dirFrom);
-            };
-        } else if (fbo.dirFrom == 2 && parseFloat(fbo.time.play_1) != 0.0 && configData.isMovingPlayer === 0) {
-            if (Math.abs(parseFloat(fbo.time.play_1)) < parseFloat(fbo.play_1.hit_time_win)) {
-                //the ball should be hit from player #1 to player #2
-                console.log("demo mode play #1 entered");
-                console.log("#472 dir=" + fbo.dirFrom);
-                configData.demoNumHits++;  //increase the number of hit
-                if (configData.demoNumHits >= configData.demoMaxNumHits) {
-                    //need to move the player
-                    //first stop the action by "serving the ball" at player #1
-                    configData.demoNumHits = 0;
-                    setBallToPlayer(fbase_ballpos_outputObj, 1);
-                    configData.demoAddrNum++;
-                    if (configData.demoAddrNum >= configData.demoAddrArray.length) {
-                        configData.demoAddrNum = 1;
-                    };
-                    var playAddrStr = configData.demoAddrArray[configData.demoAddrNum - 1];
-                    //console.log("addr = \n" + playAddrStr);
-                    var playGeoLoc = {
-                        lat: 0.0,
-                        lon: 0.0
-                    };
-                    configData.isMovingPlayer = 1;
-                    movePlayerPos_async(fixed_game_id, 1, playAddrStr, playGeoLoc, true, false, false).then(
-                        (response2) => {
-                            //player has moved
-                            //console.log('promise #1')
-                            setBallToPlayer(fbase_ballpos_outputObj, 1);
-                            playAddrStr = configData.demoAddrArray[configData.demoAddrNum];
-                            //console.log("addr = \n" + playAddrStr);
-                            movePlayerPos_async(fixed_game_id, 2, playAddrStr, playGeoLoc, true, false, true).then(
-                                (response3) => {
-                                    //second address found and moved
-                                    player_hit = 1;
-                                    console.log('promise #2');
-                                    //console.log('demo mode play #1 hit');
-                                    //console.log("dir before=" + fbo.dirFrom);
-                                    configData.isMovingPlayer = 0;
-                                    timerBallUpd = setInterval(update_ball_pos, (samp_time_ball * 1000.0));
-                                    hit_ball(fixed_game_id, player_hit, fixed_type_hit_int, fixed_result_hit);
-                                    //console.log("dir after=" + fbo.dirFrom);
-                                }); //last false is update
-                        }) //last false is update
-                } else {
-                    //did not move the player so can hit 
-                    //identical to call back function
-                    player_hit = 1;
-                    //console.log('call ...demo mode play #1 hit');
-                    //console.log("dir before=" + fbo.dirFrom);
+            //console.log("dir=" + fbo.dirFrom);
+            if (fbo.dirFrom == 1 && parseFloat(fbo.time.play_2) != 0.0) {
+                if (Math.abs(parseFloat(fbo.time.play_2)) < parseFloat(fbo.play_2.hit_time_win)) {
+                    //the ball should be hit from player #2 to player #1
+                    player_hit = 2;
+                    console.log("demo mode play #2 hit");
+                    console.log("dir before=" + fbo.dirFrom);
                     hit_ball(fixed_game_id, player_hit, fixed_type_hit_int, fixed_result_hit);
-                    //console.log("dir after=" + fbo.dirFrom);
+                    console.log("dir after=" + fbo.dirFrom);
+                };
+            } else if (fbo.dirFrom == 2 && parseFloat(fbo.time.play_1) != 0.0 && configData.isMovingPlayer === 0) {
+                if (Math.abs(parseFloat(fbo.time.play_1)) < parseFloat(fbo.play_1.hit_time_win)) {
+                    //the ball should be hit from player #1 to player #2
+                    console.log("demo mode play #1 entered");
+                    console.log("#472 dir=" + fbo.dirFrom);
+                    configData.demoNumHits++;  //increase the number of hit
+                    if (configData.demoNumHits >= configData.demoMaxNumHits) {
+                        //need to move the player
+                        //first stop the action by "serving the ball" at player #1
+                        configData.demoNumHits = 0;
+                        setBallToPlayer(fbase_ballpos_outputObj, 1);
+                        configData.demoAddrNum++;
+                        if (configData.demoAddrNum >= configData.demoAddrArray.length) {
+                            configData.demoAddrNum = 1;
+                        };
+                        var playAddrStr = configData.demoAddrArray[configData.demoAddrNum - 1];
+                        //console.log("addr = \n" + playAddrStr);
+                        var playGeoLoc = {
+                            lat: 0.0,
+                            lon: 0.0
+                        };
+                        configData.isMovingPlayer = 1;
+                        movePlayerPos_async(fixed_game_id, 1, playAddrStr, playGeoLoc, true, false, false).then(
+                            (response2) => {
+                                //player has moved
+                                //console.log('promise #1')
+                                setBallToPlayer(fbase_ballpos_outputObj, 1);
+                                playAddrStr = configData.demoAddrArray[configData.demoAddrNum];
+                                //console.log("addr = \n" + playAddrStr);
+                                movePlayerPos_async(fixed_game_id, 2, playAddrStr, playGeoLoc, true, false, true).then(
+                                    (response3) => {
+                                        //second address found and moved
+                                        player_hit = 1;
+                                        console.log('promise #2');
+                                        //console.log('demo mode play #1 hit');
+                                        //console.log("dir before=" + fbo.dirFrom);
+                                        configData.isMovingPlayer = 0;
+                                        timerBallUpd = setInterval(update_ball_pos, (samp_time_ball * 1000.0));
+                                        hit_ball(fixed_game_id, player_hit, fixed_type_hit_int, fixed_result_hit);
+                                        //console.log("dir after=" + fbo.dirFrom);
+                                    }); //last false is update
+                            }) //last false is update
+                    } else {
+                        //did not move the player so can hit 
+                        //identical to call back function
+                        player_hit = 1;
+                        //console.log('call ...demo mode play #1 hit');
+                        //console.log("dir before=" + fbo.dirFrom);
+                        hit_ball(fixed_game_id, player_hit, fixed_type_hit_int, fixed_result_hit);
+                        //console.log("dir after=" + fbo.dirFrom);
+                    };
                 };
             };
         };
+        if (configData.firebaseActive == true) {
+            //only run these routines if firebase is active
+            dbIncomingRec = database.ref(configData.firebaseMainGame);
+            //dbIncomingRec.on("value", function (snap) {
+            dbIncomingRec.once("value", function (snap) {
+                //a valud read was done
+                ball_calcs(snap, false);
+            });
+        } else {
+            //console.log(fbase_ballpos_outputObj);
+            var snap = {};
+            balln_calcs(snap, true)
+        };
+        //if (configData.isMovingPlayer === 0) timerBallUpd = setInterval(update_ball_pos, (samp_time_ball * 1000.0));
     };
-    if (configData.firebaseActive == true) {
-        //only run these routines if firebase is active
-        dbIncomingRec = database.ref(configData.firebaseMainGame);
-        //dbIncomingRec.on("value", function (snap) {
-        dbIncomingRec.once("value", function (snap) {
-            //a valud read was done
-            ball_calcs(snap, false);
-        });
-    } else {
-        //console.log(fbase_ballpos_outputObj);
-        var snap = {};
-        balln_calcs(snap, true)
-    };
-    if (configData.isMovingPlayer === 0) timerBallUpd = setInterval(update_ball_pos, (samp_time_ball * 1000.0));
 };
 
 
