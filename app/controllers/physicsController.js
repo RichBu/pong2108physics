@@ -120,8 +120,9 @@ router.post('/button', function (req, res) {
 });
 
 
-movePlayerPos = function (_game_id, _play_num, _addrString, _geo_loc, _isAddrChange, _isGeoChange, _isUpdDisp) {
-
+movePlayerPos = async (_game_id, _play_num, _addrString, _geo_loc, _isAddrChange, _isGeoChange, _isUpdDisp) => {
+  //this routine called by post command to move to new address or from the demo game mode
+  var outVal = false;
   if (_isAddrChange == true) {
     //it's an address change
     //call the addr to geo routine
@@ -131,7 +132,7 @@ movePlayerPos = function (_game_id, _play_num, _addrString, _geo_loc, _isAddrCha
       },
       addrStr: _addrString, 
     };
-    GPSmod.checkAndConvertAddrToGeo(searchLoc, configData.gKeyOther)
+    await GPSmod.checkAndConvertAddrToGeo(searchLoc, configData.gKeyOther)
       .then((result, error) => {
         var addressObj = result;
         //save to firebase
@@ -154,6 +155,7 @@ movePlayerPos = function (_game_id, _play_num, _addrString, _geo_loc, _isAddrCha
           writeFirebaseRec();
           toggleFirebaseScreenRefresh();
         };
+        outVal = true;
       });
     //write sql record
     //recalc the data ?
@@ -173,7 +175,12 @@ movePlayerPos = function (_game_id, _play_num, _addrString, _geo_loc, _isAddrCha
   //if req.body.speed_fact <> fbase_ballpos_outputObj.speed_up_fact
   //--- store the data to fbase
   //--- 
+  return outVal;
+};
 
+
+movePlayerPos_async = async ( _game_id, _play_num, _addrString, _geo_loc, _isAddrChange, _isGeoChange, _isUpdDisp ) => {
+  await movePlayerPos( _game_id, _play_num, _addrString, _geo_loc, _isAddrChange, _isGeoChange, _isUpdDisp );
 };
 
 
@@ -563,7 +570,7 @@ router.post('/start/:typeStart', function (req, res) {
   //fbo.play_2.serve_in_prog = 0;
 
   configData.demoNumHits = 0;
-  configData.demoAddrNum = 0;
+  configData.demoAddrNum = 1;
 
   //first find out if game exists
   var query1 = "SELECT * FROM games WHERE game_id=?";
