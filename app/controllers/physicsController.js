@@ -578,6 +578,13 @@ router.post('/start/:typeStart', function (req, res) {
   configData.demoNumHits = 0;
   configData.demoAddrNum = 1;
 
+  //if it is demo mode, then set the hit time window closer
+  if ( configData.isDemoMode == true ) {
+    //reset the time window
+    fbo.play_1.hit_time_win =  configData.demoTimWin;
+    fbo.play_2.hit_time_win =  configData.demoTimWin;
+  };
+
   //first find out if game exists
   var query1 = "SELECT * FROM games WHERE game_id=?";
   connection.query(query1, [_game_id], function (err, response) {
