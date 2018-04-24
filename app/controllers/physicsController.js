@@ -596,7 +596,9 @@ router.post('/start/:typeStart', function (req, res) {
             console.log("wrote new game record");
             //write to audit file
             //if (err) throw err;  
-          };
+            setBallToPlayer(fbo, 1);  //set the ball on player #1
+            clearHitMissFirebaseObj();
+            toggleFirebaseScreenRefresh();                    };
         });
       } else {
         //value exists so need to update it
@@ -609,6 +611,17 @@ router.post('/start/:typeStart', function (req, res) {
             console.log("updated existing record");
             //write to audit file
             //if (err) throw err;
+            setBallToPlayer(fbo, 1);  //set the ball on player #1
+            clearHitMissFirebaseObj();
+            toggleFirebaseScreenRefresh();
+            if ( configData.isDemoMode === true ) {
+              //if it is in demo mode, then hit the ball
+              var fixed_game_id = 1;
+              var fixed_type_hit_int = 0;  //for serve
+              var fixed_type_hit = "serve";
+              var fixed_result_hit = "good";            
+              hit_ball( _game_id, 1, fixed_type_hit_int, fixed_result_hit);
+            };
           };
         });
       };

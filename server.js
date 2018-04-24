@@ -22,7 +22,8 @@ configData = {
         '6615 Roosevelt Rd, Berwyn, IL 60402',
         '233 S. Wacker Dr Chicago, IL 60606',
         '65 Dover Drive Des Plaines, IL 60018',
-        '1200 W. Harrison St. Chicago, IL 60607'
+        '1200 W. Harrison St. Chicago, IL 60607',
+        '1464 Industrial Dr. Itasca, IL 60143'
     ],
     isMovingPlayer: 0
 
