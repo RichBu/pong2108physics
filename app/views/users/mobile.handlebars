@@ -2,7 +2,7 @@
 
 -->
 <div id="varb-storage" data-time-started="{{time_started}}" data-samp-time="{{samp_time_ball}}" data-is-running="{{isRunning}}"
- data-time-stopped="{{time_stopped}}" data-speed-fact="{{speed_up_fact}}" data-user-num="{{user_num}}">
+ data-time-stopped="{{time_stopped}}" data-speed-fact="{{speed_up_fact}}" data-user-num="{{user_num}}" data-super-user="{{super-user}}">
 
 </div>
 <br/>
@@ -22,17 +22,30 @@
 			<button class='jumbotron btn-large btn-success' style="float: right;" id="btn-start-game">Start Game</button>
 			<button class='jumbotron btn-large btn-warning' style="float: right;" id="btn-serve-1">Serve</button>
 		</div>
-	</div>     
+	</div>
 	<div class="row">
 		<div class="col-md-6 col-lg-12">
-			<button class='btn-large btn-warning' style="float: right; margin: 5px;" id="btn-stats" onclick="location.href='https://richbu.github.io/Pong2180_user_demo/demo.html'" >stats</button>
+			<button class='btn-large btn-warning' style="float: right; margin: 5px;" id="btn-stats" onclick="location.href='https://richbu.github.io/Pong2180_user_demo/demo.html'">stats</button>
 			<button class='btn-large btn-warning' style="float: right; margin: 5px;" id="btn-user-2" onclick="location.href='https://pong2180-physics.herokuapp.com/users/mobile/2'">user 2</button>
 			<button class='btn-large btn-warning' style="float: right; margin: 5px;" id="btn-user-1" onclick="location.href='https://pong2180-physics.herokuapp.com/users/mobile/1'">user 1</button>
 		</div>
 	</div>
 
-	<div id="div-full-stats" >
-		<iframe src="https://richbu.github.io/Pong2180_user_demo/" width="490px" height="1095px" allowfullscreen="true" >
+	<div class="row">
+		<div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+			<input style="width: 90%; margin: 5px 0px 5px 0px;" type="text" name="play-addr" id="play-addr" placeholder="player address">
+		</div>
+		<div class="col-md-3 col-lg-3">
+			<button class='btn-large btn-warning' style="float: right; margin: 5px;" id="send-addr">change address</button>
+		</div>
+	</div>
+
+	<div class="row">
+		<br/>
+	</div>
+
+	<div id="div-full-stats">
+		<iframe src="https://richbu.github.io/Pong2180_user_demo/" width="490px" height="1095px" allowfullscreen="true">
 		</iframe>
 	</div>
 
@@ -160,7 +173,6 @@
 						//what to do with error ?
 					};
 				});
-
 		};
 
 		var clearTimer = function () {
@@ -200,8 +212,16 @@
 			};
 		};
 
+
+
 		$(document).ready(function () {
-			//for device orientation
+			//check if a supervisor is logged in
+			var superUser = parseInt($("#varb-storage").attr("data-super-user"))
+			if (superUser != 1) {
+				$('#btn-stats').css('display', 'none');
+				$('#btn-user-1').css('display', 'none');
+				$('#btn-user-2').css('display', 'none');
+			};
 
 			//set up vibration
 			navigator.vibrate = navigator.vibrate || navigator.webkitVibrate || navigator.mozVibrate || navigator.msVibrate;
