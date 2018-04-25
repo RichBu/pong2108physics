@@ -2,7 +2,7 @@
 
 -->
 <div id="varb-storage" data-time-started="{{time_started}}" data-samp-time="{{samp_time_ball}}" data-is-running="{{isRunning}}"
- data-time-stopped="{{time_stopped}}" data-speed-fact="{{speed_up_fact}}" data-user-num="{{user_num}}" data-super-user="{{super_user}}">
+ data-time-stopped="{{time_stopped}}" data-speed-fact="{{speed_up_fact}}" data-user-num="{{user_num}}" data-super-user="{{super_user}}" data-game-id="{{game_id}}"  >
 
 </div>
 <br/>
@@ -10,9 +10,14 @@
 <div id="varb-in" data-tim-int={{commTimeInt}}></div>
 <wrapper>
 	<div class="row">
-		<div class="col-xl-10 col-lg-10 col-md-10 col-sm-12 col-xs-12">
+		<div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-3">
 			<h4>Engine Running</h4>
 			<h5 id="is_started">{{isRunning}} </h5>
+		</div>
+		<div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-3">
+			<h5 id="is_started">{{isRunning}} </h5>
+		</div>
+		<div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-3">
 			<h5 id="time_elapsed">{{time_elapsed}}</h5>
 		</div>
 	</div>
@@ -120,6 +125,19 @@
 			place_ball_1: 0,
 			place_ball_2: 0
 		};
+		var sendObj2 = {
+			ball_samp_time: 0.00,
+			speed_up_fact: 0.00,
+			game_id: 0,
+			play_num: 0,
+			isAddrChange: false,
+			addrString: "",
+			isGeoChange: false,
+			geo_loc: {
+				lat: 0.0,
+				lon: 0.0
+			}
+		};
 
 		var timerLockOutBit = false;
 		var timerLock;
@@ -151,6 +169,20 @@
 					};
 				});
 
+		};
+
+		//sends an address / game-change to the physics enginer
+		var sendPostAddr = function () {
+			$.post("/physics/game-change",
+				sendObj2,
+				function (data, status) {
+					if (data.errCode === 0) {
+						//there is no error
+						//window.location.href = "/physics"
+					} else {
+						//what to do with error ?
+					};
+				});
 		};
 
 		//sends a "serve" to the physics engine thru users
@@ -301,6 +333,41 @@
 
 			$('#ball_samp_time').val(timeVal);
 			$('#spd_up_fact').val(speedUpFact);
+
+			$(document.body).on("click", "#send-addr-1", function () {
+				console.log('pressed addr #1 change');
+				var gameId = $('#varb-storage').attr('data-game-id');
+				var userNum = $('#varb-storage').attr('data-user-num');
+				var addrStr = $("#play-1-addr").val();
+				var ballSampTime = $('#varb-storage').attr('data-samp-time');
+				var speedUpFact = $('#varb-storage').attr('data-speed-fact');
+				sendObj2.ball_samp_time = ballSampTime;
+				sendObj2.speed_up_fact = speedUpFact;
+				sendObj2.game_id = gameId;
+				sendObj2.play_num = 1;
+				sendObj2.isAddrChange = true;
+				sendObj2.addrString = addrStr;
+				sendObj2.isGeoChange = false;
+				sendPostAddr();
+			});
+
+			$(document.body).on("click", "#send-addr-2", function () {
+				console.log('pressed addr #1 change');
+				var gameId = $('#varb-storage').attr('data-game-id');
+				var userNum = $('#varb-storage').attr('data-user-num');
+				var addrStr = $("#play-1-addr").val();
+				var ballSampTime = $('#varb-storage').attr('data-samp-time');
+				var speedUpFact = $('#varb-storage').attr('data-speed-fact');
+				sendObj2.ball_samp_time = ballSampTime;
+				sendObj2.speed_up_fact = speedUpFact;
+				sendObj2.game_id = gameId;
+				sendObj2.play_num = 2;
+				sendObj2.isAddrChange = true;
+				sendObj2.addrString = addrStr;
+				sendObj2.isGeoChange = false;
+				sendPostAddr();
+			});
+
 			$(document.body).on("click", ".sendButton", function () {
 				sendImageClick(false);
 			});
