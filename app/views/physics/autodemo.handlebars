@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="eng-us">
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Pong 2180</title>
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pong 2180 User Interface</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+
+    <!-- Bootstrap CDN-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!--    <link rel="stylesheet" href="assets/css/maps.css">    -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+
+<body>
+    <script>
+        var sendObj = {
+            ball_samp_time: 0.00,
+            speed_up_fact: 0.00,
+            start_button: 0,
+            stop_button: 0,
+            isDemoMode: 0,
+            hit_01: 0,
+            hit_02: 0,
+            place_ball_1: 0,
+            place_ball_2: 0
+        };
+
+        //post to physics engine that want to fire up a demo game
+        $(document).ready(function () {
+
+            sendObj.ball_samp_time = 0.250;   //sample numbers for the demo
+            sendObj.speed_up_fact = 20.0;    //
+            sendObj.start_button = true;
+            sendObj.stop_button = false;
+            sendObj.isDemoMode = 1;         //run in demo mode
+
+            //subroutine to post 
+            $.post("/physics/start/1",
+                sendObj,
+                function (data, status) {
+                    if (data.errCode === 0) {
+                        //there is no error
+                        window.location.href = "https://richbu.github.io/Pong2180_user_demo/demo.html"
+                    } else {
+                        //what to do with error ?
+                    };
+                });
+        }); //document ready
+    </script>
+
+</body>

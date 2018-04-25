@@ -31,6 +31,12 @@ momentDurationFormatSetup(moment);  //setup formatting for durations
 console.log('physics controller is loaded...');
 
 
+router.get('/start_auto_demo', function(req,res) {
+  //entry point to fire up the demo game.
+  //render a page which will auto-post to the server engine
+  res.render('../app/views/physics/autodemo');
+});
+
 
 router.get('/', function (req, res) {
   console.log("at the physics engine");
