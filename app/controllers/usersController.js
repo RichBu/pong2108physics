@@ -175,7 +175,7 @@ router.get('/mobile/:user/:super', function (req, res) {
       speed_up_fact: response[0].speed_up_fact,
       isRunning: isRunning_str,
       user_num: req.params.user,
-      super-user: superUser-m
+      super_user: superUser
     });
 
   });
