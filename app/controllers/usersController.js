@@ -147,9 +147,10 @@ var writeAuditLog = function (_typeRec, _user_name, _user_email, _fault, _browse
 
 
 
-router.get('/mobile/:user', function (req, res) {
+router.get('/mobile/:user/:super', function (req, res) {
   console.log("at the mobile user");
 
+  var superUser = parseInt(req.params.super);
   //don't have the device id 
   var query = "SELECT * FROM engine_stats";
 
@@ -173,7 +174,8 @@ router.get('/mobile/:user', function (req, res) {
       samp_time_ball: response[0].samp_time_ball,
       speed_up_fact: response[0].speed_up_fact,
       isRunning: isRunning_str,
-      user_num : req.params.user
+      user_num: req.params.user,
+      super-user: superUser-m
     });
 
   });
@@ -197,7 +199,7 @@ router.post('/mobile/hit', function (req, res) {
 
   //turn off the ball placement
   var fbo = fbase_ballpos_outputObj;
-  
+
 
   var player_hit;
   if (button_hit_01 == 1) {
@@ -419,23 +421,23 @@ router.post('/deleteAllPics', function (req, res) {
       console.log("  no pics found in the uplaod");
     } else {
       //run the query deleting the same records just found
-      console.log( "  found pics starting to delete" );
+      console.log("  found pics starting to delete");
       var endVal = response.length;
-      for (var i=0; i<endVal; i++) {
+      for (var i = 0; i < endVal; i++) {
         //loop thru all the files
-        fs.unlinkSync( response[i].filepathUpload );
-        recIDnum.push( response[i].upload_id );
+        fs.unlinkSync(response[i].filepathUpload);
+        recIDnum.push(response[i].upload_id);
       };
 
       var query2 = "DELETE FROM uploads WHERE user_id = ?";
-      var searchArray = [ user_id ];
+      var searchArray = [user_id];
       connection.query(query2, searchArray, function (err2, response2) {
         //can't really stop returning the sendback because it could have been
         //blank already.
       });
     };
 
-    writeAuditLog( "Del pics", "User id=" + user_id, " ", " ", " ", " ");
+    writeAuditLog("Del pics", "User id=" + user_id, " ", " ", " ", " ");
 
     //send back the imgSource
     res.send({
@@ -611,7 +613,7 @@ router.get('/getAllPics/:user_id', function (req, res) {
       };
       res.render('../app/views/users/allpics', {
         outputLines: outputLine,
-        user_id : _user_id
+        user_id: _user_id
       });
     };
   });
