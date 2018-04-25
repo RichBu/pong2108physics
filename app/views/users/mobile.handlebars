@@ -2,66 +2,67 @@
 
 -->
 <div id="varb-storage" data-time-started="{{time_started}}" data-samp-time="{{samp_time_ball}}" data-is-running="{{isRunning}}"
- data-time-stopped="{{time_stopped}}" data-speed-fact="{{speed_up_fact}}" data-user-num="{{user_num}}" data-super-user="{{super_user}}" data-game-id="{{game_id}}"  >
-
+ data-time-stopped="{{time_stopped}}" data-speed-fact="{{speed_up_fact}}" data-user-num="{{user_num}}" data-super-user="{{super_user}}"
+ data-game-id="{{game_id}}">
 </div>
+
 <br/>
 
 <div id="varb-in" data-tim-int={{commTimeInt}}></div>
-	<div class="row">
-		<div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-3">
-			<h4>Engine Running</h4>
-			<h5 id="is_started">{{isRunning}} </h5>
-		</div>
-		<div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-3">
-			<h5 id="is_started">{{isRunning}} </h5>
-		</div>
-		<div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-3">
-			<h5 id="time_elapsed">{{time_elapsed}}</h5>
-		</div>
+<div class="row">
+	<div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-3">
+		<h4>Engine Running</h4>
+		<h5 id="is_started">{{isRunning}} </h5>
 	</div>
-	<div class="row">
-		<div class="col-md-6 col-lg-12">
-			<button class='jumbotron btn-large btn-danger' style="float: left;" id="btn-hit-1">Hit Ball</button>
-			<button class='jumbotron btn-large btn-success' style="float: right;" id="btn-start-game">Start Game</button>
-			<button class='jumbotron btn-large btn-warning' style="float: right;" id="btn-serve-1">Serve</button>
-		</div>
+	<div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-3">
+		<h5 id="is_started">{{isRunning}} </h5>
 	</div>
-	<div class="row">
-		<div class="col-md-6 col-lg-12">
-			<button class='btn-large btn-warning' style="float: right; margin: 5px;" id="btn-stats" onclick="location.href='https://richbu.github.io/Pong2180_user_demo/demo.html'">stats</button>
-			<button class='btn-large btn-warning' style="float: right; margin: 5px;" id="btn-user-2" onclick="location.href='https://pong2180-physics.herokuapp.com/users/mobile/2/1'">user 2</button>
-			<button class='btn-large btn-warning' style="float: right; margin: 5px;" id="btn-user-1" onclick="location.href='https://pong2180-physics.herokuapp.com/users/mobile/1/1'">user 1</button>
-		</div>
+	<div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-3">
+		<h5 id="time_elapsed">{{time_elapsed}}</h5>
 	</div>
+</div>
+<div class="row">
+	<div class="col-md-6 col-lg-12">
+		<button class='jumbotron btn-large btn-danger' style="float: left;" id="btn-hit-1">Hit Ball</button>
+		<button class='jumbotron btn-large btn-success' style="float: right;" id="btn-start-game">Start Game</button>
+		<button class='jumbotron btn-large btn-warning' style="float: right;" id="btn-serve-1">Serve</button>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-6 col-lg-12">
+		<button class='btn-large btn-warning' style="float: right; margin: 5px;" id="btn-stats" onclick="location.href='https://richbu.github.io/Pong2180_user_demo/demo.html'">stats</button>
+		<button class='btn-large btn-warning' style="float: right; margin: 5px;" id="btn-user-2" onclick="location.href='https://pong2180-physics.herokuapp.com/users/mobile/2/1'">user 2</button>
+		<button class='btn-large btn-warning' style="float: right; margin: 5px;" id="btn-user-1" onclick="location.href='https://pong2180-physics.herokuapp.com/users/mobile/1/1'">user 1</button>
+	</div>
+</div>
 
-	<div class="row">
-		<div class="col-xl-6 col-lg-6 col-md-6 col-sm-8 col-xs-12">
-			<input style="width: 90%; margin: 5px 0px 5px 0px;" class="form-control" type="text" name="play-addr-1" id="play-addr-1"
-			 placeholder="player address">
-		</div>
-		<div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6">
-			<button class='btn-large btn-warning' style="float: left; margin: 5px;" id="send-addr-1">change address</button>
-		</div>
+<div class="row">
+	<div class="col-xl-6 col-lg-6 col-md-6 col-sm-8 col-xs-12">
+		<input style="width: 90%; margin: 5px 0px 5px 0px;" class="form-control" type="text" name="play-addr-1" id="play-addr-1"
+		 placeholder="player address">
 	</div>
-	<div class="row">
-		<div class="col-xl-6 col-lg-6 col-md-6 col-sm-8 col-xs-12">
-			<input style="width: 90%; margin: 5px 0px 5px 0px;" class="form-control" type="text" name="play-addr-2" id="play-addr-2"
-			 placeholder="player 2 address">
-		</div>
-		<div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6">
-			<button class='btn-large btn-warning' style="float: left; margin: 5px;" id="send-addr-2">change address #2</button>
-		</div>
+	<div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6">
+		<button class='btn-large btn-warning' style="float: left; margin: 5px;" id="send-addr-1">change address</button>
 	</div>
+</div>
+<div class="row">
+	<div class="col-xl-6 col-lg-6 col-md-6 col-sm-8 col-xs-12">
+		<input style="width: 90%; margin: 5px 0px 5px 0px;" class="form-control" type="text" name="play-addr-2" id="play-addr-2"
+		 placeholder="player 2 address">
+	</div>
+	<div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6">
+		<button class='btn-large btn-warning' style="float: left; margin: 5px;" id="send-addr-2">change address #2</button>
+	</div>
+</div>
 
-	<div class="row">
-		<br/>
-	</div>
+<div class="row">
+	<br/>
+</div>
 
-	<div id="div-full-stats">
-		<iframe src="https://richbu.github.io/Pong2180_user_demo/" width="490px" height="1095px" allowfullscreen="true">
-		</iframe>
-	</div>
+<div id="div-full-stats">
+	<iframe src="https://richbu.github.io/Pong2180_user_demo/" width="490px" height="1095px" allowfullscreen="true">
+	</iframe>
+</div>
 
 
 
