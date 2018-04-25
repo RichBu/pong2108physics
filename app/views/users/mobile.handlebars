@@ -32,14 +32,16 @@
 	</div>
 
 	<div class="row">
-		<div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+		<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-12">
 			<input style="width: 90%; margin: 5px 0px 5px 0px;" class="form-control" type="text" name="play-addr-1" id="play-addr-1"
 			 placeholder="player address">
 		</div>
 		<div class="col-xl-3 col-lg-3 col-md-3 col-sm-6 col-xs-6">
 			<button class='btn-large btn-warning' style="float: left; margin: 5px;" id="send-addr-1">change address</button>
 		</div>
-		<div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+	</div>
+	<div class="row">
+		<div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-12">
 			<input style="width: 90%; margin: 5px 0px 5px 0px;" class="form-control" type="text" name="play-addr-2" id="play-addr-2"
 			 placeholder="player 2 address">
 		</div>
@@ -234,7 +236,7 @@
 			} else {
 				$('#play-addr-2').css('display', 'block');
 				$('#send-addr-2').css('display', 'block');
-				$('#play-addr-1').css('placeholder', 'player #1 address');
+				$('#play-addr-1').attr('placeholder', 'player #1 address');
 				$('#send-addr-1').text('change address #1');
 			};
 
