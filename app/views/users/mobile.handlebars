@@ -31,8 +31,8 @@
 	<div class="row">
 		<div class="col-md-6 col-lg-12">
 			<button class='btn-large btn-warning' style="float: right; margin: 5px;" id="btn-stats" onclick="location.href='https://richbu.github.io/Pong2180_user_demo/demo.html'">stats</button>
-			<button class='btn-large btn-warning' style="float: right; margin: 5px;" id="btn-user-2" onclick="location.href='https://pong2180-physics.herokuapp.com/users/mobile/2'">user 2</button>
-			<button class='btn-large btn-warning' style="float: right; margin: 5px;" id="btn-user-1" onclick="location.href='https://pong2180-physics.herokuapp.com/users/mobile/1'">user 1</button>
+			<button class='btn-large btn-warning' style="float: right; margin: 5px;" id="btn-user-2" onclick="location.href='https://pong2180-physics.herokuapp.com/users/mobile/2/1'">user 2</button>
+			<button class='btn-large btn-warning' style="float: right; margin: 5px;" id="btn-user-1" onclick="location.href='https://pong2180-physics.herokuapp.com/users/mobile/1/1'">user 1</button>
 		</div>
 	</div>
 
@@ -344,7 +344,7 @@
 				sendObj2.ball_samp_time = ballSampTime;
 				sendObj2.speed_up_fact = speedUpFact;
 				sendObj2.game_id = gameId;
-				sendObj2.play_num = 1;
+				sendObj2.play_num = userNum;  //if it is user #2 need to convey it here
 				sendObj2.isAddrChange = true;
 				sendObj2.addrString = addrStr;
 				sendObj2.isGeoChange = false;
@@ -352,7 +352,7 @@
 			});
 
 			$(document.body).on("click", "#send-addr-2", function () {
-				console.log('pressed addr #1 change');
+				console.log('pressed addr #2 change');
 				var gameId = $('#varb-storage').attr('data-game-id');
 				var userNum = $('#varb-storage').attr('data-user-num');
 				var addrStr = $("#play-addr-2").val();
