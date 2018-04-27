@@ -22,10 +22,11 @@
 
 
 <h2> Administrators List </h2>
-<button class='btn btn-primary' id="btn-log">Audit Log</button>
-<button class='btn btn-primary btn-users' id="btn-users">User List</button>
-<button class='btn btn-primary btn-users' id="btn-add">Add User</button>
-<button class='btn btn-primary' id="btn-admin-physics">Physics Engine</button>
+<button class='btn btn-warning' id="btn-log">Audit Log</button>
+<button class='btn btn-warning btn-users' id="btn-users">User List</button>
+<button class='btn btn-warning btn-users' id="btn-add">Add User</button>
+<button class='btn btn-warning' id="btn-admin-physics">Physics Engine</button>
+<button class='btn btn-warning' id="btn-mobile-super">Super User</button>
 <hr>
 
 <table style="width:100%" class="table table-bordered table-condensed table-hover">
@@ -92,6 +93,9 @@
 		});
 		$(document.body).on("click", "#btn-admin-physics", function () {
 			window.location = "/physics";
+		});
+		$(document.body).on("click", "#btn-mobile-super", function () {
+			window.location = "/users/mobile/1/1";
 		});
 		$(document.body).on("click", "#btn-admin-pics", function () {
 			window.location = "/admin/files";
