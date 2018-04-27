@@ -1128,68 +1128,6 @@ var startConnection = function () {
     // '.info/connected' is a boolean value, true if the client is connected and false if they are not.
     connectedRef = database.ref(".info/connected");
 
-    /*
-    // When the client's connection state changes...
-    connectedRef.on("value", function (snap) {
-        // If they are connected..
-        if (snap.val()) {   //executes with the value is finally set to true
- 
-            // Add user to the connections list.
-            var con = connectionsRef.push(true);
- 
-            // Remove user from the connection list when they disconnect.
-            con.onDisconnect().remove();
-        }
-    });
-    */
-
-    /*
-    dbRefreshScreenBit.on("value", function (snap) {
-        //refresh bit has been triggers
-        console.log(snap);
-        // If they are connected..
-        if (snap.val()) {   //executes with the value is finally set to true
-            connectionObj.refreshScreenBit = true;
-        } else {
-            connectionObj.refreshScreenBit = false;
-        };
-        //refresh the user list
-        //make sure that it doesn't pop the window open
-        dispAllUsersOnPage_start(true);
-    });
-    */
-
-    /*
-    // When first loaded or when the connections list changes...
-    connectionsRef.on("value", function (snap) {
-        // Display the viewer count in the html.
-        // The number of online users is the number of children in the connections list.
-        connectionObj.currNumberOfConn = snap.numChildren();
-        $("#numUsers").text(connectionObj.currNumberOfConn + " active connections");
-        //only change the user name if the linkActice switches
-        if (connectionObj.linkActive === false) {
-            connectionObj.linkActive = true;  //link is active
-            connectionObj.currUserRec.outRec.ID = configData.firebaseStorage + moment().valueOf();
-            dbUserStorageArea = database.ref(connectionObj.currUserRec.outRec.ID);
-            dbUserStorageArea.onDisconnect().remove();
-            console.log("started the connection");
-            connectionObj.writeCurrUserRec();
-            //            dispAllUsersOnPage_start(true);   //refresh entire area
-            showLinkButtonStatus();
- 
-            //now get the incoming record's location and set a listener on it
-            dbIncomingRec = database.ref(connectionObj.currUserRec.outRec.ID + "/inRec");
-            dbIncomingRec.on("value", function (snap) {
-                //a new incoming record
-                //store the record to memory
-                connectionObj.writeDBtoInRec(snap);
-                evalIncomingRec();
-            });
-        };
-        console.log("new connection detected");
-        //setTimeout(dispAllUsersOnPage_start(true), 5000);
-    });
-    */
     clearHitMissFirebaseObj();  //write the record once on startup
 };
 

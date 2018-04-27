@@ -31,8 +31,9 @@
 <table style="width:100%" class="table table-bordered table-condensed table-hover">
 	<tr>
 		<strong>
-			<th>User id</th>
-			<th>User Name</th>
+			<th>Admin id</th>
+			<th>Name as stored</th>
+			<th>Name decrypted</th>
 			<th>Email as stored</th>
 			<th>Email decrypted</th>
 			<th>Password hash</th>
@@ -42,6 +43,9 @@
 	<tr>
 		<td>
 			<h5>{{this.id}}</h5>
+		</td>
+		<td>
+			<h5>{{this.name_hash}}</h5>
 		</td>
 		<td>
 			<h5>{{this.name}}</h5>
